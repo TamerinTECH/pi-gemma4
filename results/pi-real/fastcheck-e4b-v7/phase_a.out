@@ -1,0 +1,90 @@
+=== build v7 2026-10-06T21:12:58+02:00
+drwxr-xr-x 2 pi pi    32768 Oct  6 21:13 .
+drwxr-xr-x 6 pi pi    32768 Oct  6 21:13 ..
+-rwxr-xr-x 1 pi pi  9894608 Oct  6 21:13 llama-bench
+-rwxr-xr-x 1 pi pi  9816608 Oct  6 21:13 llama-completion
+-rwxr-xr-x 1 pi pi 16153624 Oct  6 21:13 llama-server
+-rwxr-xr-x 1 pi pi    23343 Oct  6 21:13 pigemma-fast-v7.patch
+-rwxr-xr-x 1 pi pi      328 Oct  6 21:13 SHA256SUMS
+FAST_BUILD_DONE
+=== fastcheck E2B 2026-10-06T21:13:02+02:00
+[health 21:13:02] active active active active  temp=57.6'C throttled=0x0 free= 2.3G
+=== build the tool in the patched tree 2026-10-06T21:13:02+02:00
+=== build the tool in an unpatched reference copy 2026-10-06T21:13:07+02:00
+[health 21:13:12] active active active active  temp=58.7'C throttled=0x0 free= 2.3G
+[health 21:20:02] active active active active  temp=70.3'C throttled=0x0 free= 1.6G
+=== compare REF vs OFF --require-kv-equal --tol-kl 0 --tol-abs 0
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs S --require-kv-equal
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=137 argmax_different=0 over_tolerance=0 worst_max_abs=5.821e-01 (s3.n513.511+2.last) worst_kl=2.865e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs P 
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=126 argmax_different=0 over_tolerance=0 worst_max_abs=5.722e-06 (s5.unified.seq1.last) worst_kl=4.639e-13 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs C --require-kv-equal
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs SPC 
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=123 argmax_different=0 over_tolerance=0 worst_max_abs=5.821e-01 (s3.n513.511+2.last) worst_kl=2.865e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== controls: the reference against itself
+PAIR s3.n513.513.last | s3.n513.511+2.last : bit_identical=no max|d|=5.648e-01 KL=2.397e-04 argmax same (top logit 24.6177 vs 24.5989)
+PAIR s3.n513.513.last | s3.n513.512+1.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 24.6177 vs 24.6177)
+PAIR s2.b45.last | s2.b1.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s2.b45.last | s2.b3.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s2.b45.last | s2.b7.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s4.reused.last | s4.fresh.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 27.4194 vs 27.4194)
+=== the same controls with all switches on
+PAIR s3.n513.513.last | s3.n513.511+2.last : bit_identical=no max|d|=6.715e-01 KL=2.798e-04 argmax same (top logit 24.6177 vs 24.5715)
+PAIR s2.b45.last | s2.b3.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s2.b45.last | s2.b7.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s4.reused.last | s4.fresh.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 27.4194 vs 27.4194)
+[health 21:20:05] active active active active  temp=68.6'C throttled=0x0 free= 1.6G
+=== FASTCHECK_DONE 2026-10-06T21:20:05+02:00
+=== fastcheck E4B 2026-10-06T21:20:05+02:00
+[health 21:20:05] active active active active  temp=66.4'C throttled=0x0 free= 2.3G
+=== build the tool in the patched tree 2026-10-06T21:20:05+02:00
+=== build the tool in an unpatched reference copy 2026-10-06T21:20:10+02:00
+[health 21:20:16] active active active active  temp=64.8'C throttled=0x0 free= 2.3G
+[health 21:34:58] active active active active  temp=71.4'C throttled=0x0 free= 1.5G
+=== compare REF vs OFF --require-kv-equal --tol-kl 0 --tol-abs 0
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs S --require-kv-equal
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=137 argmax_different=0 over_tolerance=0 worst_max_abs=5.532e-01 (s3.n513.511+2.last) worst_kl=3.558e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs P 
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=126 argmax_different=0 over_tolerance=0 worst_max_abs=5.722e-06 (s5.streams.seq1.step) worst_kl=7.557e-13 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs C --require-kv-equal
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs SPC 
+info A  s7.spec_equals_plain=yes
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=123 argmax_different=0 over_tolerance=0 worst_max_abs=5.532e-01 (s3.n513.511+2.last) worst_kl=3.558e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== controls: the reference against itself
+PAIR s3.n513.513.last | s3.n513.511+2.last : bit_identical=no max|d|=5.608e-01 KL=1.532e-04 argmax same (top logit 26.7084 vs 26.6819)
+PAIR s3.n513.513.last | s3.n513.512+1.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 26.7084 vs 26.7084)
+PAIR s2.b45.last | s2.b1.last : bit_identical=no max|d|=8.629e-01 KL=9.297e-04 argmax same (top logit 26.5542 vs 26.5195)
+PAIR s2.b45.last | s2.b3.last : bit_identical=no max|d|=8.629e-01 KL=9.297e-04 argmax same (top logit 26.5542 vs 26.5195)
+PAIR s2.b45.last | s2.b7.last : bit_identical=no max|d|=8.629e-01 KL=9.297e-04 argmax same (top logit 26.5542 vs 26.5195)
+PAIR s4.reused.last | s4.fresh.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 28.3491 vs 28.3491)
+=== the same controls with all switches on
+PAIR s3.n513.513.last | s3.n513.511+2.last : bit_identical=no max|d|=6.408e-01 KL=2.545e-04 argmax same (top logit 26.7084 vs 26.7420)
+PAIR s2.b45.last | s2.b3.last : bit_identical=no max|d|=8.629e-01 KL=9.297e-04 argmax same (top logit 26.5542 vs 26.5195)
+PAIR s2.b45.last | s2.b7.last : bit_identical=no max|d|=8.629e-01 KL=9.297e-04 argmax same (top logit 26.5542 vs 26.5195)
+PAIR s4.reused.last | s4.fresh.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 28.3491 vs 28.3491)
+[health 21:35:02] active active active active  temp=68.6'C throttled=0x0 free= 1.5G
+=== FASTCHECK_DONE 2026-10-06T21:35:02+02:00
+=== PHASE_A_DONE 2026-10-06T21:35:02+02:00

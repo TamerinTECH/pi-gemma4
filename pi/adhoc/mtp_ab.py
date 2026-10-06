@@ -165,7 +165,13 @@ def main():
                     run["rendered_prompt_error"] = str(e)
                 for p in prompts:
                     body = {"messages": [{"role": "user", "content": p["text"]}], "max_tokens": p.get("max_tokens", a.max_tokens),
-                            "temperature": 0, "cache_prompt": False, **req_extra}
+                            "temperature": 0, "cache_prompt": False, **req_extra, **p.get("extra", {})}
+                    # thermal guard: never start a request at 77 C or more; wait (at most 5 minutes) for 72 C
+                    c0 = time.time()
+                    if (temp_c() or 0) >= 77.0:
+                        while (temp_c() or 0) > 72.0 and time.time() - c0 < 300:
+                            time.sleep(5)
+                    cool_wait = round(time.time() - c0, 1)
                     w0 = time.time()
                     first = {}
                     if a.stream:
@@ -186,7 +192,7 @@ def main():
                            "temp_c": temp_c(), "content": msg.get("content") or "",
                            "reasoning": msg.get("reasoning_content") or "", "finish": ch0.get("finish_reason"),
                            "text_sha256": hashlib.sha256(full.encode("utf-8")).hexdigest(),
-                           "prompt_ms": t.get("prompt_ms"), "gen_ms": t.get("predicted_ms"), **first}
+                           "prompt_ms": t.get("prompt_ms"), "gen_ms": t.get("predicted_ms"), "cool_wait_s": cool_wait, **first}
                     run["requests"].append(rec)
                     print(json.dumps({"config": name, **{x: rec[x] for x in ("id", "gen_n", "gen_tok_s", "wall_tok_s", "draft_n", "draft_n_accepted", "temp_c", "finish")}}), flush=True)
             except Exception as e:  # noqa: BLE001 - keep the other configurations; the error is recorded

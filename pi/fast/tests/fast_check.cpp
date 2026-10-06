@@ -112,6 +112,8 @@ struct harness {
     const llama_vocab * vocab = nullptr;
     int                 n_vocab = 0;
     int                 n_threads = 4;
+    int                 flash = -1;      // --flash auto|on|off (llama_flash_attn_type)
+    bool                kv_q8 = false;   // --kv-type q8_0: quantized KV cache (needs flash attention)
     writer              w;
     std::vector<llama_token> text;  // tokenised corpus, BOS first
 
@@ -126,6 +128,8 @@ struct harness {
         cp.n_threads_batch = n_threads;
         cp.embeddings      = embeddings;
         cp.no_perf         = true;
+        cp.flash_attn_type = (llama_flash_attn_type) flash;
+        if (kv_q8) { cp.type_k = GGML_TYPE_Q8_0; cp.type_v = GGML_TYPE_Q8_0; }
         if (embeddings) cp.pooling_type = LLAMA_POOLING_TYPE_NONE;
         llama_context * ctx = llama_init_from_model(model, cp);
         if (!ctx) { fprintf(stderr, "fastcheck: context creation failed\n"); exit(3); }
@@ -478,6 +482,8 @@ int pair(const std::string & pa, const std::string & na, const std::string & pb,
 int main(int argc, char ** argv) {
     std::string model_path, text_path, out_path, only, cmp_a, cmp_b, json_path;
     int    threads = 4;
+    int    flash = -1;
+    bool   kv_q8 = false;
     bool   require_kv = false;
     double tol_abs = 1e30;   // absolute logit tolerance is off by default: see --tol-kl
     double tol_kl  = 1e-3;   // KL(reference || candidate) of the next-token distribution
@@ -496,6 +502,8 @@ int main(int argc, char ** argv) {
         else if (a == "--tol-kl") tol_kl = atof(next().c_str());
         else if (a == "--pair") { for (int q = 0; q < 4; ++q) pair_args.push_back(next()); }
         else if (a == "--json") json_path = next();
+        else if (a == "--flash") { const std::string v = next(); flash = v == "on" ? 1 : v == "off" ? 0 : -1; }
+        else if (a == "--kv-type") { kv_q8 = next() == "q8_0"; }
         else { fprintf(stderr, "unknown argument %s\n", a.c_str()); return 2; }
     }
     if (pair_args.size() == 4) return pair(pair_args[0], pair_args[1], pair_args[2], pair_args[3]);
@@ -506,6 +514,8 @@ int main(int argc, char ** argv) {
     llama_model_params mp = llama_model_default_params();
     harness h;
     h.n_threads = threads;
+    h.flash     = flash;
+    h.kv_q8     = kv_q8;
     h.model = llama_model_load_from_file(model_path.c_str(), mp);
     if (!h.model) { fprintf(stderr, "fastcheck: cannot load %s\n", model_path.c_str()); return 3; }
     h.vocab   = llama_model_get_vocab(h.model);

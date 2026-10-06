@@ -50,7 +50,11 @@ def agg(run):
     passes = gen - acc
     st = run.get("draft_stats") or []
     d_calls, d_ms = sum(x["calls"] for x in st), sum(x["draft_ms"] for x in st)
+    ms_cycle = 1000 * gen_s / passes if passes else None
+    draft_cycle = d_ms / d_calls if d_calls else None
     return {
+        "verify_ms_per_cycle": round(ms_cycle - draft_cycle, 1) if ms_cycle and draft_cycle else None,
+        "drafted_per_cycle": round(sum(x["drafted"] for x in st) / d_calls, 2) if d_calls else None,
         "requests": len(reqs), "gen_tokens": gen, "prompt_tokens": prm,
         "total_wall_s": round(sum(r["wall_s"] for r in reqs), 2),
         "median_wall_s": round(med([r["wall_s"] for r in reqs]), 2),
@@ -206,7 +210,7 @@ def main():
                 bylang[lang] = {k: x.get(k) for k in ("requests", "decode_tok_s", "tokens_per_cycle", "ms_per_cycle", "acceptance", "total_wall_s")}
             summary["centroids"][n] = dict(s, same_text=f"{ident[0]}/{ident[1]}", by_lang=bylang, diff=ident[2])
             print(f"  {n:10s} total {s.get('total_wall_s')} s | decode {s.get('decode_tok_s')} tok/s | tok/cycle {s.get('tokens_per_cycle')} | ms/cycle {s.get('ms_per_cycle')} | "
-                  f"draft ms/cycle {s.get('draft_ms_per_cycle')} | accepted {s.get('accepted')}/{s.get('drafted')} = {s.get('acceptance')} | same text {ident[0]}/{ident[1]}")
+                  f"draft ms/cycle {s.get('draft_ms_per_cycle')} | verify ms/cycle {s.get('verify_ms_per_cycle')} | accepted {s.get('accepted')}/{s.get('drafted')} = {s.get('acceptance')} | same text {ident[0]}/{ident[1]}")
             print("             " + " | ".join(f"{lang}: {v['decode_tok_s']} tok/s, {v['tokens_per_cycle']} tok/cycle, acc {v['acceptance']}" for lang, v in bylang.items()))
 
     # ---- model screen ----------------------------------------------------------------------------------------
