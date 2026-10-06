@@ -1,0 +1,420 @@
+{
+ "label": "verified-ceiling/e2b_q4_copy",
+ "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+ "model_bytes": 3349516256,
+ "max_tokens": 128,
+ "threads": 4,
+ "configs": {
+  "base": "",
+  "ngram": "--spec-type ngram-mod",
+  "ngram_s": "--spec-type ngram-mod --spec-ngram-mod-n-match 8 --spec-ngram-mod-n-min 4 --spec-ngram-mod-n-max 32",
+  "mtp3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+  "both": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-type ngram-mod,draft-mtp"
+ },
+ "order": [
+  "base",
+  "ngram",
+  "ngram_s",
+  "mtp3",
+  "both"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "base",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18140 --reasoning-budget 0",
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 64.43,
+     "prompt_n": 274,
+     "gen_n": 420,
+     "gen_tok_s": 7.012573309633847,
+     "prompt_tok_s": 58.65876100708101,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 6.52,
+     "temp_c": 69.4,
+     "content": "The user wants me to repeat the provided text exactly, word for word, with no additions or comments.\n\nText to repeat:\n\"The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam fogged the glass. Her neighbour, an old clockmaker named Ilias, arrived as he did every day at half past six, bought two rolls and one small coffee, and told her what the weather would be. He was usually right. Today he said the wind would turn north before noon and that the ferry would be late, and so the people who worked on the island should take the early boat. By seven the square was full of bicycles, delivery vans and schoolchildren carrying instruments for the harvest concert. The mayor had promised that the new library would open before winter, and the builders were already on the scaffolding, fitting the last copper sheets to the roof. Nobody in the town believed the promise, but everybody hoped it was true, because the old library had been closed since the flood two years earlier and the books were still stored in the dry rooms above the fire station.\"",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "dfa128120a6dc9bb754c49fad9235f990d63fa8ebf26c20b88913302ffa1997b"
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 53.95,
+     "prompt_n": 217,
+     "gen_n": 360,
+     "gen_tok_s": 7.125181419225788,
+     "prompt_tok_s": 61.045183563148285,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 6.67,
+     "temp_c": 69.95,
+     "content": "*   **Analyze the request:** The user wants me to correct the spelling mistakes in the provided text and output *only* the full corrected text.\n\n*   **Review the text sentence by sentence for spelling and grammar errors:**\n\n    *   \"A refrigerater keeps food cold by moving heat from the inside of the box to the room outside.\" (Correct)\n    *   \"A liquid called a refrigerant flows through thin pipes inside the walls.\" (Correct)\n    *   \"When the liquid evaporates it absorbes heat from the food compartment, which makes the inside colder.\" (Correct)\n    *   \"A compresser then squeezes the gas, which raises its temperature, and pushes it through the coils at the back of the machine.\" (Correct)\n    *   \"There the gas gives its heat to the air in the kitchen and turns back into a liquid.\" (Correct)\n    *   \"The cycle repeats many times every hour.\" (Correct)\n    *   \"A thermostat measures the temperature inside and switches the compressor on and off, so that the food stays between two and six degrees.\" (Correct)\n    *   \"Because cold air is heavier than warm air, the coldest place is usualy the bottom shelf, and the door is the warmest part.\" (Error: \"usualy\" should be \"usually\")\n    *   \"Opening the door for a long time lets warm, humid air in, and the machine must work harder to remove that heat again.\" (Correct)\n\n*   **Identify the only correction needed:** \"usualy\" -> \"usually\".\n\n*   **Construct the final corrected text:** (Ensure no other changes are made, just the spelling fix.)",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "c80f89289776dc03dd7e5abe3b58d5e5306afd7b4bcc5361220b544f56e620e1"
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 54.17,
+     "prompt_n": 374,
+     "gen_n": 336,
+     "gen_tok_s": 6.9831706421336,
+     "prompt_tok_s": 60.39904388636517,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 6.2,
+     "temp_c": 70.5,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(row)\n    return rows\n\n\ndef sum_column(rows, column):\n    acc = 0.0\n    for row in rows:\n        value = row.get(column, \"\").strip()\n        if not value:\n            continue\n        try:\n            acc += float(value)\n        except ValueError:\n            print(f\"skipping bad value {value!r}\")\n    return acc\n\n\ndef average_column(rows, column):\n    acc = sum_column(rows, column)\n    count = sum(1 for row in rows if row.get(column, \"\").strip())\n    if count == 0:\n        return 0.0\n    return acc / count\n\n\ndef report(path, columns):\n    rows = load_rows(path)\n    lines = []\n    for column in columns:\n        acc = sum_column(rows, column)\n        mean = average_column(rows, column)\n        lines.append(f\"{column}: total={acc:.2f} mean={mean:.2f}\")\n    return \"\\n\".join(lines)\n\n\nif __name__ == \"__main__\":\n    print(report(\"sales.csv\", [\"amount\", \"tax\", \"discount\"]))\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "497fa96e17f1ce4a0946662a02e98d0ee76c16c6ea8e0e2032dfa45adbfe1bfb"
+    }
+   ],
+   "load_s": 5.0,
+   "draft_log": [],
+   "spec_lines": []
+  },
+  {
+   "index": 1,
+   "config": "ngram",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18141 --reasoning-budget 0 --spec-type ngram-mod",
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 28.71,
+     "prompt_n": 274,
+     "gen_n": 420,
+     "gen_tok_s": 17.407326240921133,
+     "prompt_tok_s": 59.084105793325946,
+     "draft_n": 378,
+     "draft_n_accepted": 334,
+     "wall_tok_s": 14.63,
+     "temp_c": 69.4,
+     "content": "The user wants me to repeat the provided text exactly, word for word, with no additions or comments.\n\nText to repeat:\n\"The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam fogged the glass. Her neighbour, an old clockmaker named Ilias, arrived as he did every day at half past six, bought two rolls and one small coffee, and told her what the weather would be. He was usually right. Today he said the wind would turn north before noon and that the ferry would be late, and so the people who worked on the island should take the early boat. By seven the square was full of bicycles, delivery vans and schoolchildren carrying instruments for the harvest concert. The mayor had promised that the new library would open before winter, and the builders were already on the scaffolding, fitting the last copper sheets to the roof. Nobody in the town believed the promise, but everybody hoped it was true, because the old library had been closed since the flood two years earlier and the books were still stored in the dry rooms above the fire station.\"",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "dfa128120a6dc9bb754c49fad9235f990d63fa8ebf26c20b88913302ffa1997b"
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 58.58,
+     "prompt_n": 217,
+     "gen_n": 360,
+     "gen_tok_s": 6.5296042708777415,
+     "prompt_tok_s": 60.38818751394912,
+     "draft_n": 177,
+     "draft_n_accepted": 2,
+     "wall_tok_s": 6.15,
+     "temp_c": 70.5,
+     "content": "*   **Analyze the request:** The user wants me to correct the spelling mistakes in the provided text and output *only* the full corrected text.\n\n*   **Review the text sentence by sentence for spelling and grammar errors:**\n\n    *   \"A refrigerater keeps food cold by moving heat from the inside of the box to the room outside.\" (Correct)\n    *   \"A liquid called a refrigerant flows through thin pipes inside the walls.\" (Correct)\n    *   \"When the liquid evaporates it absorbes heat from the food compartment, which makes the inside colder.\" (Correct)\n    *   \"A compresser then squeezes the gas, which raises its temperature, and pushes it through the coils at the back of the machine.\" (Correct)\n    *   \"There the gas gives its heat to the air in the kitchen and turns back into a liquid.\" (Correct)\n    *   \"The cycle repeats many times every hour.\" (Correct)\n    *   \"A thermostat measures the temperature inside and switches the compressor on and off, so that the food stays between two and six degrees.\" (Correct)\n    *   \"Because cold air is heavier than warm air, the coldest place is usualy the bottom shelf, and the door is the warmest part.\" (Error: \"usualy\" should be \"usually\")\n    *   \"Opening the door for a long time lets warm, humid air in, and the machine must work harder to remove that heat again.\" (Correct)\n\n*   **Identify the only correction needed:** \"usualy\" -> \"usually\".\n\n*   **Construct the final corrected text:** (Ensure no other changes are made, just the spelling fix.)",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "c80f89289776dc03dd7e5abe3b58d5e5306afd7b4bcc5361220b544f56e620e1"
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 48.05,
+     "prompt_n": 374,
+     "gen_n": 336,
+     "gen_tok_s": 7.995337596447339,
+     "prompt_tok_s": 60.93532464760564,
+     "draft_n": 448,
+     "draft_n_accepted": 145,
+     "wall_tok_s": 6.99,
+     "temp_c": 72.7,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(row)\n    return rows\n\n\ndef sum_column(rows, column):\n    acc = 0.0\n    for row in rows:\n        value = row.get(column, \"\").strip()\n        if not value:\n            continue\n        try:\n            acc += float(value)\n        except ValueError:\n            print(f\"skipping bad value {value!r}\")\n    return acc\n\n\ndef average_column(rows, column):\n    acc = sum_column(rows, column)\n    count = sum(1 for row in rows if row.get(column, \"\").strip())\n    if count == 0:\n        return 0.0\n    return acc / count\n\n\ndef report(path, columns):\n    rows = load_rows(path)\n    lines = []\n    for column in columns:\n        acc = sum_column(rows, column)\n        mean = average_column(rows, column)\n        lines.append(f\"{column}: total={acc:.2f} mean={mean:.2f}\")\n    return \"\\n\".join(lines)\n\n\nif __name__ == \"__main__\":\n    print(report(\"sales.csv\", [\"amount\", \"tax\", \"discount\"]))\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "497fa96e17f1ce4a0946662a02e98d0ee76c16c6ea8e0e2032dfa45adbfe1bfb"
+    }
+   ],
+   "load_s": 5.0,
+   "draft_log": [
+    [
+     "0.88360",
+     "334",
+     "378",
+     "56.67"
+    ],
+    [
+     "0.01130",
+     "2",
+     "177",
+     "1.67"
+    ],
+    [
+     "0.32366",
+     "145",
+     "448",
+     "21.71"
+    ]
+   ],
+   "spec_lines": []
+  },
+  {
+   "index": 2,
+   "config": "ngram_s",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18142 --reasoning-budget 0 --spec-type ngram-mod --spec-ngram-mod-n-match 8 --spec-ngram-mod-n-min 4 --spec-ngram-mod-n-max 32",
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 23.26,
+     "prompt_n": 274,
+     "gen_n": 420,
+     "gen_tok_s": 22.58811981342536,
+     "prompt_tok_s": 58.26624740486599,
+     "draft_n": 423,
+     "draft_n_accepted": 361,
+     "wall_tok_s": 18.06,
+     "temp_c": 72.15,
+     "content": "The user wants me to repeat the provided text exactly, word for word, with no additions or comments.\n\nText to repeat:\n\"The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam fogged the glass. Her neighbour, an old clockmaker named Ilias, arrived as he did every day at half past six, bought two rolls and one small coffee, and told her what the weather would be. He was usually right. Today he said the wind would turn north before noon and that the ferry would be late, and so the people who worked on the island should take the early boat. By seven the square was full of bicycles, delivery vans and schoolchildren carrying instruments for the harvest concert. The mayor had promised that the new library would open before winter, and the builders were already on the scaffolding, fitting the last copper sheets to the roof. Nobody in the town believed the promise, but everybody hoped it was true, because the old library had been closed since the flood two years earlier and the books were still stored in the dry rooms above the fire station.\"",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "dfa128120a6dc9bb754c49fad9235f990d63fa8ebf26c20b88913302ffa1997b"
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 51.71,
+     "prompt_n": 217,
+     "gen_n": 360,
+     "gen_tok_s": 7.464048236962698,
+     "prompt_tok_s": 60.29563198435981,
+     "draft_n": 516,
+     "draft_n_accepted": 102,
+     "wall_tok_s": 6.96,
+     "temp_c": 70.5,
+     "content": "*   **Analyze the request:** The user wants me to correct the spelling mistakes in the provided text and output *only* the full corrected text.\n\n*   **Review the text sentence by sentence for spelling and grammar errors:**\n\n    *   \"A refrigerater keeps food cold by moving heat from the inside of the box to the room outside.\" (Correct)\n    *   \"A liquid called a refrigerant flows through thin pipes inside the walls.\" (Correct)\n    *   \"When the liquid evaporates it absorbes heat from the food compartment, which makes the inside colder.\" (Correct)\n    *   \"A compresser then squeezes the gas, which raises its temperature, and pushes it through the coils at the back of the machine.\" (Correct)\n    *   \"There the gas gives its heat to the air in the kitchen and turns back into a liquid.\" (Correct)\n    *   \"The cycle repeats many times every hour.\" (Correct)\n    *   \"A thermostat measures the temperature inside and switches the compressor on and off, so that the food stays between two and six degrees.\" (Correct)\n    *   \"Because cold air is heavier than warm air, the coldest place is usualy the bottom shelf, and the door is the warmest part.\" (Error: \"usualy\" should be \"usually\")\n    *   \"Opening the door for a long time lets warm, humid air in, and the machine must work harder to remove that heat again.\" (Correct)\n\n*   **Identify the only correction needed:** \"usualy\" -> \"usually\".\n\n*   **Construct the final corrected text:** (Ensure no other changes are made, just the spelling fix.)",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "c80f89289776dc03dd7e5abe3b58d5e5306afd7b4bcc5361220b544f56e620e1"
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 32.1,
+     "prompt_n": 374,
+     "gen_n": 336,
+     "gen_tok_s": 12.968823953750773,
+     "prompt_tok_s": 59.703684547441284,
+     "draft_n": 576,
+     "draft_n_accepted": 255,
+     "wall_tok_s": 10.47,
+     "temp_c": 73.25,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(row)\n    return rows\n\n\ndef sum_column(rows, column):\n    acc = 0.0\n    for row in rows:\n        value = row.get(column, \"\").strip()\n        if not value:\n            continue\n        try:\n            acc += float(value)\n        except ValueError:\n            print(f\"skipping bad value {value!r}\")\n    return acc\n\n\ndef average_column(rows, column):\n    acc = sum_column(rows, column)\n    count = sum(1 for row in rows if row.get(column, \"\").strip())\n    if count == 0:\n        return 0.0\n    return acc / count\n\n\ndef report(path, columns):\n    rows = load_rows(path)\n    lines = []\n    for column in columns:\n        acc = sum_column(rows, column)\n        mean = average_column(rows, column)\n        lines.append(f\"{column}: total={acc:.2f} mean={mean:.2f}\")\n    return \"\\n\".join(lines)\n\n\nif __name__ == \"__main__\":\n    print(report(\"sales.csv\", [\"amount\", \"tax\", \"discount\"]))\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "497fa96e17f1ce4a0946662a02e98d0ee76c16c6ea8e0e2032dfa45adbfe1bfb"
+    }
+   ],
+   "load_s": 5.0,
+   "draft_log": [
+    [
+     "0.85343",
+     "361",
+     "423",
+     "26.79"
+    ],
+    [
+     "0.19767",
+     "102",
+     "516",
+     "7.00"
+    ],
+    [
+     "0.44271",
+     "255",
+     "576",
+     "15.17"
+    ]
+   ],
+   "spec_lines": []
+  },
+  {
+   "index": 3,
+   "config": "mtp3",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18143 --reasoning-budget 0 -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 25.37,
+     "prompt_n": 274,
+     "gen_n": 420,
+     "gen_tok_s": 20.273672318811673,
+     "prompt_tok_s": 58.35860253723609,
+     "draft_n": 332,
+     "draft_n_accepted": 308,
+     "wall_tok_s": 16.56,
+     "temp_c": 71.6,
+     "content": "The user wants me to repeat the provided text exactly, word for word, with no additions or comments.\n\nText to repeat:\n\"The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam fogged the glass. Her neighbour, an old clockmaker named Ilias, arrived as he did every day at half past six, bought two rolls and one small coffee, and told her what the weather would be. He was usually right. Today he said the wind would turn north before noon and that the ferry would be late, and so the people who worked on the island should take the early boat. By seven the square was full of bicycles, delivery vans and schoolchildren carrying instruments for the harvest concert. The mayor had promised that the new library would open before winter, and the builders were already on the scaffolding, fitting the last copper sheets to the roof. Nobody in the town believed the promise, but everybody hoped it was true, because the old library had been closed since the flood two years earlier and the books were still stored in the dry rooms above the fire station.\"",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "dfa128120a6dc9bb754c49fad9235f990d63fa8ebf26c20b88913302ffa1997b"
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 22.87,
+     "prompt_n": 217,
+     "gen_n": 360,
+     "gen_tok_s": 18.624836494428088,
+     "prompt_tok_s": 60.60201539402899,
+     "draft_n": 310,
+     "draft_n_accepted": 255,
+     "wall_tok_s": 15.74,
+     "temp_c": 72.15,
+     "content": "*   **Analyze the request:** The user wants me to correct the spelling mistakes in the provided text and output *only* the full corrected text.\n\n*   **Review the text sentence by sentence for spelling and grammar errors:**\n\n    *   \"A refrigerater keeps food cold by moving heat from the inside of the box to the room outside.\" (Correct)\n    *   \"A liquid called a refrigerant flows through thin pipes inside the walls.\" (Correct)\n    *   \"When the liquid evaporates it absorbes heat from the food compartment, which makes the inside colder.\" (Correct)\n    *   \"A compresser then squeezes the gas, which raises its temperature, and pushes it through the coils at the back of the machine.\" (Correct)\n    *   \"There the gas gives its heat to the air in the kitchen and turns back into a liquid.\" (Correct)\n    *   \"The cycle repeats many times every hour.\" (Correct)\n    *   \"A thermostat measures the temperature inside and switches the compressor on and off, so that the food stays between two and six degrees.\" (Correct)\n    *   \"Because cold air is heavier than warm air, the coldest place is usualy the bottom shelf, and the door is the warmest part.\" (Error: \"usualy\" should be \"usually\")\n    *   \"Opening the door for a long time lets warm, humid air in, and the machine must work harder to remove that heat again.\" (Correct)\n\n*   **Identify the only correction needed:** \"usualy\" -> \"usually\".\n\n*   **Construct the final corrected text:** (Ensure no other changes are made, just the spelling fix.)",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "c80f89289776dc03dd7e5abe3b58d5e5306afd7b4bcc5361220b544f56e620e1"
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 22.27,
+     "prompt_n": 374,
+     "gen_n": 336,
+     "gen_tok_s": 20.780572906127762,
+     "prompt_tok_s": 60.89320894185838,
+     "draft_n": 258,
+     "draft_n_accepted": 249,
+     "wall_tok_s": 15.09,
+     "temp_c": 73.25,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(row)\n    return rows\n\n\ndef sum_column(rows, column):\n    acc = 0.0\n    for row in rows:\n        value = row.get(column, \"\").strip()\n        if not value:\n            continue\n        try:\n            acc += float(value)\n        except ValueError:\n            print(f\"skipping bad value {value!r}\")\n    return acc\n\n\ndef average_column(rows, column):\n    acc = sum_column(rows, column)\n    count = sum(1 for row in rows if row.get(column, \"\").strip())\n    if count == 0:\n        return 0.0\n    return acc / count\n\n\ndef report(path, columns):\n    rows = load_rows(path)\n    lines = []\n    for column in columns:\n        acc = sum_column(rows, column)\n        mean = average_column(rows, column)\n        lines.append(f\"{column}: total={acc:.2f} mean={mean:.2f}\")\n    return \"\\n\".join(lines)\n\n\nif __name__ == \"__main__\":\n    print(report(\"sales.csv\", [\"amount\", \"tax\", \"discount\"]))\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "497fa96e17f1ce4a0946662a02e98d0ee76c16c6ea8e0e2032dfa45adbfe1bfb"
+    }
+   ],
+   "load_s": 7.0,
+   "draft_log": [
+    [
+     "0.30000",
+     "3",
+     "10",
+     "1.75"
+    ],
+    [
+     "0.92771",
+     "308",
+     "332",
+     "3.77"
+    ],
+    [
+     "0.82258",
+     "255",
+     "310",
+     "3.45"
+    ],
+    [
+     "0.96512",
+     "249",
+     "258",
+     "3.90"
+    ]
+   ],
+   "spec_lines": [
+    "0.05.275.188 I common_speculative_init_result: loading draft model '/mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf'"
+   ]
+  },
+  {
+   "index": 4,
+   "config": "both",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18144 --reasoning-budget 0 -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-type ngram-mod,draft-mtp",
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 22.1,
+     "prompt_n": 274,
+     "gen_n": 420,
+     "gen_tok_s": 24.038214680074596,
+     "prompt_tok_s": 58.691593029066695,
+     "draft_n": 453,
+     "draft_n_accepted": 388,
+     "wall_tok_s": 19.0,
+     "temp_c": 69.4,
+     "content": "The user wants me to repeat the provided text exactly, word for word, with no additions or comments.\n\nText to repeat:\n\"The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam fogged the glass. Her neighbour, an old clockmaker named Ilias, arrived as he did every day at half past six, bought two rolls and one small coffee, and told her what the weather would be. He was usually right. Today he said the wind would turn north before noon and that the ferry would be late, and so the people who worked on the island should take the early boat. By seven the square was full of bicycles, delivery vans and schoolchildren carrying instruments for the harvest concert. The mayor had promised that the new library would open before winter, and the builders were already on the scaffolding, fitting the last copper sheets to the roof. Nobody in the town believed the promise, but everybody hoped it was true, because the old library had been closed since the flood two years earlier and the books were still stored in the dry rooms above the fire station.\"",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "dfa128120a6dc9bb754c49fad9235f990d63fa8ebf26c20b88913302ffa1997b"
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 24.94,
+     "prompt_n": 217,
+     "gen_n": 360,
+     "gen_tok_s": 16.76665869121704,
+     "prompt_tok_s": 61.608172025915174,
+     "draft_n": 374,
+     "draft_n_accepted": 254,
+     "wall_tok_s": 14.43,
+     "temp_c": 72.15,
+     "content": "*   **Analyze the request:** The user wants me to correct the spelling mistakes in the provided text and output *only* the full corrected text.\n\n*   **Review the text sentence by sentence for spelling and grammar errors:**\n\n    *   \"A refrigerater keeps food cold by moving heat from the inside of the box to the room outside.\" (Correct)\n    *   \"A liquid called a refrigerant flows through thin pipes inside the walls.\" (Correct)\n    *   \"When the liquid evaporates it absorbes heat from the food compartment, which makes the inside colder.\" (Correct)\n    *   \"A compresser then squeezes the gas, which raises its temperature, and pushes it through the coils at the back of the machine.\" (Correct)\n    *   \"There the gas gives its heat to the air in the kitchen and turns back into a liquid.\" (Correct)\n    *   \"The cycle repeats many times every hour.\" (Correct)\n    *   \"A thermostat measures the temperature inside and switches the compressor on and off, so that the food stays between two and six degrees.\" (Correct)\n    *   \"Because cold air is heavier than warm air, the coldest place is usualy the bottom shelf, and the door is the warmest part.\" (Error: \"usualy\" should be \"usually\")\n    *   \"Opening the door for a long time lets warm, humid air in, and the machine must work harder to remove that heat again.\" (Correct)\n\n*   **Identify the only correction needed:** \"usualy\" -> \"usually\".\n\n*   **Construct the final corrected text:** (Ensure no other changes are made, just the spelling fix.)",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "c80f89289776dc03dd7e5abe3b58d5e5306afd7b4bcc5361220b544f56e620e1"
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 31.37,
+     "prompt_n": 374,
+     "gen_n": 336,
+     "gen_tok_s": 13.290482701206898,
+     "prompt_tok_s": 60.75579888920855,
+     "draft_n": 595,
+     "draft_n_accepted": 279,
+     "wall_tok_s": 10.71,
+     "temp_c": 72.7,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(row)\n    return rows\n\n\ndef sum_column(rows, column):\n    acc = 0.0\n    for row in rows:\n        value = row.get(column, \"\").strip()\n        if not value:\n            continue\n        try:\n            acc += float(value)\n        except ValueError:\n            print(f\"skipping bad value {value!r}\")\n    return acc\n\n\ndef average_column(rows, column):\n    acc = sum_column(rows, column)\n    count = sum(1 for row in rows if row.get(column, \"\").strip())\n    if count == 0:\n        return 0.0\n    return acc / count\n\n\ndef report(path, columns):\n    rows = load_rows(path)\n    lines = []\n    for column in columns:\n        acc = sum_column(rows, column)\n        mean = average_column(rows, column)\n        lines.append(f\"{column}: total={acc:.2f} mean={mean:.2f}\")\n    return \"\\n\".join(lines)\n\n\nif __name__ == \"__main__\":\n    print(report(\"sales.csv\", [\"amount\", \"tax\", \"discount\"]))\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "497fa96e17f1ce4a0946662a02e98d0ee76c16c6ea8e0e2032dfa45adbfe1bfb"
+    }
+   ],
+   "load_s": 7.0,
+   "draft_log": [
+    [
+     "0.30000",
+     "3",
+     "10",
+     "1.75"
+    ],
+    [
+     "0.85651",
+     "388",
+     "453",
+     "13.52"
+    ],
+    [
+     "0.67914",
+     "254",
+     "374",
+     "3.42"
+    ],
+    [
+     "0.46891",
+     "279",
+     "595",
+     "5.98"
+    ]
+   ],
+   "spec_lines": [
+    "0.05.229.651 I common_speculative_init_result: loading draft model '/mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf'"
+   ]
+  }
+ ]
+}

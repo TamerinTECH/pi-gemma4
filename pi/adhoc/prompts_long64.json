@@ -1,0 +1,20 @@
+[
+ {
+  "id": "repeat_en",
+  "lang": "en",
+  "max_tokens": 64,
+  "text": "Repeat the following text exactly, word for word, with no additions and no comments.\n\nThe harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam fogged the glass. Her neighbour, an old clockmaker named Ilias, arrived as he did every day at half past six, bought two rolls and one small coffee, and told her what the weather would be. He was usually right. Today he said the wind would turn north before noon and that the ferry would be late, and so the people who worked on the island should take the early boat. By seven the square was full of bicycles, delivery vans and schoolchildren carrying instruments for the harvest concert. The mayor had promised that the new library would open before winter, and the builders were already on the scaffolding, fitting the last copper sheets to the roof. Nobody in the town believed the promise, but everybody hoped it was true, because the old library had been closed since the flood two years earlier and the books were still stored in the dry rooms above the fire station."
+ },
+ {
+  "id": "fix_typos_en",
+  "lang": "en",
+  "max_tokens": 64,
+  "text": "Correct the spelling mistakes in the following text. Output only the full corrected text.\n\nA refrigerater keeps food cold by moving heat from the inside of the box to the room outside. A liquid called a refrigerant flows through thin pipes inside the walls. When the liquid evaporates it absorbes heat from the food compartment, which makes the inside colder. A compresser then squeezes the gas, which raises its temperature, and pushes it through the coils at the back of the machine. There the gas gives its heat to the air in the kitchen and turns back into a liquid. The cycle repeats many times every hour. A thermostat mesures the temperature inside and switches the compressor on and off, so that the food stays between two and six degrees. Because cold air is heavier than warm air, the coldest place is usualy the bottom shelf, and the door is the warmest part. Opening the door for a long time lets warm, humid air in, and the machine must work harder to remove that heat again."
+ },
+ {
+  "id": "code_rename",
+  "lang": "code",
+  "max_tokens": 64,
+  "text": "In the following Python code, rename the variable `total` to `acc` everywhere. Output only the full modified code.\n\n```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(row)\n    return rows\n\n\ndef sum_column(rows, column):\n    total = 0.0\n    for row in rows:\n        value = row.get(column, \"\").strip()\n        if not value:\n            continue\n        try:\n            total += float(value)\n        except ValueError:\n            print(f\"skipping bad value {value!r}\")\n    return total\n\n\ndef average_column(rows, column):\n    total = sum_column(rows, column)\n    count = sum(1 for row in rows if row.get(column, \"\").strip())\n    if count == 0:\n        return 0.0\n    return total / count\n\n\ndef report(path, columns):\n    rows = load_rows(path)\n    lines = []\n    for column in columns:\n        total = sum_column(rows, column)\n        mean = average_column(rows, column)\n        lines.append(f\"{column}: total={total:.2f} mean={mean:.2f}\")\n    return \"\\n\".join(lines)\n\n\nif __name__ == \"__main__\":\n    print(report(\"sales.csv\", [\"amount\", \"tax\", \"discount\"]))\n```"
+ }
+]

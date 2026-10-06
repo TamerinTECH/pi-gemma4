@@ -1,0 +1,4 @@
+repository: https://github.com/ggml-org/llama.cpp
+revision:   a7b94df2c616bc1f62a73b964b4a71cb0dcc488e  (build b11398)
+patch:      pigemma-fast-v4.patch  sha256 dbeaf77a464048292d748fa3dc662c85ed1693219a7debf164e7a888deaf5691
+applier:    apply_patches.py (same result as the patch file; supports --upgrade of an already patched tree)

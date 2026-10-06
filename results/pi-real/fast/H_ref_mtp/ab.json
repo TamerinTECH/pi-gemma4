@@ -1,0 +1,286 @@
+{
+ "label": "fast/H_ref_mtp",
+ "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+ "model_bytes": 3349516256,
+ "max_tokens": 128,
+ "threads": 4,
+ "configs": {
+  "base": "",
+  "mtp3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp"
+ },
+ "order": [
+  "base",
+  "mtp3"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "base",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18194",
+   "requests": [
+    {
+     "id": "en_explain",
+     "lang": "en",
+     "wall_s": 17.32,
+     "prompt_n": 28,
+     "gen_n": 128,
+     "gen_tok_s": 7.563668970250541,
+     "prompt_tok_s": 53.12347032864456,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.39,
+     "temp_c": 67.75,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants a brief explanation (a few sentences) of how a refrigerator keeps food cold.\n2.  **Identify Key Mechanisms:** How does a refrigerator work?\n    *   It uses a cooling system (compressor).\n    *   It moves heat from the inside (food) to the outside (the room).\n    *   It relies on a refrigerant (a fluid that changes state).\n    *   The process involves evaporation and condensation.\n3.  **Draft the Explanation (Focusing on Simplicity and Brevity):",
+     "finish": "length",
+     "text_sha256": "406eb9f74fd638a9b9bd0f21c6155d5d2713e5206dbeb12861783004fd0bbf9d"
+    },
+    {
+     "id": "en_story",
+     "lang": "en",
+     "wall_s": 17.76,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 7.457732420671308,
+     "prompt_tok_s": 54.73221579270721,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.21,
+     "temp_c": 68.85,
+     "content": "",
+     "reasoning": "1.  **Analyze the Request:** The user wants a short story (approx. 100 words) about a lighthouse keeper finding a message in a bottle.\n\n2.  **Identify Key Elements:**\n    *   Protagonist: Lighthouse keeper.\n    *   Setting: Lighthouse (isolated, coastal).\n    *   Plot Device: Message in a bottle.\n    *   Tone: Should be atmospheric, perhaps a little mysterious or reflective.\n\n3.  **Drafting - Focus on Pacing and Imagery (Mental Outline):**\n    *   *Introduction:* Establish the keeper and the",
+     "finish": "length",
+     "text_sha256": "2ee24aff46072402d8cc03da51b8c037622aaaddd1bac31ae22b729b9fb03033"
+    },
+    {
+     "id": "he_explain",
+     "lang": "he",
+     "wall_s": 17.97,
+     "prompt_n": 35,
+     "gen_n": 128,
+     "gen_tok_s": 7.360784810354016,
+     "prompt_tok_s": 48.831531217300316,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.12,
+     "temp_c": 68.85,
+     "content": "",
+     "reasoning": "How to explain how a refrigerator works in a few simple sentences.\n\n1.  **Identify the core function:** Cooling food.\n2.  **Identify the main mechanism:** A cycle of gas/refrigerant moving through coils.\n3.  **Identify the key components:** Compressor, condenser, evaporator.\n4.  **Explain the process simply:** It removes heat from the inside and releases it outside.\n\n*Drafting the explanation (in Hebrew):*\nמקרר פועל על ידי מעבר גז מיוחד (חומר קירור) דרך מערכת של צינ",
+     "finish": "length",
+     "text_sha256": "d0bd3c005abd8e27c290ce45650b4f7ce3fbe17b6a747fda82e0cbd243fb1d88"
+    },
+    {
+     "id": "de_explain",
+     "lang": "de",
+     "wall_s": 17.67,
+     "prompt_n": 32,
+     "gen_n": 128,
+     "gen_tok_s": 7.456270441629614,
+     "prompt_tok_s": 50.720307618665714,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.24,
+     "temp_c": 69.95,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants an explanation of how a refrigerator works, in a few simple sentences (in German).\n2.  **Identify Key Concepts (How a fridge works):**\n    *   It moves heat from inside to outside.\n    *   It uses a cooling cycle (refrigerant).\n    *   It involves evaporation and condensation.\n    *   It has a compressor.\n3.  **Draft the Explanation (Focusing on simplicity):**\n    *   *Step 1: The goal.* A fridge keeps things cold.",
+     "finish": "length",
+     "text_sha256": "0260c5fdb089b5ddeeaa0b9a24c11bef92b5e147c1312cff794c56db45c65547"
+    },
+    {
+     "id": "code_py",
+     "lang": "code",
+     "wall_s": 17.84,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 7.4217886650937155,
+     "prompt_tok_s": 54.99287154902546,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.17,
+     "temp_c": 69.4,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Goal:** Write a Python function that returns the $n$-th Fibonacci number iteratively.\n2.  **Constraints:**\n    *   Must be a Python function.\n    *   Must be iterative (not recursive, though memoization is an optimization, the core requirement is iteration).\n    *   Must have a short docstring.\n    *   Output must be *only* the code.\n3.  **Fibonacci Definition:** $F(0) = 0$, $F(1) = 1$, $F(n) = F(",
+     "finish": "length",
+     "text_sha256": "bc82efd7844dbb14978828aa9fed0adf6b28ff1932b62bdcd0cdab4a8229ab7c"
+    },
+    {
+     "id": "list_tips",
+     "lang": "en",
+     "wall_s": 17.63,
+     "prompt_n": 34,
+     "gen_n": 128,
+     "gen_tok_s": 7.521515086619426,
+     "prompt_tok_s": 45.95302519577341,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.26,
+     "temp_c": 70.5,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants five *practical* tips for learning a new language as an *adult*, presented as a *numbered list*.\n2.  **Identify the Target Audience/Context:** Adult learners often have different constraints (time, motivation, existing learning habits) compared to children or teenagers. The tips should focus on efficiency, overcoming plateaus, and leveraging adult strengths (discipline, critical thinking).\n3.  **Brainstorm Potential Tips (Focusing on Practicality):**\n    *   *Immersion:* Essential, but how to do it practically?",
+     "finish": "length",
+     "text_sha256": "a1ac098c58e0e871e48100565b6988e3541260c85a95821275e29719b7eb9c3e"
+    }
+   ],
+   "load_s": 5.0,
+   "draft_log": [],
+   "spec_lines": []
+  },
+  {
+   "index": 1,
+   "config": "mtp3",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18195 -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "requests": [
+    {
+     "id": "en_explain",
+     "lang": "en",
+     "wall_s": 8.64,
+     "prompt_n": 28,
+     "gen_n": 128,
+     "gen_tok_s": 15.687826580094569,
+     "prompt_tok_s": 51.66385283182493,
+     "draft_n": 137,
+     "draft_n_accepted": 81,
+     "wall_tok_s": 14.81,
+     "temp_c": 68.85,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants a brief explanation (a few sentences) of how a refrigerator keeps food cold.\n2.  **Identify Key Mechanisms:** How does a refrigerator work?\n    *   It uses a cooling system (compressor).\n    *   It moves heat from the inside (food) to the outside (the room).\n    *   It relies on a refrigerant (a fluid that changes state).\n    *   The process involves evaporation and condensation.\n3.  **Draft the Explanation (Focusing on Simplicity and Brevity):",
+     "finish": "length",
+     "text_sha256": "406eb9f74fd638a9b9bd0f21c6155d5d2713e5206dbeb12861783004fd0bbf9d"
+    },
+    {
+     "id": "en_story",
+     "lang": "en",
+     "wall_s": 9.04,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 15.301171636013319,
+     "prompt_tok_s": 54.71522095374102,
+     "draft_n": 139,
+     "draft_n_accepted": 79,
+     "wall_tok_s": 14.17,
+     "temp_c": 71.05,
+     "content": "",
+     "reasoning": "1.  **Analyze the Request:** The user wants a short story (approx. 100 words) about a lighthouse keeper finding a message in a bottle.\n\n2.  **Identify Key Elements:**\n    *   Protagonist: Lighthouse keeper.\n    *   Setting: Lighthouse (isolated, coastal).\n    *   Plot Device: Message in a bottle.\n    *   Tone: Should be atmospheric, perhaps a little mysterious or reflective.\n\n3.  **Drafting - Focus on Pacing and Imagery (Mental Outline):**\n    *   *Introduction:* Establish the keeper and the",
+     "finish": "length",
+     "text_sha256": "2ee24aff46072402d8cc03da51b8c037622aaaddd1bac31ae22b729b9fb03033"
+    },
+    {
+     "id": "he_explain",
+     "lang": "he",
+     "wall_s": 12.22,
+     "prompt_n": 35,
+     "gen_n": 128,
+     "gen_tok_s": 11.075639993211592,
+     "prompt_tok_s": 46.709888883847185,
+     "draft_n": 192,
+     "draft_n_accepted": 61,
+     "wall_tok_s": 10.47,
+     "temp_c": 69.95,
+     "content": "",
+     "reasoning": "How to explain how a refrigerator works in a few simple sentences.\n\n1.  **Identify the core function:** Cooling food.\n2.  **Identify the main mechanism:** A cycle of gas/refrigerant moving through coils.\n3.  **Identify the key components:** Compressor, condenser, evaporator.\n4.  **Explain the process simply:** It removes heat from the inside and releases it outside.\n\n*Drafting the explanation (in Hebrew):*\nמקרר פועל על ידי מעבר גז מיוחד (חומר קירור) דרך מערכת של צינ",
+     "finish": "length",
+     "text_sha256": "d0bd3c005abd8e27c290ce45650b4f7ce3fbe17b6a747fda82e0cbd243fb1d88"
+    },
+    {
+     "id": "de_explain",
+     "lang": "de",
+     "wall_s": 10.04,
+     "prompt_n": 32,
+     "gen_n": 128,
+     "gen_tok_s": 13.48556232511907,
+     "prompt_tok_s": 51.719512155701594,
+     "draft_n": 156,
+     "draft_n_accepted": 73,
+     "wall_tok_s": 12.75,
+     "temp_c": 70.5,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants an explanation of how a refrigerator works, in a few simple sentences (in German).\n2.  **Identify Key Concepts (How a fridge works):**\n    *   It moves heat from inside to outside.\n    *   It uses a cooling cycle (refrigerant).\n    *   It involves evaporation and condensation.\n    *   It has a compressor.\n3.  **Draft the Explanation (Focusing on simplicity):**\n    *   *Step 1: The goal.* A fridge keeps things cold.",
+     "finish": "length",
+     "text_sha256": "0260c5fdb089b5ddeeaa0b9a24c11bef92b5e147c1312cff794c56db45c65547"
+    },
+    {
+     "id": "code_py",
+     "lang": "code",
+     "wall_s": 8.68,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 15.992945977465562,
+     "prompt_tok_s": 54.73498687728689,
+     "draft_n": 133,
+     "draft_n_accepted": 82,
+     "wall_tok_s": 14.75,
+     "temp_c": 71.05,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Goal:** Write a Python function that returns the $n$-th Fibonacci number iteratively.\n2.  **Constraints:**\n    *   Must be a Python function.\n    *   Must be iterative (not recursive, though memoization is an optimization, the core requirement is iteration).\n    *   Must have a short docstring.\n    *   Output must be *only* the code.\n3.  **Fibonacci Definition:** $F(0) = 0$, $F(1) = 1$, $F(n) = F(",
+     "finish": "length",
+     "text_sha256": "bc82efd7844dbb14978828aa9fed0adf6b28ff1932b62bdcd0cdab4a8229ab7c"
+    },
+    {
+     "id": "list_tips",
+     "lang": "en",
+     "wall_s": 9.8,
+     "prompt_n": 34,
+     "gen_n": 128,
+     "gen_tok_s": 13.943848451667382,
+     "prompt_tok_s": 49.36937878801079,
+     "draft_n": 156,
+     "draft_n_accepted": 74,
+     "wall_tok_s": 13.06,
+     "temp_c": 71.6,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants five *practical* tips for learning a new language as an *adult*, presented as a *numbered list*.\n2.  **Identify the Target Audience/Context:** Adult learners often have different constraints (time, motivation, existing learning habits) compared to children or teenagers. The tips should focus on efficiency, overcoming plateaus, and leveraging adult strengths (discipline, critical thinking).\n3.  **Brainstorm Potential Tips (Focusing on Practicality):**\n    *   *Immersion:* Essential, but how to do it practically?",
+     "finish": "length",
+     "text_sha256": "a1ac098c58e0e871e48100565b6988e3541260c85a95821275e29719b7eb9c3e"
+    }
+   ],
+   "load_s": 7.0,
+   "draft_log": [
+    [
+     "1.00000",
+     "5",
+     "5",
+     "3.50"
+    ],
+    [
+     "0.59124",
+     "81",
+     "137",
+     "2.76"
+    ],
+    [
+     "0.56835",
+     "79",
+     "139",
+     "2.68"
+    ],
+    [
+     "0.31771",
+     "61",
+     "192",
+     "1.94"
+    ],
+    [
+     "0.46795",
+     "73",
+     "156",
+     "2.38"
+    ],
+    [
+     "0.61654",
+     "82",
+     "133",
+     "2.82"
+    ],
+    [
+     "0.47436",
+     "74",
+     "156",
+     "2.42"
+    ]
+   ],
+   "spec_lines": [
+    "0.05.293.417 I common_speculative_init_result: loading draft model '/mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf'"
+   ]
+  }
+ ]
+}

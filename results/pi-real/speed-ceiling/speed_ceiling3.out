@@ -1,0 +1,26 @@
+[health 09:01:06] active active active active  temp=temp=50.5'C throttled=0x0 memavail=15826160kB
+=== 5 parallel streams E2B, ik 2026-10-06T09:01:06+02:00
+{"streams": 1, "ok": 1, "wall_s": 12.86, "generated_tokens": 96, "prompt_tokens": 27, "aggregate_gen_tok_s": 7.47, "aggregate_all_tok_s": 9.57, "per_stream_gen_tok_s_mean": 7.98, "per_stream_gen_tok_s_min": 7.98, "per_stream_gen_tok_s_max": 7.98, "prompt_tok_s_mean": 32.93, "temp_c": 63.35, "errors": []}
+{"streams": 2, "ok": 2, "wall_s": 14.54, "generated_tokens": 192, "prompt_tokens": 59, "aggregate_gen_tok_s": 13.2, "aggregate_all_tok_s": 17.26, "per_stream_gen_tok_s_mean": 7.28, "per_stream_gen_tok_s_min": 7.28, "per_stream_gen_tok_s_max": 7.28, "prompt_tok_s_mean": 21.97, "temp_c": 67.2, "errors": []}
+{"streams": 4, "ok": 4, "wall_s": 20.01, "generated_tokens": 384, "prompt_tokens": 117, "aggregate_gen_tok_s": 19.19, "aggregate_all_tok_s": 25.03, "per_stream_gen_tok_s_mean": 5.41, "per_stream_gen_tok_s_min": 5.41, "per_stream_gen_tok_s_max": 5.41, "prompt_tok_s_mean": 12.97, "temp_c": 70.5, "errors": []}
+{"streams": 8, "ok": 8, "wall_s": 37.59, "generated_tokens": 768, "prompt_tokens": 236, "aggregate_gen_tok_s": 20.43, "aggregate_all_tok_s": 26.71, "per_stream_gen_tok_s_mean": 2.89, "per_stream_gen_tok_s_min": 2.89, "per_stream_gen_tok_s_max": 2.89, "prompt_tok_s_mean": 6.84, "temp_c": 71.05, "errors": []}
+{"streams": 16, "ok": 16, "wall_s": 74.29, "generated_tokens": 1536, "prompt_tokens": 462, "aggregate_gen_tok_s": 20.68, "aggregate_all_tok_s": 26.89, "per_stream_gen_tok_s_mean": 1.47, "per_stream_gen_tok_s_min": 1.47, "per_stream_gen_tok_s_max": 1.47, "prompt_tok_s_mean": 3.27, "temp_c": 73.8, "errors": []}
+RUN_DONE /home/pi/pigemma/results/speed-ceiling/par_e2b_ik/run.json
+[health 09:04:34] active active active active  temp=temp=56.5'C throttled=0x0 memavail=15887872kB
+=== 6 parallel streams 26B-A4B UD-Q3_K_M, ik 2026-10-06T09:04:34+02:00
+RUN_DONE /home/pi/pigemma/results/speed-ceiling/par_26b_ik/run.json
+Traceback (most recent call last):
+  File "/home/pi/pigemma/par_throughput.py", line 152, in <module>
+    main()
+    ~~~~^^
+  File "/home/pi/pigemma/par_throughput.py", line 88, in main
+    raise RuntimeError("server exited during load; see server.log")
+RuntimeError: server exited during load; see server.log
+[health 09:07:45] active active active active  temp=temp=51.6'C throttled=0x0 memavail=15875296kB
+=== 7 parallel streams 26B-A4B UD-Q3_K_M, ours (-nr) 2026-10-06T09:07:45+02:00
+{"streams": 1, "ok": 1, "wall_s": 22.02, "generated_tokens": 64, "prompt_tokens": 27, "aggregate_gen_tok_s": 2.91, "aggregate_all_tok_s": 4.13, "per_stream_gen_tok_s_mean": 3.34, "per_stream_gen_tok_s_min": 3.34, "per_stream_gen_tok_s_max": 3.34, "prompt_tok_s_mean": 8.54, "temp_c": 65.55, "errors": []}
+{"streams": 4, "ok": 4, "wall_s": 61.38, "generated_tokens": 256, "prompt_tokens": 117, "aggregate_gen_tok_s": 4.17, "aggregate_all_tok_s": 6.08, "per_stream_gen_tok_s_mean": 1.28, "per_stream_gen_tok_s_min": 1.28, "per_stream_gen_tok_s_max": 1.28, "prompt_tok_s_mean": 2.39, "temp_c": 69.4, "errors": []}
+{"streams": 8, "ok": 8, "wall_s": 104.22, "generated_tokens": 512, "prompt_tokens": 236, "aggregate_gen_tok_s": 4.91, "aggregate_all_tok_s": 7.18, "per_stream_gen_tok_s_mean": 0.79, "per_stream_gen_tok_s_min": 0.79, "per_stream_gen_tok_s_max": 0.79, "prompt_tok_s_mean": 1.19, "temp_c": 73.25, "errors": []}
+RUN_DONE /home/pi/pigemma/results/speed-ceiling/par_26b_ours/run.json
+[health 09:11:03] active active active active  temp=temp=69.7'C throttled=0x0 memavail=15826928kB
+=== SPEED_CEILING_PART3_DONE 2026-10-06T09:11:03+02:00

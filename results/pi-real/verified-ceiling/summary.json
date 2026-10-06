@@ -1,0 +1,896 @@
+[
+ {
+  "file": "results/pi-real/verified-ceiling/e2b_q4_mtp/ab.json",
+  "label": "verified-ceiling/e2b_q4_mtp",
+  "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+  "configs": {
+   "base": "",
+   "mtp3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "mtp2": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-draft-n-max 2",
+   "mtp4": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-draft-n-max 4",
+   "synth3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-draft-n-max 3 --spec-synth-rates 1,1,1",
+   "synth7": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-draft-n-max 7 --spec-synth-rates 1,1,1,1,1,1,1",
+   "synth15": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-draft-n-max 15 --spec-synth-rates 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+  },
+  "rows": [
+   {
+    "config": "base",
+    "index": 0,
+    "error": null,
+    "n_requests": 6,
+    "generated": 768,
+    "drafted": 0,
+    "accepted": 0,
+    "acceptance": null,
+    "decode_tok_s_total": 6.92,
+    "decode_tok_s_median": 6.94,
+    "decode_tok_s_min": 6.8,
+    "decode_tok_s_max": 7.03,
+    "request_tok_s_total": 6.71,
+    "prompt_tok_s_median": 47.9,
+    "passes": 768,
+    "tokens_per_pass": 1.0,
+    "ms_per_pass": 144.5,
+    "text_identical_to_base": 6,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 0,
+    "reasoning_chars": 2962,
+    "finish": [
+     "length"
+    ],
+    "max_temp_c": 70.5,
+    "per_request": {
+     "en_explain": [
+      128,
+      7.03,
+      null,
+      null
+     ],
+     "en_story": [
+      128,
+      6.88,
+      null,
+      null
+     ],
+     "he_explain": [
+      128,
+      6.94,
+      null,
+      null
+     ],
+     "de_explain": [
+      128,
+      6.8,
+      null,
+      null
+     ],
+     "code_py": [
+      128,
+      6.93,
+      null,
+      null
+     ],
+     "list_tips": [
+      128,
+      6.94,
+      null,
+      null
+     ]
+    }
+   },
+   {
+    "config": "mtp3",
+    "index": 1,
+    "error": null,
+    "n_requests": 6,
+    "generated": 768,
+    "drafted": 913,
+    "accepted": 450,
+    "acceptance": 0.493,
+    "decode_tok_s_total": 13.72,
+    "decode_tok_s_median": 14.33,
+    "decode_tok_s_min": 10.95,
+    "decode_tok_s_max": 15.79,
+    "request_tok_s_total": 12.88,
+    "prompt_tok_s_median": 50.8,
+    "passes": 318,
+    "tokens_per_pass": 2.42,
+    "ms_per_pass": 176.0,
+    "text_identical_to_base": 6,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 0,
+    "reasoning_chars": 2962,
+    "finish": [
+     "length"
+    ],
+    "max_temp_c": 71.05,
+    "per_request": {
+     "en_explain": [
+      128,
+      14.91,
+      137,
+      81
+     ],
+     "en_story": [
+      128,
+      15.3,
+      139,
+      79
+     ],
+     "he_explain": [
+      128,
+      10.95,
+      192,
+      61
+     ],
+     "de_explain": [
+      128,
+      12.92,
+      156,
+      73
+     ],
+     "code_py": [
+      128,
+      15.79,
+      133,
+      82
+     ],
+     "list_tips": [
+      128,
+      13.74,
+      156,
+      74
+     ]
+    }
+   },
+   {
+    "config": "mtp2",
+    "index": 2,
+    "error": null,
+    "n_requests": 6,
+    "generated": 768,
+    "drafted": 706,
+    "accepted": 402,
+    "acceptance": 0.569,
+    "decode_tok_s_total": 7.0,
+    "decode_tok_s_median": 7.26,
+    "decode_tok_s_min": 5.91,
+    "decode_tok_s_max": 7.86,
+    "request_tok_s_total": 6.8,
+    "prompt_tok_s_median": 51.1,
+    "passes": 366,
+    "tokens_per_pass": 2.1,
+    "ms_per_pass": 299.6,
+    "text_identical_to_base": 6,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 0,
+    "reasoning_chars": 2962,
+    "finish": [
+     "length"
+    ],
+    "max_temp_c": 72.15,
+    "per_request": {
+     "en_explain": [
+      128,
+      7.67,
+      108,
+      73
+     ],
+     "en_story": [
+      128,
+      7.86,
+      105,
+      73
+     ],
+     "he_explain": [
+      128,
+      5.91,
+      139,
+      56
+     ],
+     "de_explain": [
+      128,
+      6.51,
+      127,
+      62
+     ],
+     "code_py": [
+      128,
+      7.6,
+      108,
+      72
+     ],
+     "list_tips": [
+      128,
+      6.91,
+      119,
+      66
+     ]
+    }
+   },
+   {
+    "config": "mtp4",
+    "index": 3,
+    "error": null,
+    "n_requests": 6,
+    "generated": 768,
+    "drafted": 1140,
+    "accepted": 467,
+    "acceptance": 0.41,
+    "decode_tok_s_total": 9.8,
+    "decode_tok_s_median": 10.41,
+    "decode_tok_s_min": 7.65,
+    "decode_tok_s_max": 11.24,
+    "request_tok_s_total": 9.37,
+    "prompt_tok_s_median": 50.9,
+    "passes": 301,
+    "tokens_per_pass": 2.55,
+    "ms_per_pass": 260.4,
+    "text_identical_to_base": 6,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 0,
+    "reasoning_chars": 2962,
+    "finish": [
+     "length"
+    ],
+    "max_temp_c": 71.6,
+    "per_request": {
+     "en_explain": [
+      128,
+      11.11,
+      166,
+      85
+     ],
+     "en_story": [
+      128,
+      11.1,
+      168,
+      83
+     ],
+     "he_explain": [
+      128,
+      7.65,
+      242,
+      64
+     ],
+     "de_explain": [
+      128,
+      9.12,
+      202,
+      74
+     ],
+     "code_py": [
+      128,
+      11.24,
+      166,
+      84
+     ],
+     "list_tips": [
+      128,
+      9.71,
+      196,
+      77
+     ]
+    }
+   },
+   {
+    "config": "synth3",
+    "index": 4,
+    "error": null,
+    "n_requests": 6,
+    "generated": 768,
+    "drafted": 570,
+    "accepted": 570,
+    "acceptance": 1.0,
+    "decode_tok_s_total": 22.17,
+    "decode_tok_s_median": 22.22,
+    "decode_tok_s_min": 21.77,
+    "decode_tok_s_max": 22.37,
+    "request_tok_s_total": 19.99,
+    "prompt_tok_s_median": 52.1,
+    "passes": 198,
+    "tokens_per_pass": 3.88,
+    "ms_per_pass": 175.0,
+    "text_identical_to_base": 0,
+    "text_differs_from_base": [
+     "en_explain",
+     "en_story",
+     "he_explain",
+     "de_explain",
+     "code_py",
+     "list_tips"
+    ],
+    "visible_answer_chars": 0,
+    "reasoning_chars": 3092,
+    "finish": [
+     "length"
+    ],
+    "max_temp_c": 71.05,
+    "per_request": {
+     "en_explain": [
+      128,
+      22.32,
+      95,
+      95
+     ],
+     "en_story": [
+      128,
+      22.37,
+      95,
+      95
+     ],
+     "he_explain": [
+      128,
+      22.1,
+      95,
+      95
+     ],
+     "de_explain": [
+      128,
+      22.14,
+      95,
+      95
+     ],
+     "code_py": [
+      128,
+      21.77,
+      95,
+      95
+     ],
+     "list_tips": [
+      128,
+      22.31,
+      95,
+      95
+     ]
+    }
+   },
+   {
+    "config": "synth7",
+    "index": 5,
+    "error": null,
+    "n_requests": 6,
+    "generated": 768,
+    "drafted": 666,
+    "accepted": 666,
+    "acceptance": 1.0,
+    "decode_tok_s_total": 24.96,
+    "decode_tok_s_median": 24.97,
+    "decode_tok_s_min": 24.77,
+    "decode_tok_s_max": 25.08,
+    "request_tok_s_total": 22.1,
+    "prompt_tok_s_median": 50.0,
+    "passes": 102,
+    "tokens_per_pass": 7.53,
+    "ms_per_pass": 301.6,
+    "text_identical_to_base": 0,
+    "text_differs_from_base": [
+     "en_explain",
+     "en_story",
+     "he_explain",
+     "de_explain",
+     "code_py",
+     "list_tips"
+    ],
+    "visible_answer_chars": 0,
+    "reasoning_chars": 2947,
+    "finish": [
+     "length"
+    ],
+    "max_temp_c": 69.95,
+    "per_request": {
+     "en_explain": [
+      128,
+      24.97,
+      111,
+      111
+     ],
+     "en_story": [
+      128,
+      24.77,
+      111,
+      111
+     ],
+     "he_explain": [
+      128,
+      24.96,
+      111,
+      111
+     ],
+     "de_explain": [
+      128,
+      25.03,
+      111,
+      111
+     ],
+     "code_py": [
+      128,
+      25.08,
+      111,
+      111
+     ],
+     "list_tips": [
+      128,
+      24.97,
+      111,
+      111
+     ]
+    }
+   },
+   {
+    "config": "synth15",
+    "index": 6,
+    "error": null,
+    "n_requests": 6,
+    "generated": 768,
+    "drafted": 714,
+    "accepted": 714,
+    "acceptance": 1.0,
+    "decode_tok_s_total": 30.79,
+    "decode_tok_s_median": 30.98,
+    "decode_tok_s_min": 29.46,
+    "decode_tok_s_max": 31.43,
+    "request_tok_s_total": 26.59,
+    "prompt_tok_s_median": 50.6,
+    "passes": 54,
+    "tokens_per_pass": 14.22,
+    "ms_per_pass": 461.9,
+    "text_identical_to_base": 0,
+    "text_differs_from_base": [
+     "en_explain",
+     "en_story",
+     "he_explain",
+     "de_explain",
+     "code_py",
+     "list_tips"
+    ],
+    "visible_answer_chars": 0,
+    "reasoning_chars": 2495,
+    "finish": [
+     "length"
+    ],
+    "max_temp_c": 70.5,
+    "per_request": {
+     "en_explain": [
+      128,
+      31.43,
+      119,
+      119
+     ],
+     "en_story": [
+      128,
+      30.94,
+      119,
+      119
+     ],
+     "he_explain": [
+      128,
+      29.46,
+      119,
+      119
+     ],
+     "de_explain": [
+      128,
+      31.02,
+      119,
+      119
+     ],
+     "code_py": [
+      128,
+      30.89,
+      119,
+      119
+     ],
+     "list_tips": [
+      128,
+      31.06,
+      119,
+      119
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "file": "results/pi-real/verified-ceiling/e2b_q2_mtp/ab.json",
+  "label": "verified-ceiling/e2b_q2_mtp",
+  "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B-it-qat-UD-Q2_K_XL.gguf",
+  "configs": {
+   "base": "",
+   "mtp3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp"
+  },
+  "rows": [
+   {
+    "config": "base",
+    "index": 0,
+    "error": null,
+    "n_requests": 6,
+    "generated": 698,
+    "drafted": 0,
+    "accepted": 0,
+    "acceptance": null,
+    "decode_tok_s_total": 11.36,
+    "decode_tok_s_median": 11.38,
+    "decode_tok_s_min": 11.18,
+    "decode_tok_s_max": 11.64,
+    "request_tok_s_total": 10.59,
+    "prompt_tok_s_median": 41.6,
+    "passes": 698,
+    "tokens_per_pass": 1.0,
+    "ms_per_pass": 88.0,
+    "text_identical_to_base": 6,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 1285,
+    "reasoning_chars": 1529,
+    "finish": [
+     "length",
+     "stop"
+    ],
+    "max_temp_c": 69.95,
+    "per_request": {
+     "en_explain": [
+      58,
+      11.64,
+      null,
+      null
+     ],
+     "en_story": [
+      128,
+      11.48,
+      null,
+      null
+     ],
+     "he_explain": [
+      128,
+      11.42,
+      null,
+      null
+     ],
+     "de_explain": [
+      128,
+      11.18,
+      null,
+      null
+     ],
+     "code_py": [
+      128,
+      11.26,
+      null,
+      null
+     ],
+     "list_tips": [
+      128,
+      11.34,
+      null,
+      null
+     ]
+    }
+   },
+   {
+    "config": "mtp3",
+    "index": 1,
+    "error": null,
+    "n_requests": 6,
+    "generated": 698,
+    "drafted": 900,
+    "accepted": 386,
+    "acceptance": 0.429,
+    "decode_tok_s_total": 13.49,
+    "decode_tok_s_median": 13.07,
+    "decode_tok_s_min": 10.85,
+    "decode_tok_s_max": 16.6,
+    "request_tok_s_total": 12.4,
+    "prompt_tok_s_median": 42.0,
+    "passes": 312,
+    "tokens_per_pass": 2.24,
+    "ms_per_pass": 165.9,
+    "text_identical_to_base": 2,
+    "text_differs_from_base": [
+     "he_explain",
+     "de_explain",
+     "code_py",
+     "list_tips"
+    ],
+    "visible_answer_chars": 1282,
+    "reasoning_chars": 1524,
+    "finish": [
+     "length",
+     "stop"
+    ],
+    "max_temp_c": 72.7,
+    "per_request": {
+     "en_explain": [
+      58,
+      10.85,
+      96,
+      25
+     ],
+     "en_story": [
+      128,
+      16.6,
+      136,
+      81
+     ],
+     "he_explain": [
+      128,
+      13.52,
+      164,
+      71
+     ],
+     "de_explain": [
+      128,
+      12.62,
+      176,
+      67
+     ],
+     "code_py": [
+      128,
+      16.58,
+      131,
+      82
+     ],
+     "list_tips": [
+      128,
+      11.26,
+      197,
+      60
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "file": "results/pi-real/verified-ceiling/e2b_q4_copy/ab.json",
+  "label": "verified-ceiling/e2b_q4_copy",
+  "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+  "configs": {
+   "base": "",
+   "ngram": "--spec-type ngram-mod",
+   "ngram_s": "--spec-type ngram-mod --spec-ngram-mod-n-match 8 --spec-ngram-mod-n-min 4 --spec-ngram-mod-n-max 32",
+   "mtp3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "both": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp --spec-type ngram-mod,draft-mtp"
+  },
+  "rows": [
+   {
+    "config": "base",
+    "index": 0,
+    "error": null,
+    "n_requests": 3,
+    "generated": 1116,
+    "drafted": 0,
+    "accepted": 0,
+    "acceptance": null,
+    "decode_tok_s_total": 7.04,
+    "decode_tok_s_median": 7.01,
+    "decode_tok_s_min": 6.98,
+    "decode_tok_s_max": 7.13,
+    "request_tok_s_total": 6.47,
+    "prompt_tok_s_median": 60.4,
+    "passes": 1116,
+    "tokens_per_pass": 1.0,
+    "ms_per_pass": 142.1,
+    "text_identical_to_base": 3,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 3910,
+    "reasoning_chars": 0,
+    "finish": [
+     "length",
+     "stop"
+    ],
+    "max_temp_c": 70.5,
+    "per_request": {
+     "repeat_en": [
+      420,
+      7.01,
+      null,
+      null
+     ],
+     "fix_typos_en": [
+      360,
+      7.13,
+      null,
+      null
+     ],
+     "code_rename": [
+      336,
+      6.98,
+      null,
+      null
+     ]
+    }
+   },
+   {
+    "config": "ngram",
+    "index": 1,
+    "error": null,
+    "n_requests": 3,
+    "generated": 1116,
+    "drafted": 1003,
+    "accepted": 481,
+    "acceptance": 0.48,
+    "decode_tok_s_total": 9.2,
+    "decode_tok_s_median": 8.0,
+    "decode_tok_s_min": 6.53,
+    "decode_tok_s_max": 17.41,
+    "request_tok_s_total": 8.25,
+    "prompt_tok_s_median": 60.4,
+    "passes": 635,
+    "tokens_per_pass": 1.76,
+    "ms_per_pass": 191.0,
+    "text_identical_to_base": 3,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 3910,
+    "reasoning_chars": 0,
+    "finish": [
+     "length",
+     "stop"
+    ],
+    "max_temp_c": 72.7,
+    "per_request": {
+     "repeat_en": [
+      420,
+      17.41,
+      378,
+      334
+     ],
+     "fix_typos_en": [
+      360,
+      6.53,
+      177,
+      2
+     ],
+     "code_rename": [
+      336,
+      8.0,
+      448,
+      145
+     ]
+    }
+   },
+   {
+    "config": "ngram_s",
+    "index": 2,
+    "error": null,
+    "n_requests": 3,
+    "generated": 1116,
+    "drafted": 1515,
+    "accepted": 718,
+    "acceptance": 0.474,
+    "decode_tok_s_total": 12.03,
+    "decode_tok_s_median": 12.97,
+    "decode_tok_s_min": 7.46,
+    "decode_tok_s_max": 22.59,
+    "request_tok_s_total": 10.42,
+    "prompt_tok_s_median": 59.7,
+    "passes": 398,
+    "tokens_per_pass": 2.8,
+    "ms_per_pass": 233.0,
+    "text_identical_to_base": 3,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 3910,
+    "reasoning_chars": 0,
+    "finish": [
+     "length",
+     "stop"
+    ],
+    "max_temp_c": 73.25,
+    "per_request": {
+     "repeat_en": [
+      420,
+      22.59,
+      423,
+      361
+     ],
+     "fix_typos_en": [
+      360,
+      7.46,
+      516,
+      102
+     ],
+     "code_rename": [
+      336,
+      12.97,
+      576,
+      255
+     ]
+    }
+   },
+   {
+    "config": "mtp3",
+    "index": 3,
+    "error": null,
+    "n_requests": 3,
+    "generated": 1116,
+    "drafted": 900,
+    "accepted": 812,
+    "acceptance": 0.902,
+    "decode_tok_s_total": 19.85,
+    "decode_tok_s_median": 20.27,
+    "decode_tok_s_min": 18.62,
+    "decode_tok_s_max": 20.78,
+    "request_tok_s_total": 15.83,
+    "prompt_tok_s_median": 60.6,
+    "passes": 304,
+    "tokens_per_pass": 3.67,
+    "ms_per_pass": 184.9,
+    "text_identical_to_base": 3,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 3910,
+    "reasoning_chars": 0,
+    "finish": [
+     "length",
+     "stop"
+    ],
+    "max_temp_c": 73.25,
+    "per_request": {
+     "repeat_en": [
+      420,
+      20.27,
+      332,
+      308
+     ],
+     "fix_typos_en": [
+      360,
+      18.62,
+      310,
+      255
+     ],
+     "code_rename": [
+      336,
+      20.78,
+      258,
+      249
+     ]
+    }
+   },
+   {
+    "config": "both",
+    "index": 4,
+    "error": null,
+    "n_requests": 3,
+    "generated": 1116,
+    "drafted": 1422,
+    "accepted": 921,
+    "acceptance": 0.648,
+    "decode_tok_s_total": 17.38,
+    "decode_tok_s_median": 16.77,
+    "decode_tok_s_min": 13.29,
+    "decode_tok_s_max": 24.04,
+    "request_tok_s_total": 14.23,
+    "prompt_tok_s_median": 60.8,
+    "passes": 195,
+    "tokens_per_pass": 5.72,
+    "ms_per_pass": 329.4,
+    "text_identical_to_base": 3,
+    "text_differs_from_base": [],
+    "visible_answer_chars": 3910,
+    "reasoning_chars": 0,
+    "finish": [
+     "length",
+     "stop"
+    ],
+    "max_temp_c": 72.7,
+    "per_request": {
+     "repeat_en": [
+      420,
+      24.04,
+      453,
+      388
+     ],
+     "fix_typos_en": [
+      360,
+      16.77,
+      374,
+      254
+     ],
+     "code_rename": [
+      336,
+      13.29,
+      595,
+      279
+     ]
+    }
+   }
+  ]
+ }
+]

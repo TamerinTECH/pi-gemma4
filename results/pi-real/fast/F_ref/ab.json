@@ -1,0 +1,76 @@
+{
+ "label": "fast/F_ref",
+ "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+ "model_bytes": 3349516256,
+ "max_tokens": 64,
+ "threads": 4,
+ "configs": {
+  "base": ""
+ },
+ "order": [
+  "base"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "base",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18180 --reasoning-budget 0",
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 13.5,
+     "prompt_n": 274,
+     "gen_n": 64,
+     "gen_tok_s": 7.144589827396916,
+     "prompt_tok_s": 58.606993054857426,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 4.74,
+     "temp_c": 70.5,
+     "content": "The user wants me to repeat the provided text exactly, word for word, with no additions or comments.\n\nText to repeat:\n\"The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "1d1c74326182c35a2c3e56965d2b93c5b176b6c3dcc134e0f4003dabada33dba"
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 12.11,
+     "prompt_n": 217,
+     "gen_n": 64,
+     "gen_tok_s": 7.346485563747729,
+     "prompt_tok_s": 61.463894352346166,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 5.28,
+     "temp_c": 70.5,
+     "content": "*   **Analyze the request:** The user wants me to correct the spelling mistakes in the provided text and output *only* the full corrected text.\n\n*   **Review the text sentence by sentence for spelling and grammar errors:**\n\n    *   \"A refrigerater keeps food cold by moving heat from",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "98ae813bfad3ae5f40f2acd17cac80f937d6a0697f9ac1911cc955d216829321"
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 14.9,
+     "prompt_n": 374,
+     "gen_n": 64,
+     "gen_tok_s": 7.213756427399725,
+     "prompt_tok_s": 60.74114592232019,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 4.3,
+     "temp_c": 71.6,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "e87296e32e946e0788d40699d97865670494fae3eb4be0ecac5333c12384c31e"
+    }
+   ],
+   "load_s": 5.0,
+   "draft_log": [],
+   "spec_lines": []
+  }
+ ]
+}

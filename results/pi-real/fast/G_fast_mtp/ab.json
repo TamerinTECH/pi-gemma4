@@ -1,0 +1,103 @@
+{
+ "label": "fast/G_fast_mtp",
+ "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+ "model_bytes": 3349516256,
+ "max_tokens": 128,
+ "threads": 4,
+ "configs": {
+  "mtp3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp"
+ },
+ "order": [
+  "mtp3"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "mtp3",
+   "command": "nice -n 10 /mnt/usb/pigemma/fast/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18192 --reasoning-budget 0 -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 5.44,
+     "prompt_n": 274,
+     "gen_n": 64,
+     "gen_tok_s": 16.91285610622562,
+     "prompt_tok_s": 159.95189767748676,
+     "draft_n": 60,
+     "draft_n_accepted": 42,
+     "wall_tok_s": 11.76,
+     "temp_c": 69.4,
+     "content": "The user wants me to repeat the provided text exactly, word for word, with no additions or comments.\n\nText to repeat:\n\"The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "1d1c74326182c35a2c3e56965d2b93c5b176b6c3dcc134e0f4003dabada33dba"
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 4.86,
+     "prompt_n": 217,
+     "gen_n": 64,
+     "gen_tok_s": 17.741950927453445,
+     "prompt_tok_s": 167.35007708129126,
+     "draft_n": 58,
+     "draft_n_accepted": 43,
+     "wall_tok_s": 13.18,
+     "temp_c": 69.95,
+     "content": "*   **Analyze the request:** The user wants me to correct the spelling mistakes in the provided text and output *only* the full corrected text.\n\n*   **Review the text sentence by sentence for spelling and grammar errors:**\n\n    *   \"A refrigerater keeps food cold by moving heat from",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "98ae813bfad3ae5f40f2acd17cac80f937d6a0697f9ac1911cc955d216829321"
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 5.49,
+     "prompt_n": 374,
+     "gen_n": 64,
+     "gen_tok_s": 19.33524803440324,
+     "prompt_tok_s": 168.201316287734,
+     "draft_n": 51,
+     "draft_n_accepted": 46,
+     "wall_tok_s": 11.66,
+     "temp_c": 71.05,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "e87296e32e946e0788d40699d97865670494fae3eb4be0ecac5333c12384c31e"
+    }
+   ],
+   "load_s": 7.0,
+   "draft_log": [
+    [
+     "0.30000",
+     "3",
+     "10",
+     "1.75"
+    ],
+    [
+     "0.70000",
+     "42",
+     "60",
+     "3.10"
+    ],
+    [
+     "0.74138",
+     "43",
+     "58",
+     "3.15"
+    ],
+    [
+     "0.90196",
+     "46",
+     "51",
+     "3.71"
+    ]
+   ],
+   "spec_lines": [
+    "0.05.151.304 I common_speculative_init_result: loading draft model '/mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf'"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,110 @@
+[health 12:26:45] active active active active  temp=46.9C throttled=0x0 memavail=15782560kB
+=== 1 eval rate vs tokens per pass, E2B QAT Q4_0 2026-10-06T12:26:45+02:00
+| model                          |       size |     params | backend    | threads | n_batch |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | ------: | --------------: | -------------------: |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       1 |           pp512 |          7.07 ± 0.14 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       2 |           pp512 |         10.26 ± 0.01 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       4 |           pp512 |         25.78 ± 0.12 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       8 |           pp512 |         34.88 ± 0.00 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |      16 |           pp512 |         57.67 ± 0.76 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |      32 |           pp512 |         61.84 ± 0.11 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |      64 |           pp512 |         55.57 ± 0.22 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |     128 |           pp512 |         62.02 ± 0.23 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |     512 |           pp512 |         60.90 ± 0.39 |
+
+build: a7b94df (1)
+[health 12:37:40] active active active active  temp=59.5C throttled=0x0 memavail=15829632kB
+=== 2 llama-bench E2B QAT 2-bit (UD-Q2_K_XL) 2026-10-06T12:37:40+02:00
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| gemma4 E2B Q4_0                |   2.02 GiB |     4.63 B | CPU        |       4 |           pp512 |         41.35 ± 0.19 |
+| gemma4 E2B Q4_0                |   2.02 GiB |     4.63 B | CPU        |       4 |           tg128 |         10.66 ± 0.09 |
+
+build: a7b94df (1)
+| model                          |       size |     params | backend    | threads | n_batch |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | ------: | --------------: | -------------------: |
+| gemma4 E2B Q4_0                |   2.02 GiB |     4.63 B | CPU        |       4 |       4 |           pp512 |         30.06 ± 0.38 |
+| gemma4 E2B Q4_0                |   2.02 GiB |     4.63 B | CPU        |       4 |       8 |           pp512 |         35.65 ± 0.11 |
+| gemma4 E2B Q4_0                |   2.02 GiB |     4.63 B | CPU        |       4 |      16 |           pp512 |         42.00 ± 0.10 |
+
+build: a7b94df (1)
+[health 12:42:03] active active active active  temp=60.0C throttled=0x0 memavail=15818496kB
+=== 3 MTP real and synthetic acceptance, E2B QAT Q4_0 2026-10-06T12:42:03+02:00
+{"config": "base", "id": "en_explain", "gen_n": 128, "gen_tok_s": 7.029987101911066, "wall_tok_s": 6.84, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.85, "finish": "length"}
+{"config": "base", "id": "en_story", "gen_n": 128, "gen_tok_s": 6.88276675517435, "wall_tok_s": 6.66, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.3, "finish": "length"}
+{"config": "base", "id": "he_explain", "gen_n": 128, "gen_tok_s": 6.936268310587744, "wall_tok_s": 6.71, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.3, "finish": "length"}
+{"config": "base", "id": "de_explain", "gen_n": 128, "gen_tok_s": 6.797687908299511, "wall_tok_s": 6.62, "draft_n": null, "draft_n_accepted": null, "temp_c": 69.95, "finish": "length"}
+{"config": "base", "id": "code_py", "gen_n": 128, "gen_tok_s": 6.934386777707857, "wall_tok_s": 6.7, "draft_n": null, "draft_n_accepted": null, "temp_c": 70.5, "finish": "length"}
+{"config": "base", "id": "list_tips", "gen_n": 128, "gen_tok_s": 6.942054886509702, "wall_tok_s": 6.72, "draft_n": null, "draft_n_accepted": null, "temp_c": 69.4, "finish": "length"}
+{"config": "mtp3", "id": "en_explain", "gen_n": 128, "gen_tok_s": 14.905755135531457, "wall_tok_s": 14.08, "draft_n": 137, "draft_n_accepted": 81, "temp_c": 69.4, "finish": "length"}
+{"config": "mtp3", "id": "en_story", "gen_n": 128, "gen_tok_s": 15.301678618241553, "wall_tok_s": 14.17, "draft_n": 139, "draft_n_accepted": 79, "temp_c": 69.4, "finish": "length"}
+{"config": "mtp3", "id": "he_explain", "gen_n": 128, "gen_tok_s": 10.952787277380287, "wall_tok_s": 10.39, "draft_n": 192, "draft_n_accepted": 61, "temp_c": 69.95, "finish": "length"}
+{"config": "mtp3", "id": "de_explain", "gen_n": 128, "gen_tok_s": 12.917707288007708, "wall_tok_s": 12.26, "draft_n": 156, "draft_n_accepted": 73, "temp_c": 71.05, "finish": "length"}
+{"config": "mtp3", "id": "code_py", "gen_n": 128, "gen_tok_s": 15.788367255324129, "wall_tok_s": 14.53, "draft_n": 133, "draft_n_accepted": 82, "temp_c": 69.95, "finish": "length"}
+{"config": "mtp3", "id": "list_tips", "gen_n": 128, "gen_tok_s": 13.744428095429187, "wall_tok_s": 12.87, "draft_n": 156, "draft_n_accepted": 74, "temp_c": 71.05, "finish": "length"}
+{"config": "mtp2", "id": "en_explain", "gen_n": 128, "gen_tok_s": 7.6655881727338295, "wall_tok_s": 7.47, "draft_n": 108, "draft_n_accepted": 73, "temp_c": 68.3, "finish": "length"}
+{"config": "mtp2", "id": "en_story", "gen_n": 128, "gen_tok_s": 7.85986954225667, "wall_tok_s": 7.58, "draft_n": 105, "draft_n_accepted": 73, "temp_c": 69.95, "finish": "length"}
+{"config": "mtp2", "id": "he_explain", "gen_n": 128, "gen_tok_s": 5.9125667322775355, "wall_tok_s": 5.76, "draft_n": 139, "draft_n_accepted": 56, "temp_c": 69.4, "finish": "length"}
+{"config": "mtp2", "id": "de_explain", "gen_n": 128, "gen_tok_s": 6.511801666313644, "wall_tok_s": 6.36, "draft_n": 127, "draft_n_accepted": 62, "temp_c": 70.5, "finish": "length"}
+{"config": "mtp2", "id": "code_py", "gen_n": 128, "gen_tok_s": 7.599299811286049, "wall_tok_s": 7.33, "draft_n": 108, "draft_n_accepted": 72, "temp_c": 71.6, "finish": "length"}
+{"config": "mtp2", "id": "list_tips", "gen_n": 128, "gen_tok_s": 6.914911631240722, "wall_tok_s": 6.71, "draft_n": 119, "draft_n_accepted": 66, "temp_c": 72.15, "finish": "length"}
+{"config": "mtp4", "id": "en_explain", "gen_n": 128, "gen_tok_s": 11.111507742358606, "wall_tok_s": 10.69, "draft_n": 166, "draft_n_accepted": 85, "temp_c": 69.95, "finish": "length"}
+{"config": "mtp4", "id": "en_story", "gen_n": 128, "gen_tok_s": 11.102383646800831, "wall_tok_s": 10.47, "draft_n": 168, "draft_n_accepted": 83, "temp_c": 69.95, "finish": "length"}
+{"config": "mtp4", "id": "he_explain", "gen_n": 128, "gen_tok_s": 7.651693006364643, "wall_tok_s": 7.39, "draft_n": 242, "draft_n_accepted": 64, "temp_c": 69.95, "finish": "length"}
+{"config": "mtp4", "id": "de_explain", "gen_n": 128, "gen_tok_s": 9.117640027387381, "wall_tok_s": 8.79, "draft_n": 202, "draft_n_accepted": 74, "temp_c": 71.6, "finish": "length"}
+{"config": "mtp4", "id": "code_py", "gen_n": 128, "gen_tok_s": 11.24433832071385, "wall_tok_s": 10.61, "draft_n": 166, "draft_n_accepted": 84, "temp_c": 71.05, "finish": "length"}
+{"config": "mtp4", "id": "list_tips", "gen_n": 128, "gen_tok_s": 9.708591652583474, "wall_tok_s": 9.3, "draft_n": 196, "draft_n_accepted": 77, "temp_c": 71.6, "finish": "length"}
+{"config": "synth3", "id": "en_explain", "gen_n": 128, "gen_tok_s": 22.318255155297273, "wall_tok_s": 20.53, "draft_n": 95, "draft_n_accepted": 95, "temp_c": 69.4, "finish": "length"}
+{"config": "synth3", "id": "en_story", "gen_n": 128, "gen_tok_s": 22.374174776130527, "wall_tok_s": 19.96, "draft_n": 95, "draft_n_accepted": 95, "temp_c": 68.85, "finish": "length"}
+{"config": "synth3", "id": "he_explain", "gen_n": 128, "gen_tok_s": 22.09603318789388, "wall_tok_s": 19.75, "draft_n": 95, "draft_n_accepted": 95, "temp_c": 68.85, "finish": "length"}
+{"config": "synth3", "id": "de_explain", "gen_n": 128, "gen_tok_s": 22.13520742432286, "wall_tok_s": 20.15, "draft_n": 95, "draft_n_accepted": 95, "temp_c": 69.95, "finish": "length"}
+{"config": "synth3", "id": "code_py", "gen_n": 128, "gen_tok_s": 21.77356860217118, "wall_tok_s": 19.47, "draft_n": 95, "draft_n_accepted": 95, "temp_c": 69.95, "finish": "length"}
+{"config": "synth3", "id": "list_tips", "gen_n": 128, "gen_tok_s": 22.30869329376087, "wall_tok_s": 20.06, "draft_n": 95, "draft_n_accepted": 95, "temp_c": 71.05, "finish": "length"}
+{"config": "synth7", "id": "en_explain", "gen_n": 128, "gen_tok_s": 24.967169155519905, "wall_tok_s": 22.65, "draft_n": 111, "draft_n_accepted": 111, "temp_c": 67.2, "finish": "length"}
+{"config": "synth7", "id": "en_story", "gen_n": 128, "gen_tok_s": 24.766357691728658, "wall_tok_s": 21.32, "draft_n": 111, "draft_n_accepted": 111, "temp_c": 69.4, "finish": "length"}
+{"config": "synth7", "id": "he_explain", "gen_n": 128, "gen_tok_s": 24.96078012854605, "wall_tok_s": 22.0, "draft_n": 111, "draft_n_accepted": 111, "temp_c": 68.85, "finish": "length"}
+{"config": "synth7", "id": "de_explain", "gen_n": 128, "gen_tok_s": 25.033993008616818, "wall_tok_s": 22.53, "draft_n": 111, "draft_n_accepted": 111, "temp_c": 69.4, "finish": "length"}
+{"config": "synth7", "id": "code_py", "gen_n": 128, "gen_tok_s": 25.08365497689341, "wall_tok_s": 21.96, "draft_n": 111, "draft_n_accepted": 111, "temp_c": 69.95, "finish": "length"}
+{"config": "synth7", "id": "list_tips", "gen_n": 128, "gen_tok_s": 24.965942130125633, "wall_tok_s": 22.18, "draft_n": 111, "draft_n_accepted": 111, "temp_c": 69.95, "finish": "length"}
+{"config": "synth15", "id": "en_explain", "gen_n": 128, "gen_tok_s": 31.431076722268322, "wall_tok_s": 27.73, "draft_n": 119, "draft_n_accepted": 119, "temp_c": 67.2, "finish": "length"}
+{"config": "synth15", "id": "en_story", "gen_n": 128, "gen_tok_s": 30.9448460506092, "wall_tok_s": 26.45, "draft_n": 119, "draft_n_accepted": 119, "temp_c": 68.3, "finish": "length"}
+{"config": "synth15", "id": "he_explain", "gen_n": 128, "gen_tok_s": 29.455115159063418, "wall_tok_s": 25.4, "draft_n": 119, "draft_n_accepted": 119, "temp_c": 69.4, "finish": "length"}
+{"config": "synth15", "id": "de_explain", "gen_n": 128, "gen_tok_s": 31.015347224138633, "wall_tok_s": 27.08, "draft_n": 119, "draft_n_accepted": 119, "temp_c": 70.5, "finish": "length"}
+{"config": "synth15", "id": "code_py", "gen_n": 128, "gen_tok_s": 30.892306015777944, "wall_tok_s": 26.24, "draft_n": 119, "draft_n_accepted": 119, "temp_c": 69.4, "finish": "length"}
+{"config": "synth15", "id": "list_tips", "gen_n": 128, "gen_tok_s": 31.064963197802854, "wall_tok_s": 26.83, "draft_n": 119, "draft_n_accepted": 119, "temp_c": 69.4, "finish": "length"}
+AB_DONE /home/pi/pigemma/results/verified-ceiling/e2b_q4_mtp/ab.json
+[health 12:53:45] active active active active  temp=55.1C throttled=0x0 memavail=15819520kB
+=== 4 MTP on the 2-bit file 2026-10-06T12:53:45+02:00
+{"config": "base", "id": "en_explain", "gen_n": 58, "gen_tok_s": 11.640000514610549, "wall_tok_s": 10.39, "draft_n": null, "draft_n_accepted": null, "temp_c": 63.9, "finish": "stop"}
+{"config": "base", "id": "en_story", "gen_n": 128, "gen_tok_s": 11.483726384214016, "wall_tok_s": 10.67, "draft_n": null, "draft_n_accepted": null, "temp_c": 67.2, "finish": "length"}
+{"config": "base", "id": "he_explain", "gen_n": 128, "gen_tok_s": 11.422599297914882, "wall_tok_s": 10.69, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.3, "finish": "length"}
+{"config": "base", "id": "de_explain", "gen_n": 128, "gen_tok_s": 11.17943083316953, "wall_tok_s": 10.55, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.3, "finish": "length"}
+{"config": "base", "id": "code_py", "gen_n": 128, "gen_tok_s": 11.256809483374491, "wall_tok_s": 10.47, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.3, "finish": "stop"}
+{"config": "base", "id": "list_tips", "gen_n": 128, "gen_tok_s": 11.341527691277543, "wall_tok_s": 10.63, "draft_n": null, "draft_n_accepted": null, "temp_c": 69.95, "finish": "length"}
+{"config": "mtp3", "id": "en_explain", "gen_n": 58, "gen_tok_s": 10.853797820024228, "wall_tok_s": 9.78, "draft_n": 96, "draft_n_accepted": 25, "temp_c": 68.3, "finish": "stop"}
+{"config": "mtp3", "id": "en_story", "gen_n": 128, "gen_tok_s": 16.6010836716839, "wall_tok_s": 14.91, "draft_n": 136, "draft_n_accepted": 81, "temp_c": 68.85, "finish": "length"}
+{"config": "mtp3", "id": "he_explain", "gen_n": 128, "gen_tok_s": 13.515557097960865, "wall_tok_s": 12.51, "draft_n": 164, "draft_n_accepted": 71, "temp_c": 69.4, "finish": "length"}
+{"config": "mtp3", "id": "de_explain", "gen_n": 128, "gen_tok_s": 12.622576900068053, "wall_tok_s": 11.82, "draft_n": 176, "draft_n_accepted": 67, "temp_c": 71.6, "finish": "length"}
+{"config": "mtp3", "id": "code_py", "gen_n": 128, "gen_tok_s": 16.580571721612984, "wall_tok_s": 14.88, "draft_n": 131, "draft_n_accepted": 82, "temp_c": 72.7, "finish": "length"}
+{"config": "mtp3", "id": "list_tips", "gen_n": 128, "gen_tok_s": 11.262954060006713, "wall_tok_s": 10.58, "draft_n": 197, "draft_n_accepted": 60, "temp_c": 72.7, "finish": "length"}
+AB_DONE /home/pi/pigemma/results/verified-ceiling/e2b_q2_mtp/ab.json
+[health 12:57:09] active active active active  temp=54.5C throttled=0x0 memavail=15861552kB
+=== 5 copy-heavy tasks, n-gram drafter, E2B QAT Q4_0, thinking off 2026-10-06T12:57:09+02:00
+{"config": "base", "id": "repeat_en", "gen_n": 420, "gen_tok_s": 7.012573309633847, "wall_tok_s": 6.52, "draft_n": null, "draft_n_accepted": null, "temp_c": 69.4, "finish": "length"}
+{"config": "base", "id": "fix_typos_en", "gen_n": 360, "gen_tok_s": 7.125181419225788, "wall_tok_s": 6.67, "draft_n": null, "draft_n_accepted": null, "temp_c": 69.95, "finish": "length"}
+{"config": "base", "id": "code_rename", "gen_n": 336, "gen_tok_s": 6.9831706421336, "wall_tok_s": 6.2, "draft_n": null, "draft_n_accepted": null, "temp_c": 70.5, "finish": "stop"}
+{"config": "ngram", "id": "repeat_en", "gen_n": 420, "gen_tok_s": 17.407326240921133, "wall_tok_s": 14.63, "draft_n": 378, "draft_n_accepted": 334, "temp_c": 69.4, "finish": "length"}
+{"config": "ngram", "id": "fix_typos_en", "gen_n": 360, "gen_tok_s": 6.5296042708777415, "wall_tok_s": 6.15, "draft_n": 177, "draft_n_accepted": 2, "temp_c": 70.5, "finish": "length"}
+{"config": "ngram", "id": "code_rename", "gen_n": 336, "gen_tok_s": 7.995337596447339, "wall_tok_s": 6.99, "draft_n": 448, "draft_n_accepted": 145, "temp_c": 72.7, "finish": "stop"}
+{"config": "ngram_s", "id": "repeat_en", "gen_n": 420, "gen_tok_s": 22.58811981342536, "wall_tok_s": 18.06, "draft_n": 423, "draft_n_accepted": 361, "temp_c": 72.15, "finish": "length"}
+{"config": "ngram_s", "id": "fix_typos_en", "gen_n": 360, "gen_tok_s": 7.464048236962698, "wall_tok_s": 6.96, "draft_n": 516, "draft_n_accepted": 102, "temp_c": 70.5, "finish": "length"}
+{"config": "ngram_s", "id": "code_rename", "gen_n": 336, "gen_tok_s": 12.968823953750773, "wall_tok_s": 10.47, "draft_n": 576, "draft_n_accepted": 255, "temp_c": 73.25, "finish": "stop"}
+{"config": "mtp3", "id": "repeat_en", "gen_n": 420, "gen_tok_s": 20.273672318811673, "wall_tok_s": 16.56, "draft_n": 332, "draft_n_accepted": 308, "temp_c": 71.6, "finish": "length"}
+{"config": "mtp3", "id": "fix_typos_en", "gen_n": 360, "gen_tok_s": 18.624836494428088, "wall_tok_s": 15.74, "draft_n": 310, "draft_n_accepted": 255, "temp_c": 72.15, "finish": "length"}
+{"config": "mtp3", "id": "code_rename", "gen_n": 336, "gen_tok_s": 20.780572906127762, "wall_tok_s": 15.09, "draft_n": 258, "draft_n_accepted": 249, "temp_c": 73.25, "finish": "stop"}
+{"config": "both", "id": "repeat_en", "gen_n": 420, "gen_tok_s": 24.038214680074596, "wall_tok_s": 19.0, "draft_n": 453, "draft_n_accepted": 388, "temp_c": 69.4, "finish": "length"}
+{"config": "both", "id": "fix_typos_en", "gen_n": 360, "gen_tok_s": 16.76665869121704, "wall_tok_s": 14.43, "draft_n": 374, "draft_n_accepted": 254, "temp_c": 72.15, "finish": "length"}
+{"config": "both", "id": "code_rename", "gen_n": 336, "gen_tok_s": 13.290482701206898, "wall_tok_s": 10.71, "draft_n": 595, "draft_n_accepted": 279, "temp_c": 72.7, "finish": "stop"}
+AB_DONE /home/pi/pigemma/results/verified-ceiling/e2b_q4_copy/ab.json
+[health 13:08:51] active active active active  temp=60.6C throttled=0x0 memavail=15838464kB
+=== VERIFIED_CEILING_DONE 2026-10-06T13:08:51+02:00

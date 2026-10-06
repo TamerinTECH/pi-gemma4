@@ -1,0 +1,266 @@
+[
+ {
+  "id": "neg-en-01",
+  "lang": "en",
+  "text": "Which of these numbers is NOT divisible by 3: 51, 87, 91, 117? Answer with the number only.",
+  "max_tokens": 96
+ },
+ {
+  "id": "neg-en-02",
+  "lang": "en",
+  "text": "Name one country in South America that does NOT share a land border with Brazil. Answer with the country name only.",
+  "max_tokens": 96
+ },
+ {
+  "id": "neg-en-03",
+  "lang": "en",
+  "text": "From this list, give every word that does NOT contain the letter 'e': table, chair, window, lamp, shelf, sofa, mirror, bench. Keep the original order and separate the words with commas.",
+  "max_tokens": 96
+ },
+ {
+  "id": "neg-he-01",
+  "lang": "he",
+  "text": "איזה מהמספרים הבאים אינו מספר ראשוני: 2, 13, 21, 29? ענה במספר בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "neg-he-02",
+  "lang": "he",
+  "text": "כמה מהמספרים 4, 9, 15, 22, 27, 30 אינם זוגיים? ענה במספר בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "neg-he-03",
+  "lang": "he",
+  "text": "איזו מהערים הבאות אינה נמצאת בישראל: חיפה, אילת, עמאן, נתניה? ענה בשם העיר בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "neg-de-01",
+  "lang": "de",
+  "text": "Welches dieser Metalle ist bei Raumtemperatur NICHT fest: Eisen, Quecksilber, Kupfer, Zink? Antworte mit einem Wort.",
+  "max_tokens": 96
+ },
+ {
+  "id": "neg-de-02",
+  "lang": "de",
+  "text": "Wie viele der folgenden Zahlen sind NICHT größer als 10: 3, 12, 10, 7, 15, 11? Antworte nur mit der Zahl.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-en-01",
+  "lang": "en",
+  "text": "A recipe needs 250 g of flour for 4 servings. How many grams of flour are needed for 10 servings? Answer with the number only.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-en-02",
+  "lang": "en",
+  "text": "A shirt costs 40 euros. It is discounted by 25%, and then a 10% coupon is applied to the discounted price. What is the final price in euros? Answer with the number only.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-en-03",
+  "lang": "en",
+  "text": "A car travels 180 km in 2 hours and 15 minutes. What is its average speed in km/h? Answer with the number only.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-en-04",
+  "lang": "en",
+  "text": "Today is Wednesday. Which weekday falls exactly 100 days after today? Answer with the name of the day only.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-he-01",
+  "lang": "he",
+  "text": "במיכל יש 12 ליטר מים. שפכו ממנו שליש, ואחר כך הוסיפו 5 ליטר. כמה ליטר יש עכשיו במיכל? ענה במספר בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-he-02",
+  "lang": "he",
+  "text": "יוסי קרא 24 עמודים ביום הראשון, ובכל יום שאחריו קרא 6 עמודים יותר מאשר ביום הקודם. כמה עמודים קרא בסך הכול בארבעת הימים הראשונים? ענה במספר בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-he-03",
+  "lang": "he",
+  "text": "השעון מראה 22:45. מה תהיה השעה בעוד 3 שעות ו-50 דקות? ענה בפורמט HH:MM בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-de-01",
+  "lang": "de",
+  "text": "Ein Zug fährt um 14:52 ab und kommt um 17:09 an. Wie viele Minuten dauert die Fahrt? Antworte nur mit der Zahl.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-de-02",
+  "lang": "de",
+  "text": "Lena hat 3 Packungen mit je 18 Stiften. Sie verteilt die Stifte gleichmäßig an 4 Gruppen, jede Gruppe bekommt gleich viele ganze Stifte. Wie viele Stifte bleiben übrig? Antworte nur mit der Zahl.",
+  "max_tokens": 96
+ },
+ {
+  "id": "num-de-03",
+  "lang": "de",
+  "text": "Ein Rechteck hat einen Umfang von 46 cm und ist 15 cm lang. Wie groß ist seine Fläche in Quadratzentimetern? Antworte nur mit der Zahl.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-en-he-01",
+  "lang": "en",
+  "text": "Answer in Hebrew only, with one word: what is the opposite of 'early'?",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-en-de-01",
+  "lang": "en",
+  "text": "Answer in German only, with one word: what is the season after summer called?",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-he-en-01",
+  "lang": "he",
+  "text": "ענה באנגלית בלבד, במילה אחת: איך אומרים 'ספרייה' באנגלית?",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-he-de-01",
+  "lang": "he",
+  "text": "ענה בגרמנית בלבד: איזה מספר בא אחרי שבע? כתוב אותו במילה בגרמנית, בלי ספרות.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-de-he-01",
+  "lang": "de",
+  "text": "Antworte ausschließlich auf Hebräisch und mit einem Wort: Welche Farbe hat frischer Schnee?",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-de-en-01",
+  "lang": "de",
+  "text": "Antworte nur auf Englisch: Wie viele Tage hat ein Schaltjahr? Schreibe die Zahl in Worten, nicht in Ziffern.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-en-mix-01",
+  "lang": "en",
+  "text": "Write the word 'water' first in Hebrew and then in German, separated by a single comma, and nothing else.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ml-he-01",
+  "lang": "he",
+  "text": "כתוב את שלושת הצבעים הראשונים של הקשת בענן, מהצבע החיצוני פנימה, בעברית, מופרדים בפסיקים ובלי טקסט נוסף.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-en-01",
+  "lang": "en",
+  "text": "Delivery note: \"DN-7781. Shipped on 3 March 2025 from Kessler Tools, Leipzig, to Oakridge Workshop, Bristol. Items: 12 hammers, 30 screwdriver sets, 5 toolboxes. Carrier: NordFreight. Gross weight: 142.5 kg.\"\n\nReturn a JSON object with exactly these keys: note_id (string), ship_date (YYYY-MM-DD), carrier (string), total_items (integer, the sum of all item quantities), weight_kg (number). Output only the JSON.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-en-02",
+  "lang": "en",
+  "text": "E-mail: \"Hi Sam, quick update on Thursday's workshop: it moves from room B12 to the main hall, starts at 10:30 instead of 9:00, and we now expect 48 participants (up from 35). Lunch is still provided. Best, Priya\"\n\nExtract new_room, new_start_time (HH:MM), participants (integer), lunch_provided (true or false) and sender into a JSON object. Output only the JSON.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-en-03",
+  "lang": "en",
+  "text": "Chess club results: \"Maya won 5 games and lost 1. Omer won 4, drew 1 and lost 1. Lior won 3 and lost 3. Dana won 2, drew 2 and lost 2.\" A win scores 1 point, a draw 0.5 and a loss 0.\n\nReturn JSON with the keys winner (the player with the most points), winner_points, second_place and second_place_points. Output only the JSON.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-he-01",
+  "lang": "he",
+  "text": "הזמנה: \"הזמנה מספר 5521: שלוש חולצות במחיר 45 שקלים כל אחת ומכנסיים במחיר 120 שקלים. משלוח עד הבית בעלות 25 שקלים. שם הלקוחה: רותם אלון. תאריך ההזמנה: 14 באפריל 2025.\"\n\nהחזר אובייקט JSON עם המפתחות order_id, customer, items_total (סכום המוצרים בלי המשלוח), shipping, grand_total ו-date (בפורמט YYYY-MM-DD). החזר JSON בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-he-02",
+  "lang": "he",
+  "text": "הודעה: \"חוג הרובוטיקה ייפתח ביום שני, 3 בנובמבר, בשעה 16:30 בחדר 108. המדריך: אורי שמעוני. מספר המקומות מוגבל ל-14 משתתפים, ומחיר החוג לשנה הוא 950 שקלים.\"\n\nחלץ את הנתונים לאובייקט JSON עם המפתחות day, start_time, room, instructor, max_participants ו-yearly_price. החזר JSON בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-he-03",
+  "lang": "he",
+  "text": "תוצאות: \"בבחירות למועצת התלמידים קיבלה נועה 132 קולות, איתי קיבל 98 קולות ושירה קיבלה 115 קולות. בנוסף נפסלו 7 פתקים.\"\n\nהחזר JSON עם המפתחות winner, winner_votes, valid_votes (סך הקולות הכשרים), invalid_votes ו-total_ballots (כל הפתקים, כולל הפסולים). JSON בלבד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-de-01",
+  "lang": "de",
+  "text": "Rechnung: \"Rechnung Nr. 2025-114 der Tischlerei Brandt vom 9. Mai 2025: 2 Regale zu je 180 Euro, 1 Schreibtisch zu 420 Euro, Montage pauschal 95 Euro. Zahlbar innerhalb von 14 Tagen.\"\n\nGib ein JSON-Objekt mit den Schlüsseln invoice_no, vendor, date (YYYY-MM-DD), total_eur (Gesamtbetrag) und payment_days zurück. Nur das JSON.",
+  "max_tokens": 96
+ },
+ {
+  "id": "ext-de-02",
+  "lang": "de",
+  "text": "Kursinfo: \"Der Kurs Fotografie für Einsteiger findet an vier Samstagen statt, jeweils von 10:00 bis 13:00 Uhr. Kursleiterin ist Jana Weiß. Die Teilnahme kostet 160 Euro, Vereinsmitglieder zahlen 25 Prozent weniger.\"\n\nErstelle ein JSON-Objekt mit den Schlüsseln sessions (Anzahl der Termine), hours_total (Kursstunden insgesamt), instructor, price_eur und member_price_eur. Nur das JSON.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-01",
+  "lang": "en",
+  "text": "Write a Python function `second_largest(nums)` that returns the second largest DISTINCT value in a list of integers, or None if there is no such value. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-02",
+  "lang": "en",
+  "text": "Write a Python function `run_length(s)` that compresses a string with run-length encoding, for example 'aaabcc' becomes 'a3b1c2'. Return an empty string for an empty input. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-03",
+  "lang": "en",
+  "text": "Write a Python function `is_valid_brackets(s)` that returns True if every (, [ and { in the string is closed by the matching bracket in the correct order, ignoring all other characters, and False otherwise. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-04",
+  "lang": "en",
+  "text": "Write a Python function `days_between(d1, d2)` that takes two dates as 'YYYY-MM-DD' strings and returns the absolute number of days between them. The datetime module is allowed. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-05",
+  "lang": "en",
+  "text": "Write a Python function `word_count_top(text, k)` that lowercases the text, splits it on whitespace, strips the characters .,!?;: from both ends of every word, ignores empty strings, and returns the k most frequent words as a list of (word, count) tuples sorted by count (highest first) and then alphabetically. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-06",
+  "lang": "en",
+  "text": "Write a Python function `flatten(nested)` that flattens arbitrarily nested lists of integers into a single list, keeping the original order. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-07",
+  "lang": "en",
+  "text": "Write a Python function `roman_to_int(s)` that converts a Roman numeral written with I, V, X, L, C, D and M (subtractive notation such as IV and CM allowed) to an integer. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-08",
+  "lang": "en",
+  "text": "Write a Python function `moving_average(values, window)` that returns the average of every consecutive window of the given size, each rounded to 2 decimals, as a list. Return an empty list if the window is larger than the list. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-he-01",
+  "lang": "he",
+  "text": "כתוב פונקציה בפייתון בשם `digit_sum(n)` שמחזירה את סכום הספרות של מספר שלם. עבור מספר שלילי יש להתעלם מהסימן. השתמש רק בספרייה הסטנדרטית, אל תקרא קלט ואל תדפיס דבר, והחזר את הפונקציה בבלוק קוד פייתון אחד.",
+  "max_tokens": 96
+ },
+ {
+  "id": "code-de-01",
+  "lang": "de",
+  "text": "Schreibe eine Python-Funktion `caesar(text, shift)`, die nur die Buchstaben a-z und A-Z um `shift` Stellen im Alphabet verschiebt (mit Umlauf am Ende des Alphabets, auch für negative Werte) und alle anderen Zeichen unverändert lässt. Nur die Standardbibliothek, keine Eingabe, keine Ausgabe; gib die Funktion in einem einzigen Python-Codeblock zurück.",
+  "max_tokens": 96
+ }
+]

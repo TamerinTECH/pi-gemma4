@@ -1,0 +1,58 @@
+[health 08:49:52] active active active active  temp=temp=45.0'C throttled=0x0 memavail=15828880kB
+=== 1 llama-bench E2B, ours (default repack) 2026-10-06T08:49:52+02:00
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |           pp512 |         61.95 ± 0.33 |
+| gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |           tg128 |          7.68 ± 0.10 |
+
+build: a7b94df (1)
+[health 08:51:48] active active active active  temp=temp=52.1'C throttled=0x0 memavail=15888368kB
+=== 2 llama-bench E2B, ik (mmap) 2026-10-06T08:51:48+02:00
+| model                          |       size |     params | backend    | threads |          test |              t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | ------------: | ---------------: |
+| gemma4 2B Q4_0                 |   3.41 GiB |     5.03 B | CPU        |       4 |         pp512 |     53.13 ± 0.76 |
+| gemma4 2B Q4_0                 |   3.41 GiB |     5.03 B | CPU        |       4 |         tg128 |      7.90 ± 0.07 |
+
+build: 3d27f5b (1)
+[health 08:53:37] active active active active  temp=temp=53.2'C throttled=0x0 memavail=15866944kB
+=== 3 llama-bench E2B, ik run-time repack 2026-10-06T08:53:37+02:00
+| model                          |       size |     params | backend    | threads | rtr |          test |              t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --: | ------------: | ---------------: |
+| gemma4 2B Q4_0                 |   3.41 GiB |     5.03 B | CPU        |       4 |   1 |         pp512 |     51.66 ± 0.33 |
+| gemma4 2B Q4_0                 |   3.41 GiB |     5.03 B | CPU        |       4 |   1 |         tg128 |      7.88 ± 0.03 |
+
+build: 3d27f5b (1)
+[health 08:55:29] active active active active  temp=temp=53.2'C throttled=0x0 memavail=15890960kB
+=== 4 parallel streams E2B, ours 2026-10-06T08:55:29+02:00
+{"streams": 1, "ok": 1, "wall_s": 13.37, "generated_tokens": 96, "prompt_tokens": 27, "aggregate_gen_tok_s": 7.18, "aggregate_all_tok_s": 9.2, "per_stream_gen_tok_s_mean": 7.49, "per_stream_gen_tok_s_min": 7.49, "per_stream_gen_tok_s_max": 7.49, "prompt_tok_s_mean": 39.78, "temp_c": 63.9, "errors": []}
+{"streams": 2, "ok": 2, "wall_s": 21.01, "generated_tokens": 192, "prompt_tokens": 59, "aggregate_gen_tok_s": 9.14, "aggregate_all_tok_s": 11.95, "per_stream_gen_tok_s_mean": 4.77, "per_stream_gen_tok_s_min": 4.77, "per_stream_gen_tok_s_max": 4.77, "prompt_tok_s_mean": 26.84, "temp_c": 65.55, "errors": []}
+{"streams": 4, "ok": 4, "wall_s": 16.74, "generated_tokens": 384, "prompt_tokens": 117, "aggregate_gen_tok_s": 22.95, "aggregate_all_tok_s": 29.94, "per_stream_gen_tok_s_mean": 6.53, "per_stream_gen_tok_s_min": 6.46, "per_stream_gen_tok_s_max": 6.59, "prompt_tok_s_mean": 15.02, "temp_c": 66.65, "errors": []}
+{"streams": 8, "ok": 8, "wall_s": 29.77, "generated_tokens": 768, "prompt_tokens": 236, "aggregate_gen_tok_s": 25.8, "aggregate_all_tok_s": 33.72, "per_stream_gen_tok_s_mean": 3.71, "per_stream_gen_tok_s_min": 3.7, "per_stream_gen_tok_s_max": 3.75, "prompt_tok_s_mean": 7.65, "temp_c": 67.75, "errors": []}
+{"streams": 16, "ok": 16, "wall_s": 46.01, "generated_tokens": 1536, "prompt_tokens": 462, "aggregate_gen_tok_s": 33.38, "aggregate_all_tok_s": 43.42, "per_stream_gen_tok_s_mean": 2.48, "per_stream_gen_tok_s_min": 2.48, "per_stream_gen_tok_s_max": 2.48, "prompt_tok_s_mean": 3.78, "temp_c": 69.4, "errors": []}
+RUN_DONE /home/pi/pigemma/results/speed-ceiling/par_e2b_ours/run.json
+[health 08:58:12] active active active active  temp=temp=55.4'C throttled=0x0 memavail=15893664kB
+=== 5 parallel streams E2B, ik 2026-10-06T08:58:12+02:00
+RUN_DONE /home/pi/pigemma/results/speed-ceiling/par_e2b_ik/run.json
+Traceback (most recent call last):
+  File "/home/pi/pigemma/par_throughput.py", line 152, in <module>
+    main()
+    ~~~~^^
+  File "/home/pi/pigemma/par_throughput.py", line 88, in main
+    raise RuntimeError("server exited during load; see server.log")
+RuntimeError: server exited during load; see server.log
+[health 08:58:58] active active active active  temp=temp=53.8'C throttled=0x0 memavail=15887104kB
+=== 6 parallel streams 26B-A4B UD-Q3_K_M, ik 2026-10-06T08:58:58+02:00
+usage: par_throughput.py [-h] --bin BIN --model MODEL --label LABEL
+                         [--threads THREADS] [--streams STREAMS]
+                         [--n-predict N_PREDICT] [--ctx-per-slot CTX_PER_SLOT]
+                         [--extra EXTRA] [--port PORT] [--out OUT]
+par_throughput.py: error: argument --extra: expected one argument
+[health 08:59:44] active active active active  temp=temp=51.0'C throttled=0x0 memavail=15896768kB
+=== 7 parallel streams 26B-A4B UD-Q3_K_M, ours (-nr) 2026-10-06T08:59:44+02:00
+usage: par_throughput.py [-h] --bin BIN --model MODEL --label LABEL
+                         [--threads THREADS] [--streams STREAMS]
+                         [--n-predict N_PREDICT] [--ctx-per-slot CTX_PER_SLOT]
+                         [--extra EXTRA] [--port PORT] [--out OUT]
+par_throughput.py: error: argument --extra: expected one argument
+[health 08:59:44] active active active active  temp=temp=51.6'C throttled=0x0 memavail=15881008kB
+=== SPEED_CEILING_DONE 2026-10-06T08:59:44+02:00

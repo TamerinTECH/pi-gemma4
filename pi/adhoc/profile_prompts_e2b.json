@@ -1,0 +1,4 @@
+[
+  {"id": "warmup", "prompt": "Hello", "max_tokens": 8},
+  {"id": "en_explain", "prompt": "Explain in a few sentences how a refrigerator keeps food cold.", "max_tokens": 96}
+]

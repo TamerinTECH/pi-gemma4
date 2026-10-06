@@ -1,0 +1,8 @@
+[health 17:12:07] active active active active  temp=59.3'C throttled=0x0
+=== reference, plain 2026-10-06T17:12:07+02:00
+AB_DONE /home/pi/pigemma/results/fast/Q2_ref_plain/ab.json
+[health 17:17:28] active active active active  temp=57.6'C throttled=0x0
+=== patched, fast profile 2026-10-06T17:17:28+02:00
+AB_DONE /home/pi/pigemma/results/fast/Q2_fast_mtp/ab.json
+[health 17:19:49] active active active active  temp=60.9'C throttled=0x0
+=== FAST_QA44_DONE 2026-10-06T17:19:49+02:00

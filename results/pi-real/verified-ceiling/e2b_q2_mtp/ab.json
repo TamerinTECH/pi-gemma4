@@ -1,0 +1,286 @@
+{
+ "label": "verified-ceiling/e2b_q2_mtp",
+ "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B-it-qat-UD-Q2_K_XL.gguf",
+ "model_bytes": 2186186784,
+ "max_tokens": 128,
+ "threads": 4,
+ "configs": {
+  "base": "",
+  "mtp3": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp"
+ },
+ "order": [
+  "base",
+  "mtp3"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "base",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B-it-qat-UD-Q2_K_XL.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18130",
+   "requests": [
+    {
+     "id": "en_explain",
+     "lang": "en",
+     "wall_s": 5.58,
+     "prompt_n": 28,
+     "gen_n": 58,
+     "gen_tok_s": 11.640000514610549,
+     "prompt_tok_s": 41.190523825775855,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 10.39,
+     "temp_c": 63.9,
+     "content": "A refrigerator keeps food cold by maintaining a low temperature through refrigeration. The cooling system uses a Refrigerant to circulate a refrigerant, which absorbs heat from the food and transfers it to the condenser, which releases the heat to the environment. This process is called the Refrigeration Refrigeration Cycle.",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "2502f6e60a0ac558ef12fa59c5584742d4f7ada3e07660f432b185311897e9e6"
+    },
+    {
+     "id": "en_story",
+     "lang": "en",
+     "wall_s": 11.99,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 11.483726384214016,
+     "prompt_tok_s": 43.03634311585276,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 10.67,
+     "temp_c": 67.2,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants a short story (about 100 words) about a lighthouse keeper finding a message in a bottle.\n2.  **Identify Key Elements:**\n    *   Character: Lighthouse keeper.\n    *   Setting: Lighthouse/sea.\n    *   Plot point: Finding a message in a bottle.\n    *   Tone: Mysterious, perhaps slightly melancholic or reflective.\n3.  **Drafting - Focus on Sensory Details:** The isolation, the sea, the discovery.\n4.  **Drafting - Focus",
+     "finish": "length",
+     "text_sha256": "18dbc3df92a329a84eea97fc6f3a4bcbaf3905e36e37bb41accf01a0634a6a75"
+    },
+    {
+     "id": "he_explain",
+     "lang": "he",
+     "wall_s": 11.97,
+     "prompt_n": 35,
+     "gen_n": 128,
+     "gen_tok_s": 11.422599297914882,
+     "prompt_tok_s": 41.12436360047328,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 10.69,
+     "temp_c": 68.3,
+     "content": "",
+     "reasoning": "Here's a thinking process to arrive at the suggested answer:\n\n1.  **Analyze the Request:** The user is asking for an explanation of how to \"explain\" (or perhaps \"explain\" or \"explain\" - the request is slightly ambiguous, but the core request is about explaining a concept). The request is in Hebrew: \"הסבר בכמה משפטים פשוטים איך פועל מקרר.\" (Explain in a few simple sentences how to explain/explain how a refrigerator works.)\n\n2.  **Identify the Core Topic:** The user is asking for an explanation of how a",
+     "finish": "length",
+     "text_sha256": "dc5898b89804fec9668212b8b8261c6e50345ab53b036e3e6fead2c32ceef9db"
+    },
+    {
+     "id": "de_explain",
+     "lang": "de",
+     "wall_s": 12.13,
+     "prompt_n": 32,
+     "gen_n": 128,
+     "gen_tok_s": 11.17943083316953,
+     "prompt_tok_s": 41.952247853880316,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 10.55,
+     "temp_c": 68.3,
+     "content": "",
+     "reasoning": "Here's a thinking process that leads to the suggested response:\n\n1.  **Analyze the Request:** The user wants an explanation of how a refrigerator (re Kühlschrank) works, in simple sentences. (The request is in German: \"Erkläre in einigen einfachen Sätzen, wie ein Kühlschrank funktioniert.\")\n\n2.  **Identify the Core Concepts:** What are the key functions of a refrigerator?\n    *   Cooling/ Cooling ( Cooling/ Cooling).\n    *   Temperature control (Temperature control).\n    *   Energy efficiency (Energy efficiency).\n    *   Maintaining the",
+     "finish": "length",
+     "text_sha256": "96d07bbff8c128ae6e375d2ea149a24cf788440e63a6f46ae3a23ada961a6122"
+    },
+    {
+     "id": "code_py",
+     "lang": "code",
+     "wall_s": 12.23,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 11.256809483374491,
+     "prompt_tok_s": 42.61534642547801,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 10.47,
+     "temp_c": 68.3,
+     "content": "```python\ndef fibonacci(n):\n    \"\"\"Returns the n-th Fibonacci number iteratively.\"\"\"\n    if n <= 0:\n        return 0\n    Fib_a, Fib_b = 0, 1\n    if n == 1:\n        return 1\n    elif n == 2:\n        return 1\n    else:\n        a, b = 0, 1\n        for _ in range(2, n):\n            a, b = b, a + b\n            a, b = b, a\n        return b\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "eb83bb658ac8af32bc525d8a8e47bb8f96b5a609d810a8c6fff63370d7399e9f"
+    },
+    {
+     "id": "list_tips",
+     "lang": "en",
+     "wall_s": 12.04,
+     "prompt_n": 34,
+     "gen_n": 128,
+     "gen_tok_s": 11.341527691277543,
+     "prompt_tok_s": 40.5820904073487,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 10.63,
+     "temp_c": 69.95,
+     "content": "Here are five practical tips for learning a new language as an adult:\n\n1. **Immerse Yourself in the Language (Immersion):** Create a consistent environment where you are exposed to the language. Change your phone settings, watch TV shows in the target language, listen to music, or watch movies/shows in the target language. This helps you build passive comprehension and familiarity with the sounds and vocabulary.\n2. **Focus on High-Frequency Vocabulary First:** Prioritize learning the most common words and phrases first. Focus on the 2000 most frequent words and phrases, as they will allow you to communicate basic",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "f69a616ed2749e1dc113dcde7039acf3872ed80b6baea7e121d702d96ef82523"
+    }
+   ],
+   "load_s": 3.0,
+   "draft_log": [],
+   "spec_lines": []
+  },
+  {
+   "index": 1,
+   "config": "mtp3",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B-it-qat-UD-Q2_K_XL.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18131 -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "requests": [
+    {
+     "id": "en_explain",
+     "lang": "en",
+     "wall_s": 5.93,
+     "prompt_n": 28,
+     "gen_n": 58,
+     "gen_tok_s": 10.853797820024228,
+     "prompt_tok_s": 41.487197495358615,
+     "draft_n": 96,
+     "draft_n_accepted": 25,
+     "wall_tok_s": 9.78,
+     "temp_c": 68.3,
+     "content": "A refrigerator keeps food cold by maintaining a low temperature through refrigeration. The cooling system uses a Refrigerant to circulate a refrigerant, which absorbs heat from the food and transfers it to the condenser, which releases the heat to the environment. This process is called the Refrigeration Refrigeration Cycle.",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "2502f6e60a0ac558ef12fa59c5584742d4f7ada3e07660f432b185311897e9e6"
+    },
+    {
+     "id": "en_story",
+     "lang": "en",
+     "wall_s": 8.58,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 16.6010836716839,
+     "prompt_tok_s": 42.99642054798938,
+     "draft_n": 136,
+     "draft_n_accepted": 81,
+     "wall_tok_s": 14.91,
+     "temp_c": 68.85,
+     "content": "",
+     "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants a short story (about 100 words) about a lighthouse keeper finding a message in a bottle.\n2.  **Identify Key Elements:**\n    *   Character: Lighthouse keeper.\n    *   Setting: Lighthouse/sea.\n    *   Plot point: Finding a message in a bottle.\n    *   Tone: Mysterious, perhaps slightly melancholic or reflective.\n3.  **Drafting - Focus on Sensory Details:** The isolation, the sea, the discovery.\n4.  **Drafting - Focus",
+     "finish": "length",
+     "text_sha256": "18dbc3df92a329a84eea97fc6f3a4bcbaf3905e36e37bb41accf01a0634a6a75"
+    },
+    {
+     "id": "he_explain",
+     "lang": "he",
+     "wall_s": 10.23,
+     "prompt_n": 35,
+     "gen_n": 128,
+     "gen_tok_s": 13.515557097960865,
+     "prompt_tok_s": 42.06882459704076,
+     "draft_n": 164,
+     "draft_n_accepted": 71,
+     "wall_tok_s": 12.51,
+     "temp_c": 69.4,
+     "content": "",
+     "reasoning": "Here's a thinking process to arrive at the suggested answer:\n\n1.  **Analyze the Request:** The user is asking for an explanation of how to \"explain\" (or perhaps \"explain\" or \"explain\" - the request is slightly ambiguous, but the core request is about explaining a concept). The request is in Hebrew: \"הסבר בכמה משפטים פשוטים איך פועל מקרר.\" (Explain in a few simple sentences how to explain/explain.)\n\n2.  **Identify the Core Concept:** The user is asking for an explanation of *how to explain* something",
+     "finish": "length",
+     "text_sha256": "74129d5fe72a07fc805f0fe151b5600d01fc7fe63d99826d952706a44ccfe7cc"
+    },
+    {
+     "id": "de_explain",
+     "lang": "de",
+     "wall_s": 10.83,
+     "prompt_n": 32,
+     "gen_n": 128,
+     "gen_tok_s": 12.622576900068053,
+     "prompt_tok_s": 41.83898007026334,
+     "draft_n": 176,
+     "draft_n_accepted": 67,
+     "wall_tok_s": 11.82,
+     "temp_c": 71.6,
+     "content": "",
+     "reasoning": "Here's a thinking process that leads to the suggested response:\n\n1.  **Analyze the Request:** The user wants an explanation of how a refrigerator (Kühlschrank) works, in simple sentences. (The request is in German: \"Erkläre in einigen einfachen Sätzen, wie ein Kühlschrank funktioniert.\")\n\n2.  **Identify the Core Concepts:** What are the key functions of a refrigerator?\n    *   Cooling/ Cooling ( Cooling/ Cooling).\n    *   Temperature control (Temperature control).\n    *   Energy efficiency (Energy efficiency).\n    *   Maintaining the",
+     "finish": "length",
+     "text_sha256": "1dc660aa13f2b981adbaece105e322b09f9adee2f6715c0cba0a0f4b0a82a0ac"
+    },
+    {
+     "id": "code_py",
+     "lang": "code",
+     "wall_s": 8.6,
+     "prompt_n": 40,
+     "gen_n": 128,
+     "gen_tok_s": 16.580571721612984,
+     "prompt_tok_s": 42.704565545102426,
+     "draft_n": 131,
+     "draft_n_accepted": 82,
+     "wall_tok_s": 14.88,
+     "temp_c": 72.7,
+     "content": "```python\ndef fibonacci(n):\n    \"\"\"Returns the n-th Fibonacci number iteratively.\"\"\"\n    if n <= 0:\n        return 0\n    Fib_a, Fib_b = 0, 1\n    if n == 1:\n        return 1\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n    \n    a, b = 0, 1\n    for _ in range(2, n):\n        a, b = b, a + b\n    return b\n",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "c40f51b177aad35335838f08a993a3553f6b5c7a6753ef896f9e43f5234f3c65"
+    },
+    {
+     "id": "list_tips",
+     "lang": "en",
+     "wall_s": 12.1,
+     "prompt_n": 34,
+     "gen_n": 128,
+     "gen_tok_s": 11.262954060006713,
+     "prompt_tok_s": 41.63513417534269,
+     "draft_n": 197,
+     "draft_n_accepted": 60,
+     "wall_tok_s": 10.58,
+     "temp_c": 72.7,
+     "content": "Here are five practical tips for learning a new language as an adult:\n\n1. **Immerse Yourself in the Language (Immersion):** Immerse yourself in the language as much as possible. Change the language settings on your phone, computer, and social media to the target language. Watch movies, watch shows, listen to music, and consume media in the target language. This helps you build passive comprehension and exposure, which is crucial for building fluency.\n\n2. **Focus on Communication, Not Perfection:** Don't worry about making mistakes. Focus on communication first. Prioritize speaking over perfect grammar. Focus on being understood",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "e878d0b3d59fa68cff812af9eba40d89a864d02390046f1f0ad4d9da3341181d"
+    }
+   ],
+   "load_s": 6.0,
+   "draft_log": [
+    [
+     "0.44444",
+     "4",
+     "9",
+     "2.33"
+    ],
+    [
+     "0.26042",
+     "25",
+     "96",
+     "1.78"
+    ],
+    [
+     "0.59559",
+     "81",
+     "136",
+     "2.76"
+    ],
+    [
+     "0.43293",
+     "71",
+     "164",
+     "2.29"
+    ],
+    [
+     "0.38068",
+     "67",
+     "176",
+     "2.14"
+    ],
+    [
+     "0.62595",
+     "82",
+     "131",
+     "2.86"
+    ],
+    [
+     "0.30457",
+     "60",
+     "197",
+     "1.91"
+    ]
+   ],
+   "spec_lines": [
+    "0.04.204.865 I common_speculative_init_result: loading draft model '/mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf'"
+   ]
+  }
+ ]
+}

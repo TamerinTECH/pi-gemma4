@@ -1,0 +1,56 @@
+{
+ "label": "speed-ceiling/par_26b_ours",
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -t 4 -c 8192 -np 8 --host 127.0.0.1 --port 18096 -nr",
+ "model_bytes": 12728497888,
+ "started": "2026-10-06T09:07:45+0200",
+ "n_predict": 64,
+ "results": [
+  {
+   "streams": 1,
+   "ok": 1,
+   "wall_s": 22.02,
+   "generated_tokens": 64,
+   "prompt_tokens": 27,
+   "aggregate_gen_tok_s": 2.91,
+   "aggregate_all_tok_s": 4.13,
+   "per_stream_gen_tok_s_mean": 3.34,
+   "per_stream_gen_tok_s_min": 3.34,
+   "per_stream_gen_tok_s_max": 3.34,
+   "prompt_tok_s_mean": 8.54,
+   "temp_c": 65.55,
+   "errors": []
+  },
+  {
+   "streams": 4,
+   "ok": 4,
+   "wall_s": 61.38,
+   "generated_tokens": 256,
+   "prompt_tokens": 117,
+   "aggregate_gen_tok_s": 4.17,
+   "aggregate_all_tok_s": 6.08,
+   "per_stream_gen_tok_s_mean": 1.28,
+   "per_stream_gen_tok_s_min": 1.28,
+   "per_stream_gen_tok_s_max": 1.28,
+   "prompt_tok_s_mean": 2.39,
+   "temp_c": 69.4,
+   "errors": []
+  },
+  {
+   "streams": 8,
+   "ok": 8,
+   "wall_s": 104.22,
+   "generated_tokens": 512,
+   "prompt_tokens": 236,
+   "aggregate_gen_tok_s": 4.91,
+   "aggregate_all_tok_s": 7.18,
+   "per_stream_gen_tok_s_mean": 0.79,
+   "per_stream_gen_tok_s_min": 0.79,
+   "per_stream_gen_tok_s_max": 0.79,
+   "prompt_tok_s_mean": 1.19,
+   "temp_c": 73.25,
+   "errors": []
+  }
+ ],
+ "load_s": 5.0,
+ "finished": "2026-10-06T09:11:03+0200"
+}

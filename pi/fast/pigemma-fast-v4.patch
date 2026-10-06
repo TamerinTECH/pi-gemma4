@@ -1,0 +1,305 @@
+--- a/common/speculative.cpp
++++ b/common/speculative.cpp
+@@ -1408,6 +1408,7 @@
+     int32_t n_mtp_layers  = 1;
+     bool    is_mem_shared = false;   // gemma4
+     bool    chain_heads   = false;   // derived in the ctor: n_mtp_layers > 1 && !is_mem_shared
++    bool    pg_masked_tgt = false;   // PIGEMMA: target exports hidden rows of output tokens only
+ 
+     // Per-sequence cross-batch carryover: pair (h_p, x_{p+1}) at MTP pos p+1.
+     // The last h-row of one process() call needs the first token of the NEXT
+@@ -1475,12 +1476,18 @@
+             }
+         }
+ 
+-        llama_set_embeddings_nextn(ctx_tgt, true, /*masked*/ false);
+-        llama_set_embeddings_nextn(ctx_dft, true, /*masked*/ true);
+-
+         is_mem_shared = llama_get_ctx_other(ctx_dft) == ctx_tgt;
+         chain_heads   = n_mtp_layers > 1 && !is_mem_shared;
+ 
++        // PIGEMMA: a drafter that shares the target KV (gemma4) only reads target hidden rows of tokens that
++        // have the output flag, so the target may skip its shared-KV layers for all other prompt tokens
++        {
++            const char * pg_e = getenv("PIGEMMA_STRIP_PREFILL");
++            pg_masked_tgt = pg_e && atoi(pg_e) != 0 && is_mem_shared;
++        }
++        llama_set_embeddings_nextn(ctx_tgt, true, /*masked*/ pg_masked_tgt);
++        llama_set_embeddings_nextn(ctx_dft, true, /*masked*/ true);
++
+         if (chain_heads) {
+             this->params.n_max = std::min(this->params.n_max, n_mtp_layers);
+ 
+@@ -1630,6 +1637,30 @@
+             }
+ 
+             const int32_t n_rows = i_batch_end[seq_id] - i_batch_beg[seq_id] + 1;
++            if (pg_masked_tgt) {
++                // PIGEMMA: rows exist only for tokens with the output flag (a prompt batch: its last token or none;
++                // a verification batch: every token, in order)
++                verify_h[seq_id].resize((size_t) n_rows * n_embd);
++                int32_t n_out = 0;
++                for (int32_t i = 0; i < n_rows; ++i) {
++                    const int32_t k = i_batch_beg[seq_id] + i;
++                    if (!batch_in.tokens[k].output || batch_in.tokens[k].seq_id != seq_id) {
++                        continue;
++                    }
++                    const float * h = llama_get_embeddings_nextn_ith(ctx_tgt, k);
++                    if (h == nullptr) {
++                        continue;
++                    }
++                    std::memcpy(verify_h[seq_id].data() + (size_t) n_out * n_embd, h, row_bytes);
++                    n_out++;
++                }
++                verify_h_rows[seq_id] = n_out;
++                if (n_out > 0) {
++                    std::memcpy(pending_h[seq_id].data(),
++                            verify_h[seq_id].data() + (size_t) (n_out - 1) * n_embd, row_bytes);
++                }
++                continue;
++            }
+             verify_h_rows[seq_id] = n_rows;
+             verify_h[seq_id].resize((size_t) n_rows * n_embd);
+ 
+--- a/ggml/src/ggml-cpu/repack.cpp
++++ b/ggml/src/ggml-cpu/repack.cpp
+@@ -15,6 +15,9 @@
+ #include <cstring>
+ #include <cassert>
+ #include <cstdio>  // for GGML_ASSERT
++#include <algorithm>
++#include <cstdlib>
++#include <vector>
+ 
+ #include "repack.h"
+ 
+@@ -4598,6 +4601,17 @@
+         return false;
+     }
+ 
++    // PIGEMMA: PIGEMMA_PAD_TAIL switch and the per-call buffer with the zero-padded, quantized tail rows.
++    // One buffer per kernel family; assumes one graph computation at a time (true for llama-server/llama-bench).
++    static bool pg_pad_tail_on() {
++        static const bool on = []() { const char * e = getenv("PIGEMMA_PAD_TAIL"); return e && atoi(e) != 0; }();
++        return on;
++    }
++    static std::vector<char> & pg_tail_buf() {
++        static std::vector<char> buf;
++        return buf;
++    }
++
+     void forward_mul_mat_one_chunk(ggml_compute_params * params,
+                                    ggml_tensor *         op,
+                                    int64_t               src0_start,
+@@ -4640,6 +4654,22 @@
+                                                              src0_ptr + src0_start * nb01, src1_ptr,
+                                                              nrows - (nrows % 4), ncols);
+         }
++        // PIGEMMA: 2 or 3 leftover token rows -> ONE gemm sweep over this weight chunk with zero rows as padding
++        // (upstream: one gemv sweep, i.e. one more pass over the weights, per leftover row).
++        const int64_t pg_tail = nrows % 4;
++        if (pg_pad_tail_on() && pg_tail >= 2 && ncols > 0 && i11 == 0 && nrows == ne11) {
++            static thread_local std::vector<float> pg_out;  // [4, ncols]
++            pg_out.resize((size_t) 4 * ncols);
++            // the 4 padded rows of this plane were quantized once in forward_mul_mat
++            const char * pg_q = pg_tail_buf().data() + (size_t) i12 * 4 * src1_col_stride;
++            gemm<BLOC_TYPE, INTER_SIZE, NB_COLS, PARAM_TYPE>(ne00, pg_out.data(), (size_t) ncols,
++                                                             src0_ptr + src0_start * nb01, pg_q, 4, ncols);
++            for (int64_t t = 0; t < pg_tail; t++) {
++                memcpy((float *) (dst_ptr + (nrows - pg_tail + t) * nb1) + src0_start, pg_out.data() + t * ncols,
++                       (size_t) ncols * sizeof(float));
++            }
++            return;
++        }
+         for (int iter = nrows - (nrows % 4); iter < nrows; iter++) {
+             gemv<BLOC_TYPE, INTER_SIZE, NB_COLS, PARAM_TYPE>(ne00, (float *) (dst_ptr + (iter * nb1)) + src0_start,
+                                                              ne01, src0_ptr + src0_start * nb01,
+@@ -4705,6 +4735,23 @@
+             }
+         }
+ 
++        // PIGEMMA: zero-padded copy of the 2-3 leftover token rows, quantized once (thread 0) for all chunks;
++        // the other threads only read it after the barrier below
++        if (pg_pad_tail_on() && ith == 0 && (ne11 % 4) >= 2) {
++            const int64_t       pg_tail = ne11 % 4;
++            std::vector<char> & pg_q    = pg_tail_buf();
++            pg_q.resize((size_t) ne12 * 4 * nbw1);
++            std::vector<float> pg_x((size_t) 4 * ne10);
++            for (int64_t i12 = 0; i12 < ne12; i12++) {
++                std::fill(pg_x.begin(), pg_x.end(), 0.0f);
++                const char * pg_src = (const char *) src1->data + i12 * nb12;
++                for (int64_t t = 0; t < pg_tail; t++) {
++                    memcpy(pg_x.data() + t * ne10, pg_src + (ne11 - pg_tail + t) * nb11, (size_t) ne10 * sizeof(float));
++                }
++                ggml_quantize_mat_t<INTER_SIZE, PARAM_TYPE>(pg_x.data(), (void *) (pg_q.data() + (size_t) i12 * 4 * nbw1), 4, ne10);
++            }
++        }
++
+         // disable for NUMA
+         const bool disable_chunking = ggml_is_numa();
+ 
+@@ -4713,6 +4760,21 @@
+ 
+         int     nth_scaled  = nth * 4;
+         int64_t chunk_size0 = (nr0 + nth_scaled - 1) / nth_scaled;
++        {
++            // PIGEMMA: cache-sized weight chunks when several groups of token rows sweep the same chunk
++            static const int64_t pg_chunk_bytes = []() { const char * e = getenv("PIGEMMA_CHUNK_KB"); return e ? (int64_t) atol(e) * 1024 : (int64_t) 0; }();
++            if (pg_chunk_bytes > 0 && ne11 > 4) {
++                const int64_t pg_row_bytes = (int64_t) ggml_row_size(src0->type, ne00);
++                int64_t pg_rows = pg_chunk_bytes / (pg_row_bytes > 0 ? pg_row_bytes : 1);
++                pg_rows -= pg_rows % NB_COLS;
++                if (pg_rows < NB_COLS) {
++                    pg_rows = NB_COLS;
++                }
++                if (pg_rows < chunk_size0) {
++                    chunk_size0 = pg_rows;
++                }
++            }
++        }
+         int64_t nchunk0     = (nr0 + chunk_size0 - 1) / chunk_size0;
+ 
+         // src1 is chunked only by full planes.
+--- a/src/llama-graph.cpp
++++ b/src/llama-graph.cpp
+@@ -3128,7 +3128,8 @@
+         ggml_tensor * sinks,
+         ggml_tensor * v_mla,
+             float     kq_scale,
+-            int       il) const {
++            int       il,
++        ggml_tensor * q_out_ids) const {
+     const bool is_swa = hparams.is_swa(il);
+ 
+     auto * k_rot = is_swa ? inp->self_k_rot_swa : inp->self_k_rot;
+@@ -3183,7 +3184,16 @@
+         ggml_build_forward_expand(gf, mctx_cur->cpy_v(ctx0, v_cur, v_idxs, il));
+     }
+ 
+-    const auto & kq_mask = is_swa ? inp->get_kq_mask_swa() : inp->get_kq_mask();
++    ggml_tensor * kq_mask = is_swa ? inp->get_kq_mask_swa() : inp->get_kq_mask();
++    if (q_out_ids) {
++        // PIGEMMA: [n_kv, n_tokens] -> [n_kv, n_outputs]; ggml_get_rows returns F32, flash attention wants F16
++        GGML_ASSERT(k_cur == nullptr && v_cur == nullptr);
++        GGML_ASSERT(kq_mask->ne[2] == 1 && kq_mask->ne[3] == 1);
++        kq_mask = ggml_get_rows(ctx0, kq_mask, q_out_ids);
++        if (cparams.flash_attn) {
++            kq_mask = ggml_cast(ctx0, kq_mask, GGML_TYPE_F16);
++        }
++    }
+ 
+     ggml_tensor * q = q_cur;
+     ggml_tensor * k = use_kv_cur ? k_cur : mctx_cur->get_k(ctx0, il);
+--- a/src/llama-graph.h
++++ b/src/llama-graph.h
+@@ -1280,7 +1280,8 @@
+             ggml_tensor * sinks, // [n_head_q]
+             ggml_tensor * v_mla, // [n_embd_head_v_mla, n_embd_head_v, n_head_v]
+                   float   kq_scale,
+-                    int   il) const;
++                    int   il,
++            ggml_tensor * q_out_ids = nullptr) const; // PIGEMMA: q_cur holds only these batch rows
+ 
+     llm_graph_input_attn_k_iswa * build_attn_inp_k_iswa() const;
+ 
+--- a/src/models/gemma4.cpp
++++ b/src/models/gemma4.cpp
+@@ -1,4 +1,7 @@
+ #include "models.h"
++
++#include <algorithm>
++#include <cstdlib>
+ #include "llama-impl.h"
+ 
+ void llama_model_gemma4::load_arch_hparams(llama_model_loader & ml) {
+@@ -182,10 +185,33 @@
+         inp_per_layer = project_per_layer_inputs(inpL, inp_per_layer);
+     }
+ 
++    // PIGEMMA (upstream "TODO @ngxson" below): layers >= n_layer_kv_from_start reuse the KV cache of earlier
++    // layers, so a token that needs no output never has to pass through them. Strip those rows before the first
++    // such layer. Not possible while a drafter reads the hidden state of every token (embeddings_nextn).
++    static const bool pg_strip_env = []() { const char * e = getenv("PIGEMMA_STRIP_PREFILL"); return e && atoi(e) != 0; }();
++    const int  pg_il_strip = hparams.n_layer_kv_from_start;
++    const bool pg_strip    = pg_strip_env && inp_out_ids != nullptr && (!cparams.embeddings_nextn || cparams.embeddings_nextn_masked) &&
++                             pg_il_strip > 0 && pg_il_strip < n_layer &&
++                             (cparams.kv_unified || ubatch.n_seqs_unq == 1) && hparams.n_pos_per_embd() == 1 &&
++                             std::none_of(cparams.embeddings_layer_inp.begin() +
++                                              std::min<size_t>((size_t) std::max(pg_il_strip, 0), cparams.embeddings_layer_inp.size()),
++                                          cparams.embeddings_layer_inp.end(), [](bool b) { return b; });
++    ggml_tensor * pg_pos       = inp_pos;
++    int64_t       pg_n_tok     = n_tokens;
++    bool          pg_stripped  = false;
++
+     for (int il = 0; il < n_layer; ++il) {
+         const int64_t n_embd_head = hparams.n_embd_head_k(il);
+         GGML_ASSERT(n_embd_head == hparams.n_embd_head_v(il));
+ 
++        if (pg_strip && il == pg_il_strip) {
++            inpL        = ggml_get_rows(ctx0, inpL, inp_out_ids);
++            pg_pos      = ggml_reshape_1d(ctx0, ggml_get_rows(ctx0, ggml_reshape_2d(ctx0, inp_pos, 1, n_tokens), inp_out_ids), n_outputs);
++            pg_n_tok    = n_outputs;
++            pg_stripped = true;
++            cb(inpL, "pg_stripped_inp", il);
++        }
++
+         const int64_t n_head    = hparams.n_head(il);
+         const int64_t n_head_kv = hparams.n_head_kv(il);
+ 
+@@ -213,19 +239,19 @@
+             qkv_fused = build_lora_mm(model.layers[il].wqkv, cur, model.layers[il].wqkv_s);
+             cb(qkv_fused, "wqkv", il);
+             const int64_t q_dim = n_embd_head * n_head;
+-            Qcur = ggml_cont(ctx0, ggml_view_2d(ctx0, qkv_fused, q_dim, n_tokens, qkv_fused->nb[1], 0));
++            Qcur = ggml_cont(ctx0, ggml_view_2d(ctx0, qkv_fused, q_dim, pg_n_tok, qkv_fused->nb[1], 0));
+         } else {
+             Qcur = build_lora_mm(model.layers[il].wq, cur, model.layers[il].wq_s);
+         }
+         {
+             cb(Qcur, "Qcur", il);
+ 
+-            Qcur = ggml_reshape_3d(ctx0, Qcur, n_embd_head, n_head, n_tokens);
++            Qcur = ggml_reshape_3d(ctx0, Qcur, n_embd_head, n_head, pg_n_tok);
+ 
+             Qcur = build_norm(Qcur, model.layers[il].attn_q_norm, nullptr, LLM_NORM_RMS, il);
+             cb(Qcur, "Qcur_normed", il);
+ 
+-            Qcur = ggml_rope_ext(ctx0, Qcur, inp_pos, freq_factors, n_rot_l, rope_type, n_ctx_orig, freq_base_l, freq_scale_l,
++            Qcur = ggml_rope_ext(ctx0, Qcur, pg_pos, freq_factors, n_rot_l, rope_type, n_ctx_orig, freq_base_l, freq_scale_l,
+                                  ext_factor, attn_factor, beta_fast, beta_slow);
+             cb(Qcur, "Qcur_pos", il);
+         }
+@@ -271,12 +297,13 @@
+             // reuse KV cache of earlier layers
+             cur = build_attn(inp_attn,
+                     model.layers[il].wo, nullptr, model.layers[il].wo_s,
+-                    Qcur, nullptr, nullptr, nullptr, nullptr, nullptr, hparams.f_attention_scale, il);
++                    Qcur, nullptr, nullptr, nullptr, nullptr, nullptr, hparams.f_attention_scale, il,
++                    pg_stripped ? inp_out_ids : nullptr);
+         }
+ 
+         // TODO @ngxson : strip unused token right after the last KV layer to speed up prompt processing
+         // keep all rows when extracting unmasked nextn embeddings (MTP target needs the hidden state for every token)
+-        if (il == n_layer - 1 && inp_out_ids && cparams.embeddings_nextn_masked) {
++        if (il == n_layer - 1 && inp_out_ids && cparams.embeddings_nextn_masked && !pg_stripped) {
+             cur  = ggml_get_rows(ctx0,  cur, inp_out_ids);
+             inpL = ggml_get_rows(ctx0, inpL, inp_out_ids);
+         }
+@@ -376,7 +403,7 @@
+             ggml_tensor * inp_this_layer = gemma4_view_2d_slice(ctx0, inp_per_layer, il); // [n_embd_per_layer, n_tokens]
+ 
+             // TODO @ngxson : improve this
+-            if (il == n_layer - 1 && inp_out_ids && cparams.embeddings_nextn_masked) {
++            if (pg_stripped || (il == n_layer - 1 && inp_out_ids && cparams.embeddings_nextn_masked)) {
+                 inp_this_layer = ggml_get_rows(ctx0, inp_this_layer, inp_out_ids);
+             }
+ 
+@@ -414,7 +441,7 @@
+     cb(cur, "h_nextn", -1);
+     res->t_h_nextn = cur;
+ 
+-    if (!cparams.embeddings_nextn_masked && inp_out_ids) {
++    if (!cparams.embeddings_nextn_masked && inp_out_ids && !pg_stripped) {
+         cur = ggml_get_rows(ctx0, cur, inp_out_ids);
+     }
+ 

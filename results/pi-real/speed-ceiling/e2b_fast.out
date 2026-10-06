@@ -1,0 +1,34 @@
+downloaded_bytes=59235648 seconds=6
+OK /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf
+FETCH_DONE
+downloaded_bytes=2186186784 seconds=175
+OK /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B-it-qat-UD-Q2_K_XL.gguf
+FETCH_DONE
+[health 09:14:12] active active active active  temp=temp=56.0'C throttled=0x0 memavail=15747600kB
+=== B MTP A/B on E2B QAT Q4_0 2026-10-06T09:14:12+02:00
+{"config": "base", "id": "en_explain", "gen_n": 128, "gen_tok_s": 6.618971159631239, "wall_tok_s": 6.46, "draft_n": null, "draft_n_accepted": null, "temp_c": 63.9}
+{"config": "base", "id": "en_story", "gen_n": 128, "gen_tok_s": 6.695868385589226, "wall_tok_s": 6.48, "draft_n": null, "draft_n_accepted": null, "temp_c": 63.9}
+{"config": "base", "id": "he_explain", "gen_n": 128, "gen_tok_s": 6.74069757196889, "wall_tok_s": 6.53, "draft_n": null, "draft_n_accepted": null, "temp_c": 65.55}
+{"config": "base", "id": "de_explain", "gen_n": 128, "gen_tok_s": 6.699348585938954, "wall_tok_s": 6.52, "draft_n": null, "draft_n_accepted": null, "temp_c": 67.2}
+{"config": "base", "id": "code_py", "gen_n": 128, "gen_tok_s": 6.5128191768576045, "wall_tok_s": 6.31, "draft_n": null, "draft_n_accepted": null, "temp_c": 66.1}
+{"config": "base", "id": "list_tips", "gen_n": 128, "gen_tok_s": 6.491143422580593, "wall_tok_s": 6.3, "draft_n": null, "draft_n_accepted": null, "temp_c": 66.1}
+{"config": "mtp3", "id": "en_explain", "gen_n": 128, "gen_tok_s": 15.593697494055977, "wall_tok_s": 14.74, "draft_n": 137, "draft_n_accepted": 81, "temp_c": 66.65}
+{"config": "mtp3", "id": "en_story", "gen_n": 128, "gen_tok_s": 15.495906213406936, "wall_tok_s": 14.35, "draft_n": 139, "draft_n_accepted": 79, "temp_c": 66.65}
+{"config": "mtp3", "id": "he_explain", "gen_n": 128, "gen_tok_s": 10.911535030452205, "wall_tok_s": 10.36, "draft_n": 192, "draft_n_accepted": 61, "temp_c": 66.65}
+{"config": "mtp3", "id": "de_explain", "gen_n": 128, "gen_tok_s": 13.102176550075177, "wall_tok_s": 12.32, "draft_n": 156, "draft_n_accepted": 73, "temp_c": 68.3}
+{"config": "mtp3", "id": "code_py", "gen_n": 128, "gen_tok_s": 16.040876700853943, "wall_tok_s": 14.78, "draft_n": 133, "draft_n_accepted": 82, "temp_c": 69.4}
+{"config": "mtp3", "id": "list_tips", "gen_n": 128, "gen_tok_s": 13.999301798601635, "wall_tok_s": 13.12, "draft_n": 156, "draft_n_accepted": 74, "temp_c": 68.3}
+{"config": "base", "id": "en_explain", "gen_n": 128, "gen_tok_s": 7.581035448862065, "wall_tok_s": 7.41, "draft_n": null, "draft_n_accepted": null, "temp_c": 66.65}
+{"config": "base", "id": "en_story", "gen_n": 128, "gen_tok_s": 7.464373047030546, "wall_tok_s": 7.21, "draft_n": null, "draft_n_accepted": null, "temp_c": 66.1}
+{"config": "base", "id": "he_explain", "gen_n": 128, "gen_tok_s": 7.2901309077900605, "wall_tok_s": 7.05, "draft_n": null, "draft_n_accepted": null, "temp_c": 66.1}
+{"config": "base", "id": "de_explain", "gen_n": 128, "gen_tok_s": 7.348295736385734, "wall_tok_s": 7.15, "draft_n": null, "draft_n_accepted": null, "temp_c": 67.2}
+{"config": "base", "id": "code_py", "gen_n": 128, "gen_tok_s": 7.429343144278195, "wall_tok_s": 7.16, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.85}
+{"config": "base", "id": "list_tips", "gen_n": 128, "gen_tok_s": 7.4124566976828365, "wall_tok_s": 7.19, "draft_n": null, "draft_n_accepted": null, "temp_c": 68.3}
+{"config": "mtp3", "id": "en_explain", "gen_n": 128, "gen_tok_s": 16.145236958049207, "wall_tok_s": 15.22, "draft_n": 137, "draft_n_accepted": 81, "temp_c": 66.65}
+{"config": "mtp3", "id": "en_story", "gen_n": 128, "gen_tok_s": 15.495592358061899, "wall_tok_s": 14.34, "draft_n": 139, "draft_n_accepted": 79, "temp_c": 68.3}
+{"config": "mtp3", "id": "he_explain", "gen_n": 128, "gen_tok_s": 10.925276271848402, "wall_tok_s": 10.36, "draft_n": 192, "draft_n_accepted": 61, "temp_c": 66.65}
+{"config": "mtp3", "id": "de_explain", "gen_n": 128, "gen_tok_s": 13.380504352298775, "wall_tok_s": 12.68, "draft_n": 156, "draft_n_accepted": 73, "temp_c": 68.3}
+{"config": "mtp3", "id": "code_py", "gen_n": 128, "gen_tok_s": 15.575897978113533, "wall_tok_s": 14.4, "draft_n": 133, "draft_n_accepted": 82, "temp_c": 68.3}
+{"config": "mtp3", "id": "list_tips", "gen_n": 128, "gen_tok_s": 13.739912118656582, "wall_tok_s": 12.89, "draft_n": 156, "draft_n_accepted": 74, "temp_c": 68.3}
+{"config": "mtp6", "id": "en_explain", "gen_n": 128, "gen_tok_s": 7.955660784656174, "wall_tok_s": 7.76, "draft_n": 229, "draft_n_accepted": 88, "temp_c": 66.65}
+{"config": "mtp6", "id": "en_story", "gen_n": 128, "gen_tok_s": 7.751119960543748, "wall_tok_s": 7.48, "draft_n": 225, "draft_n_accepted": 87, "temp_c": 67.75}

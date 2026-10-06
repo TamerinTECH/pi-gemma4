@@ -1,0 +1,1 @@
+{"role": "assistant", "content": "", "reasoning_content": "*   Topic: How a refrigerator keeps food cold.\n*   Constraint: \"In simple words.\"\n*   Goal: Explain the mechanism/process clearly without getting bogged down in overly complex thermodynamics.\n\n    *   Heat transfer (moving heat from inside to outside).\n    *   Refriger"}
