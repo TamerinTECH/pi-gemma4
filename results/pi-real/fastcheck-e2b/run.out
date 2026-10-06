@@ -1,0 +1,99 @@
+[health 20:45:40] active active active active  temp=47.7'C throttled=0x0 free= 2.9G
+=== build the tool in the patched tree 2026-10-06T20:45:40+02:00
+installed into /mnt/pigemma-fast/llama-fast-v4-fresh
+=== build the tool in an unpatched reference copy 2026-10-06T20:45:45+02:00
+installed into /mnt/pigemma-fast/llama-ref-check
+3fcff95b07b27a79d99e9d725987825f29ea207704c0baaf5701ab915f5bac34  /mnt/pigemma-fast/llama-
+3868789506e5adc12b7a8a8bb20933ce31892c5675a06c163b3b00540d7d17bb  /mnt/pigemma-fast/llama-
+[health 20:50:10] active active active active  temp=59.3'C throttled=0x0 free= 2.7G
+--- run REF (PIGEMMA_NONE=0) 20:50:10
+fastcheck: FASTCHECK_RUN_DONE /mnt/pigemma-fast/fastcheck-e2b/REF.bin
+--- run OFF (PIGEMMA_NONE=0) 20:51:40
+fastcheck: FASTCHECK_RUN_DONE /mnt/pigemma-fast/fastcheck-e2b/OFF.bin
+--- run S (PIGEMMA_STRIP_PREFILL=1) 20:53:10
+fastcheck: FASTCHECK_RUN_DONE /mnt/pigemma-fast/fastcheck-e2b/S.bin
+--- run P (PIGEMMA_PAD_TAIL=1) 20:53:52
+fastcheck: FASTCHECK_RUN_DONE /mnt/pigemma-fast/fastcheck-e2b/P.bin
+--- run C (PIGEMMA_CHUNK_KB=64) 20:55:20
+fastcheck: FASTCHECK_RUN_DONE /mnt/pigemma-fast/fastcheck-e2b/C.bin
+--- run SPC (PIGEMMA_STRIP_PREFILL=1 PIGEMMA_PAD_TAIL=1 PIGEMMA_CHUNK_KB=64) 20:56:48
+fastcheck: FASTCHECK_RUN_DONE /mnt/pigemma-fast/fastcheck-e2b/SPC.bin
+[health 20:57:29] active active active active  temp=71.9'C throttled=0x0 free= 1.9G
+=== compare REF vs OFF --require-kv-equal --tol-kl 0 --tol-abs 0
+info A  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info A  s7.spec_equals_plain=yes
+info B  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs S --require-kv-equal
+s3.n511.511.last                   max|d|=4.447e-01  KL=1.492e-06  argmax same
+s3.n512.512.last                   max|d|=5.250e-01  KL=1.744e-07  argmax same
+s3.n513.511+2.last                 max|d|=5.821e-01  KL=2.865e-04  argmax same
+info A  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info A  s7.spec_equals_plain=yes
+info B  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=137 argmax_different=0 over_tolerance=0 worst_max_abs=5.821e-01 (s3.n513.511+2.last) worst_kl=2.865e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs P 
+s5.unified.seq0.last               max|d|=2.861e-06  KL=9.322e-14  argmax same
+s5.unified.seq1.last               max|d|=5.722e-06  KL=4.152e-14  argmax same
+s5.unified.seq0.step               max|d|=3.815e-06  KL=-8.184e-15  argmax same
+s5.unified.seq1.step               max|d|=3.815e-06  KL=1.549e-14  argmax same
+s5.streams.seq0.step               max|d|=3.815e-06  KL=-8.184e-15  argmax same
+s5.streams.seq1.step               max|d|=4.768e-06  KL=4.665e-14  argmax same
+info A  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info A  s7.spec_equals_plain=yes
+s9.b2.row0                         max|d|=2.861e-06  KL=4.715e-14  argmax same
+s9.b2.row1                         max|d|=2.861e-06  KL=6.967e-14  argmax same
+s9.b3.row0                         max|d|=2.861e-06  KL=4.715e-14  argmax same
+s9.b3.row1                         max|d|=2.861e-06  KL=6.967e-14  argmax same
+s9.b3.row2                         max|d|=2.861e-06  KL=3.925e-14  argmax same
+s9.b7.row4                         max|d|=3.815e-06  KL=1.845e-13  argmax same
+s9.b7.row5                         max|d|=2.861e-06  KL=4.639e-13  argmax same
+s9.b7.row6                         max|d|=3.815e-06  KL=3.003e-13  argmax same
+info B  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=126 argmax_different=0 over_tolerance=0 worst_max_abs=5.722e-06 (s5.unified.seq1.last) worst_kl=4.639e-13 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs C --require-kv-equal
+info A  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info A  s7.spec_equals_plain=yes
+info B  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs SPC 
+s3.n511.511.last                   max|d|=4.447e-01  KL=1.492e-06  argmax same
+s3.n512.512.last                   max|d|=5.250e-01  KL=1.744e-07  argmax same
+s3.n513.511+2.last                 max|d|=5.821e-01  KL=2.865e-04  argmax same
+s5.unified.seq0.last               max|d|=2.861e-06  KL=9.322e-14  argmax same
+s5.unified.seq1.last               max|d|=5.722e-06  KL=4.152e-14  argmax same
+s5.unified.seq0.step               max|d|=3.815e-06  KL=-8.184e-15  argmax same
+s5.unified.seq1.step               max|d|=3.815e-06  KL=1.549e-14  argmax same
+s5.streams.seq0.step               max|d|=3.815e-06  KL=-8.184e-15  argmax same
+s5.streams.seq1.step               max|d|=4.768e-06  KL=4.665e-14  argmax same
+info A  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info A  s7.spec_equals_plain=yes
+s9.b2.row0                         max|d|=2.861e-06  KL=4.715e-14  argmax same
+s9.b2.row1                         max|d|=2.861e-06  KL=6.967e-14  argmax same
+s9.b3.row0                         max|d|=2.861e-06  KL=4.715e-14  argmax same
+s9.b3.row1                         max|d|=2.861e-06  KL=6.967e-14  argmax same
+s9.b3.row2                         max|d|=2.861e-06  KL=3.925e-14  argmax same
+s9.b7.row4                         max|d|=3.815e-06  KL=1.845e-13  argmax same
+s9.b7.row5                         max|d|=2.861e-06  KL=4.639e-13  argmax same
+s9.b7.row6                         max|d|=3.815e-06  KL=3.003e-13  argmax same
+info B  s7.cycles=12 accepted_drafts=12 cycles_with_rejection=9
+info B  s7.spec_equals_plain=yes
+SUMMARY float=140 bit_identical=123 argmax_different=0 over_tolerance=0 worst_max_abs=5.821e-01 (s3.n513.511+2.last) worst_kl=2.865e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== controls: the reference against itself
+PAIR s3.n513.513.last | s3.n513.511+2.last : bit_identical=no max|d|=5.648e-01 KL=2.397e-04 argmax same (top logit 24.6177 vs 24.5989)
+PAIR s3.n513.513.last | s3.n513.512+1.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 24.6177 vs 24.6177)
+PAIR s2.b45.last | s2.b1.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s2.b45.last | s2.b3.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s2.b45.last | s2.b7.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s4.reused.last | s4.fresh.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 27.4194 vs 27.4194)
+=== the same controls with all switches on
+PAIR s3.n513.513.last | s3.n513.511+2.last : bit_identical=no max|d|=6.715e-01 KL=2.798e-04 argmax same (top logit 24.6177 vs 24.5715)
+PAIR s2.b45.last | s2.b3.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s2.b45.last | s2.b7.last : bit_identical=no max|d|=6.706e-01 KL=5.044e-04 argmax same (top logit 28.0804 vs 28.0848)
+PAIR s4.reused.last | s4.fresh.last : bit_identical=yes max|d|=0.000e+00 KL=0.000e+00 argmax same (top logit 27.4194 vs 27.4194)
+[health 20:57:33] active active active active  temp=68.1'C throttled=0x0 free= 1.9G
+=== FASTCHECK_DONE 2026-10-06T20:57:33+02:00

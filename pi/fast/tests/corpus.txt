@@ -1,0 +1,59 @@
+Repeat the following text exactly, word for word, with no additions and no comments.
+
+The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam fogged the glass. Her neighbour, an old clockmaker named Ilias, arrived as he did every day at half past six, bought two rolls and one small coffee, and told her what the weather would be. He was usually right. Today he said the wind would turn north before noon and that the ferry would be late, and so the people who worked on the island should take the early boat. By seven the square was full of bicycles, delivery vans and schoolchildren carrying instruments for the harvest concert. The mayor had promised that the new library would open before winter, and the builders were already on the scaffolding, fitting the last copper sheets to the roof. Nobody in the town believed the promise, but everybody hoped it was true, because the old library had been closed since the flood two years earlier and the books were still stored in the dry rooms above the fire station.
+
+Correct the spelling mistakes in the following text. Output only the full corrected text.
+
+A refrigerater keeps food cold by moving heat from the inside of the box to the room outside. A liquid called a refrigerant flows through thin pipes inside the walls. When the liquid evaporates it absorbes heat from the food compartment, which makes the inside colder. A compresser then squeezes the gas, which raises its temperature, and pushes it through the coils at the back of the machine. There the gas gives its heat to the air in the kitchen and turns back into a liquid. The cycle repeats many times every hour. A thermostat mesures the temperature inside and switches the compressor on and off, so that the food stays between two and six degrees. Because cold air is heavier than warm air, the coldest place is usualy the bottom shelf, and the door is the warmest part. Opening the door for a long time lets warm, humid air in, and the machine must work harder to remove that heat again.
+
+In the following Python code, rename the variable `total` to `acc` everywhere. Output only the full modified code.
+
+```python
+import csv
+from pathlib import Path
+
+
+def load_rows(path):
+    rows = []
+    with Path(path).open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            rows.append(row)
+    return rows
+
+
+def sum_column(rows, column):
+    total = 0.0
+    for row in rows:
+        value = row.get(column, "").strip()
+        if not value:
+            continue
+        try:
+            total += float(value)
+        except ValueError:
+            print(f"skipping bad value {value!r}")
+    return total
+
+
+def average_column(rows, column):
+    total = sum_column(rows, column)
+    count = sum(1 for row in rows if row.get(column, "").strip())
+    if count == 0:
+        return 0.0
+    return total / count
+
+
+def report(path, columns):
+    rows = load_rows(path)
+    lines = []
+    for column in columns:
+        total = sum_column(rows, column)
+        mean = average_column(rows, column)
+        lines.append(f"{column}: total={total:.2f} mean={mean:.2f}")
+    return "\n".join(lines)
+
+
+if __name__ == "__main__":
+    print(report("sales.csv", ["amount", "tax", "discount"]))
+```
+
+The water cycle moves water between the sea, the air and the land. Heat from the sun turns water at the surface into vapour, which rises and cools until it forms clouds made of tiny droplets. When the droplets grow heavy they fall as rain or snow. Some of that water runs over the ground into streams and rivers, some soaks into the soil and feeds plants or slowly fills the rock layers below, and a part of it freezes in glaciers for many years. Rivers carry the water back to the sea, where the cycle begins again. People depend on every stage of it: farmers on rain at the right time, towns on rivers and wells, and power stations on water held behind dams. In German the same idea is short: Wasser verdunstet, bildet Wolken und fällt als Regen zurück auf die Erde. In Hebrew: המים מתאדים, יוצרים עננים ויורדים כגשם בחזרה אל האדמה.

@@ -485,7 +485,187 @@ def patch_v4_layer_inp_guard(root):
 """)
 
 
-UPGRADES = [("v2", patch_v2_mtp_strip), ("v3", patch_v3_pad_once), ("v4", patch_v4_layer_inp_guard)]
+def patch_v5_fallback_guards(root):
+    """v5: explicit fallback to the reference graph for consumers the layer skip does not support:
+    an eval callback (it would see fewer rows in the upper layers), training mode, and batches that carry
+    embeddings instead of token ids (image/audio input)."""
+    g = root / "src/models/gemma4.cpp"
+    sub(g, """                             pg_il_strip > 0 && pg_il_strip < n_layer &&
+""", """                             pg_il_strip > 0 && pg_il_strip < n_layer &&
+                             cparams.cb_eval == nullptr && !cparams.training && ubatch.token != nullptr &&
+""")
+
+
+def patch_v6_mtp_centroids(root):
+    """v6: PIGEMMA_MTP_CENTROIDS=1 — the Gemma 4 E2B/E4B assistant (MTP drafter) computes its draft logits only for
+    the tokens of the best clusters ("masked embedding" of the reference implementation in transformers:
+    centroids [n_centroids, n_embd], token_ordering = permutation of the vocabulary in cluster order, equal
+    cluster size, top-k clusters). Needs a drafter GGUF that carries masked_embd_centroids.weight and
+    masked_embd_ordering (the reference converter drops them; see pi/fast/make_centroid_gguf.py).
+    Only the DRAFT proposals change; the target model's verification is untouched.
+    Also: PIGEMMA_SPEC_STATS=1 prints the time spent in the drafter per request."""
+    h = root / "src/llama-model.h"
+    sub(h, """    struct ggml_tensor * nextn_proj_post = nullptr;
+""", """    struct ggml_tensor * nextn_proj_post = nullptr;
+
+    // PIGEMMA: masked-embedding tensors of the Gemma 4 E2B/E4B assistants (optional)
+    struct ggml_tensor * pg_masked_centroids = nullptr; // F32/F16 [n_embd, n_centroids]
+    struct ggml_tensor * pg_masked_ordering  = nullptr; // I32 [n_vocab], token ids in cluster order
+""")
+    a = root / "src/models/gemma4-assistant.cpp"
+    sub(a, '#include "models.h"\n', '#include "models.h"\n\n#include <algorithm>\n#include <cstdlib>\n#include <string>\n')
+    sub(a, "void llama_model_gemma4_assistant::load_arch_tensors(llama_model_loader &) {",
+           "void llama_model_gemma4_assistant::load_arch_tensors(llama_model_loader & ml) {")
+    sub(a, """    create_tensor(tn(LLM_TENSOR_MASKED_EMBD_CENTROIDS, "weight"), {}, TENSOR_NOT_REQUIRED);
+    create_tensor(tn(LLM_TENSOR_MASKED_EMBD_ORDERING),  {}, TENSOR_NOT_REQUIRED);
+""", """    // PIGEMMA: load the masked-embedding tensors with their real shapes when the file carries them
+    // (upstream asks for an empty shape, which cannot match a real tensor)
+    {
+        const std::string pg_name_c = tn(LLM_TENSOR_MASKED_EMBD_CENTROIDS, "weight");
+        const std::string pg_name_o = tn(LLM_TENSOR_MASKED_EMBD_ORDERING);
+        const auto * pg_w_c = ml.get_weight(pg_name_c.c_str());
+        const auto * pg_w_o = ml.get_weight(pg_name_o.c_str());
+        if (pg_w_c && pg_w_o) {
+            pg_masked_centroids = create_tensor(tn(LLM_TENSOR_MASKED_EMBD_CENTROIDS, "weight"), { n_embd, pg_w_c->tensor->ne[1] }, 0);
+            pg_masked_ordering  = create_tensor(tn(LLM_TENSOR_MASKED_EMBD_ORDERING), { n_vocab }, 0);
+        }
+    }
+""")
+    sub(a, """    ggml_tensor * logits = build_lora_mm(model.output, cur);
+    cb(logits, "result_output", -1);
+""", """    // PIGEMMA_MTP_CENTROIDS=1: score the cluster centroids, keep the best clusters and compute the logits of
+    // their tokens only (reference: Gemma4AssistantMaskedEmbedder in transformers); every other token gets a
+    // large negative logit. One output row per graph only, otherwise the dense head is used.
+    static const int pg_centroid_top_k = []() {
+        const char * e = getenv("PIGEMMA_MTP_CENTROIDS");
+        const int v = e ? atoi(e) : 0;
+        return v == 1 ? 32 : v;   // 1 = the reference value (centroid_intermediate_top_k = 32), n > 1 = n clusters
+    }();
+    ggml_tensor * logits = nullptr;
+    if (pg_centroid_top_k > 0 && model.pg_masked_centroids && model.pg_masked_ordering && n_outputs == 1 &&
+            cur->ne[1] == 1 && model.pg_masked_ordering->type == GGML_TYPE_I32) {
+        const int64_t pg_n_vocab     = model.pg_masked_ordering->ne[0];
+        const int64_t pg_n_centroids = model.pg_masked_centroids->ne[1];
+        const int64_t pg_per_cluster = pg_n_vocab / pg_n_centroids;
+        const int64_t pg_k           = std::min<int64_t>(pg_centroid_top_k, pg_n_centroids);
+        ggml_tensor * pg_scores = ggml_mul_mat(ctx0, model.pg_masked_centroids, cur);               // [n_centroids, 1]
+        ggml_tensor * pg_top    = ggml_reshape_1d(ctx0, ggml_top_k(ctx0, pg_scores, (int) pg_k), pg_k);  // I32 [k]
+        ggml_tensor * pg_order  = ggml_reshape_2d(ctx0, model.pg_masked_ordering, pg_per_cluster, pg_n_centroids);
+        ggml_tensor * pg_cand   = ggml_reshape_1d(ctx0, ggml_get_rows(ctx0, pg_order, pg_top), pg_per_cluster * pg_k);
+        ggml_tensor * pg_embd   = ggml_get_rows(ctx0, model.tok_embd, pg_cand);                     // F32 [n_embd, n_cand]
+        ggml_tensor * pg_lc     = ggml_mul_mat(ctx0, pg_embd, cur);                                 // [n_cand, 1]
+        ggml_tensor * pg_full   = ggml_new_tensor_2d(ctx0, GGML_TYPE_F32, 1, pg_n_vocab);
+        pg_full = ggml_fill(ctx0, pg_full, -1.0e30f);
+        pg_full = ggml_set_rows(ctx0, pg_full, ggml_reshape_2d(ctx0, pg_lc, 1, pg_per_cluster * pg_k), pg_cand);
+        logits  = ggml_reshape_2d(ctx0, pg_full, pg_n_vocab, 1);
+    } else {
+        logits = build_lora_mm(model.output, cur);
+    }
+    cb(logits, "result_output", -1);
+""")
+    s = root / "common/speculative.cpp"
+    sub(s, """    bool    pg_masked_tgt = false;   // PIGEMMA: target exports hidden rows of output tokens only
+""", """    bool    pg_masked_tgt = false;   // PIGEMMA: target exports hidden rows of output tokens only
+
+    // PIGEMMA_SPEC_STATS=1: time spent building drafts, printed per request (at the next begin() and at exit)
+    bool    pg_stats      = false;
+    int64_t pg_t_draft_us = 0;
+    int64_t pg_n_calls    = 0;
+    int64_t pg_n_drafted  = 0;
+
+    void pg_print_stats(const char * when) {
+        if (!pg_stats || pg_n_calls == 0) {
+            return;
+        }
+        fprintf(stderr, "pigemma-mtp-stats %s draft_calls=%lld drafted_tokens=%lld draft_ms=%.3f ms_per_call=%.3f ms_per_token=%.3f\\n",
+                when, (long long) pg_n_calls, (long long) pg_n_drafted, pg_t_draft_us / 1000.0,
+                pg_t_draft_us / 1000.0 / (double) pg_n_calls,
+                pg_n_drafted > 0 ? pg_t_draft_us / 1000.0 / (double) pg_n_drafted : 0.0);
+        pg_t_draft_us = 0;
+        pg_n_calls    = 0;
+        pg_n_drafted  = 0;
+    }
+""")
+    sub(s, """            const char * pg_e = getenv("PIGEMMA_STRIP_PREFILL");
+            pg_masked_tgt = pg_e && atoi(pg_e) != 0 && is_mem_shared;
+""", """            const char * pg_e = getenv("PIGEMMA_STRIP_PREFILL");
+            pg_masked_tgt = pg_e && atoi(pg_e) != 0 && is_mem_shared;
+            const char * pg_s = getenv("PIGEMMA_SPEC_STATS");
+            pg_stats = pg_s && atoi(pg_s) != 0;
+""")
+    sub(s, """    ~common_speculative_impl_draft_mtp() override {
+        auto * ctx_dft = this->params.ctx_dft;
+""", """    ~common_speculative_impl_draft_mtp() override {
+        pg_print_stats("exit");
+        auto * ctx_dft = this->params.ctx_dft;
+""")
+    sub(s, """    void begin(llama_seq_id seq_id, const llama_tokens & prompt) override {
+        // reset here rather than per round, or two identical requests differ
+        common_sampler_reset(smpls[seq_id].get());
+""", """    void begin(llama_seq_id seq_id, const llama_tokens & prompt) override {
+        pg_print_stats("request");
+        // reset here rather than per round, or two identical requests differ
+        common_sampler_reset(smpls[seq_id].get());
+""")
+    sub(s, """                    verify_h[seq_id].data() + (size_t) (n_rows - 1) * n_embd, row_bytes);
+        }
+
+        return true;
+    }
+
+    void draft(common_speculative_draft_params_vec & dparams) override {
+        auto & ctx_dft = params.ctx_dft;
+
+        batch.clear();
+
+        // keep track of which sequences are still drafting
+        int n_drafting = 0;
+        std::vector<bool> drafting(n_seq);
+""", """                    verify_h[seq_id].data() + (size_t) (n_rows - 1) * n_embd, row_bytes);
+        }
+
+        return true;
+    }
+
+    void draft(common_speculative_draft_params_vec & dparams) override {
+        const int64_t pg_t0 = pg_stats ? ggml_time_us() : 0;
+        draft_impl(dparams);
+        if (pg_stats) {
+            pg_t_draft_us += ggml_time_us() - pg_t0;
+            pg_n_calls    += 1;
+            for (auto & dp : dparams) {
+                if (dp.drafting && dp.result) {
+                    pg_n_drafted += (int64_t) dp.result->size();
+                }
+            }
+        }
+    }
+
+    void draft_impl(common_speculative_draft_params_vec & dparams) {
+        auto & ctx_dft = params.ctx_dft;
+
+        batch.clear();
+
+        // keep track of which sequences are still drafting
+        int n_drafting = 0;
+        std::vector<bool> drafting(n_seq);
+""")
+    sub(s, "#include <cinttypes>\n", "#include <cinttypes>\n#include <cstdio>\n#include <cstdlib>\n")
+
+
+def patch_v7_masked_tensor_ops(root):
+    """v7: upstream registers the two masked-embedding tensors with GGML_OP_NONE, which makes the loader report
+    them as unused and skip them. Register the operations they are used with so that v6 can load them."""
+    a = root / "src/llama-arch.cpp"
+    sub(a, """    {LLM_TENSOR_MASKED_EMBD_CENTROIDS,      {LLM_TENSOR_LAYER_INPUT,     GGML_OP_NONE}},
+    {LLM_TENSOR_MASKED_EMBD_ORDERING,       {LLM_TENSOR_LAYER_INPUT,     GGML_OP_NONE}},
+""", """    {LLM_TENSOR_MASKED_EMBD_CENTROIDS,      {LLM_TENSOR_LAYER_INPUT,     GGML_OP_MUL_MAT}},   // PIGEMMA: was GGML_OP_NONE
+    {LLM_TENSOR_MASKED_EMBD_ORDERING,       {LLM_TENSOR_LAYER_INPUT,     GGML_OP_GET_ROWS}},  // PIGEMMA: was GGML_OP_NONE
+""")
+
+
+UPGRADES = [("v2", patch_v2_mtp_strip), ("v3", patch_v3_pad_once), ("v4", patch_v4_layer_inp_guard),
+            ("v5", patch_v5_fallback_guards), ("v6", patch_v6_mtp_centroids), ("v7", patch_v7_masked_tensor_ops)]
 
 
 def main():
