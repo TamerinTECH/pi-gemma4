@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 # Phase C (after phase B): 26B per-operation profile, from-scratch build of patch v7 in a new directory with the
 # correctness scenarios, and the upstream-style patches on llama.cpp master on the Pi.
-#   run_phase_c.sh [steps]     steps = comma list out of: profile26,fresh7,upstream (default: all)
+#   run_phase_c.sh [steps]     steps = comma list out of: attrib,profile26,fresh7,upstream (default: all)
 # Every step takes the bench lock itself, so they run one after the other.
 set -uo pipefail
 cd ~/pigemma/fast
-steps=",${1:-profile26,fresh7,upstream},"
+steps=",${1:-attrib,profile26,fresh7,upstream},"
 want() { case "$steps" in *",$1,"*) return 0;; *) return 1;; esac; }
 E2B=/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf
+if want attrib; then
+  echo "=== attribution of the one differing answer $(date -Is)"
+  ./run_attrib.sh
+fi
 if want profile26; then
   echo "=== profile26 $(date -Is)"
   ./run_26b_profile.sh

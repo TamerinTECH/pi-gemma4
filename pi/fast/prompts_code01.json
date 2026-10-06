@@ -1,0 +1,9 @@
+[
+ {
+  "id": "code-01",
+  "lang": "code",
+  "category": "code",
+  "text": "Write a Python function `second_largest(nums)` that returns the second largest DISTINCT value in a list of integers, or None if there is no such value. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+  "max_tokens": 512
+ }
+]
