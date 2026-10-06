@@ -1,0 +1,220 @@
+{
+ "label": "fast3/ablation/mtp3_pad",
+ "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+ "model_bytes": 3349516256,
+ "max_tokens": 128,
+ "threads": 4,
+ "configs": {
+  "c": "@PIGEMMA_PAD_TAIL=1 -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp"
+ },
+ "order": [
+  "c"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "c",
+   "command": "nice -n 10 /mnt/usb/pigemma/fast/bin-v7/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18428 --reasoning off -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "env": {
+    "PIGEMMA_PAD_TAIL": "1"
+   },
+   "requests": [
+    {
+     "id": "repeat_en",
+     "lang": "en",
+     "wall_s": 7.46,
+     "prompt_n": 267,
+     "gen_n": 64,
+     "gen_tok_s": 22.088197119278366,
+     "prompt_tok_s": 57.969843956904306,
+     "draft_n": 47,
+     "draft_n_accepted": 47,
+     "wall_tok_s": 8.58,
+     "temp_c": 72.15,
+     "content": "The harbour town woke slowly on the first cold morning of autumn. Fishing boats rocked against the stone quay while gulls argued over scraps left from the night market. In the bakery on the corner, Marta pulled the first trays of rye bread from the oven and set them on the wooden rack by the window, where the steam",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "51b1f2a1ed26af65ac5a6be0ec7d40b7a52797192a9050594d50a3446218e165",
+     "prompt_ms": 4605.843,
+     "gen_ms": 2852.202,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 4.611,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 4.611
+    },
+    {
+     "id": "fix_typos_en",
+     "lang": "en",
+     "wall_s": 6.52,
+     "prompt_n": 210,
+     "gen_n": 64,
+     "gen_tok_s": 20.870885743826772,
+     "prompt_tok_s": 60.07686405635553,
+     "draft_n": 50,
+     "draft_n_accepted": 46,
+     "wall_tok_s": 9.81,
+     "temp_c": 72.15,
+     "content": "A refrigerator keeps food cold by moving heat from the inside of the box to the room outside. A liquid called a refrigerant flows through thin pipes inside the walls. When the liquid evaporates, it absorbs heat from the food compartment, which makes the inside colder. A compressor then squeezes the gas, which raises its temperature,",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "fd04a85bb6bd17f81270ba93d09ed653239f15087ab53a6eaf5fdd5f0f24b003",
+     "prompt_ms": 3495.522,
+     "gen_ms": 3018.559,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 3.503,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 3.503
+    },
+    {
+     "id": "code_rename",
+     "lang": "code",
+     "wall_s": 9.1,
+     "prompt_n": 367,
+     "gen_n": 64,
+     "gen_tok_s": 20.869316341072206,
+     "prompt_tok_s": 60.415818869753366,
+     "draft_n": 47,
+     "draft_n_accepted": 47,
+     "wall_tok_s": 7.03,
+     "temp_c": 73.25,
+     "content": "```python\nimport csv\nfrom pathlib import Path\n\n\ndef load_rows(path):\n    rows = []\n    with Path(path).open(newline=\"\", encoding=\"utf-8\") as handle:\n        for row in csv.DictReader(handle):\n            rows.append(row)\n",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "84ea12ae4016366cf03795eac468008de2c57dd78a5733dfaa69f0a7f45f5b0d",
+     "prompt_ms": 6074.568,
+     "gen_ms": 3018.786,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 6.081,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 6.081
+    },
+    {
+     "id": "en_explain",
+     "lang": "en",
+     "wall_s": 6.51,
+     "prompt_n": 21,
+     "gen_n": 76,
+     "gen_tok_s": 12.472110282722785,
+     "prompt_tok_s": 42.70219489281749,
+     "draft_n": 105,
+     "draft_n_accepted": 40,
+     "wall_tok_s": 11.67,
+     "temp_c": 72.7,
+     "content": "A refrigerator keeps food cold by using a **refrigerant** that absorbs heat from the inside of the fridge. This heat is then transferred to the outside of the refrigerator, where it is released into the surrounding environment. This process is facilitated by a **compressor** and a **condenser coil**, which work together to continuously remove heat, maintaining a low temperature inside.",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "f3df91408cf3e7b0cbf616e0f0c4b803a5b90228ed8891b9cb420de557b91665",
+     "prompt_ms": 491.778,
+     "gen_ms": 6013.417,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 0.499,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 0.499
+    },
+    {
+     "id": "he_explain",
+     "lang": "he",
+     "wall_s": 11.36,
+     "prompt_n": 28,
+     "gen_n": 96,
+     "gen_tok_s": 8.864886715612661,
+     "prompt_tok_s": 44.08733701462598,
+     "draft_n": 184,
+     "draft_n_accepted": 32,
+     "wall_tok_s": 8.45,
+     "temp_c": 73.8,
+     "content": "מקרר פועל על ידי **העברת חום מהמקרר אל החלל החיצוני** באמצעות גז מקרר.\n\nהגז הזה עובר דרך צינורות ומחליף חום עם האוויר בתוך המקרר, מה שגורם לאוויר להתקרר. המקרר משתמש במדחס כדי להזיז את הגז ולשמור על תה",
+     "reasoning": "",
+     "finish": "length",
+     "text_sha256": "158fb81ac646555c9e22004ca39bbcdc300d3b0d73d96457236cf7bec4bd7e42",
+     "prompt_ms": 635.103,
+     "gen_ms": 10716.437,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 0.642,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 0.642
+    },
+    {
+     "id": "code_py",
+     "lang": "code",
+     "wall_s": 5.35,
+     "prompt_n": 33,
+     "gen_n": 95,
+     "gen_tok_s": 20.041473056797958,
+     "prompt_tok_s": 50.37544975354192,
+     "draft_n": 81,
+     "draft_n_accepted": 67,
+     "wall_tok_s": 17.76,
+     "temp_c": 73.25,
+     "content": "```python\ndef fibonacci_iterative(n):\n    \"\"\"Returns the n-th Fibonacci number iteratively.\"\"\"\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    \n    a, b = 0, 1\n    for _ in range(2, n + 1):\n        a, b = b, a + b\n    return b\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "688dc147ab369d5e72fbeb14acf7153ad8f05b521e413882706bd567d856a8b0",
+     "prompt_ms": 655.081,
+     "gen_ms": 4690.274,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 0.662,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 0.662
+    }
+   ],
+   "load_s": 7.0,
+   "rendered_prompt": "<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 5117376,
+    "VmRSS": 5117376,
+    "RssAnon": 1808448,
+    "RssFile": 3308928,
+    "VmSwap": 0
+   },
+   "draft_log": [
+    [
+     "1.00000",
+     "5",
+     "5",
+     "3.50"
+    ],
+    [
+     "1.00000",
+     "47",
+     "47",
+     "3.94"
+    ],
+    [
+     "0.92000",
+     "46",
+     "50",
+     "3.71"
+    ],
+    [
+     "1.00000",
+     "47",
+     "47",
+     "3.94"
+    ],
+    [
+     "0.38095",
+     "40",
+     "105",
+     "2.14"
+    ],
+    [
+     "0.17391",
+     "32",
+     "184",
+     "1.52"
+    ],
+    [
+     "0.82716",
+     "67",
+     "81",
+     "3.48"
+    ]
+   ],
+   "spec_lines": [
+    "0.05.229.886 I common_speculative_init_result: loading draft model '/mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf'"
+   ],
+   "draft_stats": []
+  }
+ ]
+}
