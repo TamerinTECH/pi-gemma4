@@ -1,0 +1,5 @@
+[
+  {"id": "warmup", "prompt": "Hello", "max_tokens": 8},
+  {"id": "en_explain", "prompt": "Explain in a few sentences how a refrigerator keeps food cold.", "max_tokens": 48},
+  {"id": "de_explain", "prompt": "Erkläre in wenigen Sätzen, warum der Himmel blau ist.", "max_tokens": 48}
+]

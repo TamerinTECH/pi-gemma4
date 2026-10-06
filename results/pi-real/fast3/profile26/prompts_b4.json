@@ -1,0 +1,4 @@
+[
+  {"id": "warmup", "prompt": "Hello", "max_tokens": 4},
+  {"id": "long_en", "prompt": "Read the following note and then answer in one sentence. The city council met on Tuesday evening to discuss the new bicycle lanes along the river road. Several residents asked for better lighting, two shop owners worried about parking, and the head of the school asked for a safe crossing near the main gate. The council agreed to add lights and a crossing, and to review parking after six months. What did the council decide?", "max_tokens": 32}
+]

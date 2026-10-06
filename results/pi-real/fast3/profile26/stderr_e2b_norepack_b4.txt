@@ -1,0 +1,13 @@
+CF_ENGINE mode=reference kernel=dotprod dotprod_available=1 packed_bytes=0 init_ms=0.009 validate=0
+pigemma-probe: loading /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf (mode run; warm-up disabled)
+0.02.320.461 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.02.321.330 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.02.377.854 W load: '</s>' is a normal token here, removing it from EOG list
+0.02.502.749 I cmn          init: llama threadpool init, n_threads = 4
+pigemma-probe: model: arch=gemma4 name='Hf' n_layer=35 n_embd=1536 n_expert=0 n_expert_used=0 n_vocab=262144 | n_ctx=1024 n_batch=4 n_ubatch=4 threads=4/4
+pigemma-probe: chat-wrapped prompt 0 (template): "<|turn>user\nHello<turn|>\n<|turn>model\n"
+pigemma-probe: gen-prompts: 2 prompt(s) from /home/pi/pigemma/results/fast3/profile26/prompts_b4.json
+pigemma-probe: chunk 1/2 (prompts_b4): prefill 10 tok 678 ms (14.75 tok/s) | gen 3 tok 427 ms (7.02 tok/s) | recorded 13
+pigemma-probe: chunk 2/2 (prompts_b4): prefill 92 tok 5990 ms (15.36 tok/s) | gen 22 tok 3178 ms (6.92 tok/s) | recorded 127
+PIGEMMA_SUMMARY {"mode":"run","exit_code":0,"n_prompt":102,"n_gen":25,"n_records":0,"n_chunks":2,"t_load_ms":1096.927,"t_p_eval_ms":6667.028,"t_eval_ms":3598.313,"tok_s_prompt":15.299,"tok_s_gen":6.948,"callback_ms":0.0,"t_prefill_wall_ms":6667.584,"t_gen_wall_ms":3598.805,"wall_tok_s_prompt":15.298,"wall_tok_s_gen":6.947,"trace_out":null,"act_out":null,"io_csv":null,"n_p_eval":102,"n_eval":25,"wall_ms":13034.907,"n_ctx":1024,"n_threads":4,"interrupted":false,"error":null,"probe_version":"1.1.0","llama_build":11398,"llama_commit":"a7b94df"}
+CF_COVERAGE cf_calls=0 reference_calls=45441 reference_runtime_share=1.0 validation_failures=0

@@ -1,0 +1,163 @@
+{
+ "label": "fast3/attrib/ref",
+ "model": "/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf",
+ "model_bytes": 3349516256,
+ "max_tokens": 128,
+ "threads": 4,
+ "configs": {
+  "plain": "",
+  "mtp": "-md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+  "plain_again": ""
+ },
+ "order": [
+  "plain",
+  "mtp",
+  "plain_again"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "plain",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18470 --reasoning off",
+   "env": {},
+   "requests": [
+    {
+     "id": "code-01",
+     "lang": "code",
+     "wall_s": 35.44,
+     "prompt_n": 70,
+     "gen_n": 253,
+     "gen_tok_s": 7.379005610474651,
+     "prompt_tok_s": 54.61002203124317,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.14,
+     "temp_c": 67.75,
+     "content": "```python\ndef second_largest(nums):\n    \"\"\"\n    Returns the second largest distinct value in a list of integers, or None if there is no such value.\n    \"\"\"\n    # Convert the list to a set to get distinct values\n    distinct_nums = set(nums)\n\n    # Convert the set back to a list and sort it in descending order\n    sorted_distinct_nums = sorted(list(distinct_nums), reverse=True)\n\n    # Check if there are at least two distinct elements\n    if len(sorted_distinct_nums) < 2:\n        return None\n\n    # The largest distinct value is at index 0\n    largest = sorted_distinct_nums[0]\n\n    # Iterate through the sorted list to find the first element that is not the largest\n    for i in range(1, len(sorted_distinct_nums)):\n        if sorted_distinct_nums[i] != largest:\n            return sorted_distinct_nums[i]\n\n    # This part should theoretically not be reached if len(sorted_distinct_nums) >= 2,\n    # but as a fallback, return None\n    return None\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "944d8da783e426265aa3d0a293746c82e6ce259caddc6025aa4d3418464fa567",
+     "prompt_ms": 1281.816,
+     "gen_ms": 34150.943,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 1.285,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 1.285
+    }
+   ],
+   "load_s": 5.0,
+   "rendered_prompt": "<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 4798464,
+    "VmRSS": 4798464,
+    "RssAnon": 1532528,
+    "RssFile": 3265936,
+    "VmSwap": 0
+   },
+   "draft_log": [],
+   "spec_lines": [],
+   "draft_stats": []
+  },
+  {
+   "index": 1,
+   "config": "mtp",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18471 --reasoning off -md /mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf --spec-type draft-mtp",
+   "env": {},
+   "requests": [
+    {
+     "id": "code-01",
+     "lang": "code",
+     "wall_s": 15.37,
+     "prompt_n": 70,
+     "gen_n": 251,
+     "gen_tok_s": 17.736353224156858,
+     "prompt_tok_s": 54.96943306882566,
+     "draft_n": 237,
+     "draft_n_accepted": 171,
+     "wall_tok_s": 16.33,
+     "temp_c": 68.85,
+     "content": "```python\ndef second_largest(nums):\n    \"\"\"\n    Returns the second largest distinct value in a list of integers, or None if there is no such value.\n    \"\"\"\n    # Convert the list to a set to get distinct values\n    distinct_nums = set(nums)\n\n    # Convert the set back to a list and sort it in descending order\n    sorted_distinct_nums = sorted(list(distinct_nums), reverse=True)\n\n    # Check if there are at least two distinct elements\n    if len(sorted_distinct_nums) < 2:\n        return None\n\n    # The largest distinct value is at index 0\n    largest = sorted_distinct_nums[0]\n\n    # Iterate through the sorted list to find the first element that is not the largest\n    for i in range(1, len(sorted_distinct_nums)):\n        if sorted_distinct_nums[i] != largest:\n            return sorted_distinct_nums[i]\n\n    # This part should theoretically not be reached if len(sorted_distinct_nums) >= 2,\n    # but included for completeness.\n    return None\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "3b924bf554e56249ca15ad20ab0e83acd3c7f8f1ab1195ae863ba9ac0eddb371",
+     "prompt_ms": 1273.435,
+     "gen_ms": 14095.344,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 1.281,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 1.281
+    }
+   ],
+   "load_s": 7.0,
+   "rendered_prompt": "<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 5021376,
+    "VmRSS": 5021376,
+    "RssAnon": 1712912,
+    "RssFile": 3308464,
+    "VmSwap": 0
+   },
+   "draft_log": [
+    [
+     "1.00000",
+     "5",
+     "5",
+     "3.50"
+    ],
+    [
+     "0.72152",
+     "171",
+     "237",
+     "3.16"
+    ]
+   ],
+   "spec_lines": [
+    "0.05.341.907 I common_speculative_init_result: loading draft model '/mnt/usb/pigemma/models/e2b-qat-q4_0/mtp-gemma-4-E2B-it.gguf'"
+   ],
+   "draft_stats": []
+  },
+  {
+   "index": 2,
+   "config": "plain_again",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18472 --reasoning off",
+   "env": {},
+   "requests": [
+    {
+     "id": "code-01",
+     "lang": "code",
+     "wall_s": 35.74,
+     "prompt_n": 70,
+     "gen_n": 253,
+     "gen_tok_s": 7.315550796963941,
+     "prompt_tok_s": 54.47008775131137,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 7.08,
+     "temp_c": 70.5,
+     "content": "```python\ndef second_largest(nums):\n    \"\"\"\n    Returns the second largest distinct value in a list of integers, or None if there is no such value.\n    \"\"\"\n    # Convert the list to a set to get distinct values\n    distinct_nums = set(nums)\n\n    # Convert the set back to a list and sort it in descending order\n    sorted_distinct_nums = sorted(list(distinct_nums), reverse=True)\n\n    # Check if there are at least two distinct elements\n    if len(sorted_distinct_nums) < 2:\n        return None\n\n    # The largest distinct value is at index 0\n    largest = sorted_distinct_nums[0]\n\n    # Iterate through the sorted list to find the first element that is not the largest\n    for i in range(1, len(sorted_distinct_nums)):\n        if sorted_distinct_nums[i] != largest:\n            return sorted_distinct_nums[i]\n\n    # This part should theoretically not be reached if len(sorted_distinct_nums) >= 2,\n    # but as a fallback, return None\n    return None\n```",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "944d8da783e426265aa3d0a293746c82e6ce259caddc6025aa4d3418464fa567",
+     "prompt_ms": 1285.109,
+     "gen_ms": 34447.167,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 1.288,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 1.288
+    }
+   ],
+   "load_s": 5.0,
+   "rendered_prompt": "<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 4798576,
+    "VmRSS": 4798576,
+    "RssAnon": 1532512,
+    "RssFile": 3266064,
+    "VmSwap": 0
+   },
+   "draft_log": [],
+   "spec_lines": [],
+   "draft_stats": []
+  }
+ ]
+}

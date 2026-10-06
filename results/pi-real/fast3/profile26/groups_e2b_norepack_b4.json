@@ -1,0 +1,120 @@
+{
+ "report": "results/pi-real/fast3/profile26/profile_e2b_norepack_b4.json",
+ "phases": {
+  "decode": {
+   "passes": 25,
+   "ms_per_pass": 142.96,
+   "groups": {
+    "dense feed-forward": {
+     "ms_per_pass": 87.33,
+     "share": 0.611,
+     "ms_per_prompt_token": null,
+     "modeled_weight_mb_per_pass": 875.9,
+     "read_rate_gb_s": 10.03
+    },
+    "output head / embeddings": {
+     "ms_per_pass": 30.77,
+     "share": 0.215,
+     "ms_per_prompt_token": null,
+     "modeled_weight_mb_per_pass": 357.8,
+     "read_rate_gb_s": 11.63
+    },
+    "attention projections": {
+     "ms_per_pass": 15.64,
+     "share": 0.109,
+     "ms_per_prompt_token": null,
+     "modeled_weight_mb_per_pass": 156.6,
+     "read_rate_gb_s": 10.01
+    },
+    "other operations without weights": {
+     "ms_per_pass": 6.46,
+     "share": 0.045,
+     "ms_per_prompt_token": null,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    },
+    "other weights": {
+     "ms_per_pass": 1.7,
+     "share": 0.012,
+     "ms_per_prompt_token": null,
+     "modeled_weight_mb_per_pass": 15.5,
+     "read_rate_gb_s": 9.11
+    },
+    "attention over the context (no weights)": {
+     "ms_per_pass": 1.07,
+     "share": 0.007,
+     "ms_per_prompt_token": null,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    }
+   },
+   "modeled_weight_mb_per_pass": 1405.8
+  },
+  "prefill": {
+   "passes": 26,
+   "ms_per_pass": 255.39,
+   "groups": {
+    "dense feed-forward": {
+     "ms_per_pass": 210.62,
+     "share": 0.825,
+     "ms_per_prompt_token": 53.69,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    },
+    "attention projections": {
+     "ms_per_pass": 30.3,
+     "share": 0.119,
+     "ms_per_prompt_token": 7.72,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    },
+    "output head / embeddings": {
+     "ms_per_pass": 4.86,
+     "share": 0.019,
+     "ms_per_prompt_token": 1.24,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    },
+    "other operations without weights": {
+     "ms_per_pass": 4.2,
+     "share": 0.016,
+     "ms_per_prompt_token": 1.07,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    },
+    "other weights": {
+     "ms_per_pass": 3.08,
+     "share": 0.012,
+     "ms_per_prompt_token": 0.78,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    },
+    "attention over the context (no weights)": {
+     "ms_per_pass": 2.33,
+     "share": 0.009,
+     "ms_per_prompt_token": 0.59,
+     "modeled_weight_mb_per_pass": 0.0,
+     "read_rate_gb_s": null
+    }
+   },
+   "modeled_weight_mb_per_pass": 0.0
+  }
+ },
+ "peak_rss_kib": 3403232,
+ "major_faults": 0,
+ "reference_op_ms": 10214.157308000013,
+ "request_execution": [
+  {
+   "request": 0,
+   "reference_ms": 1094.4135850000018,
+   "storage_read_bytes": 0,
+   "major_faults": 0
+  },
+  {
+   "request": 1,
+   "reference_ms": 9119.743722999929,
+   "storage_read_bytes": 0,
+   "major_faults": 0
+  }
+ ]
+}

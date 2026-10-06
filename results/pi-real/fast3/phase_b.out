@@ -1,0 +1,124 @@
+[health 21:35:47] active active active active  temp=57.3C throttled=0x0 memavail=15335712kB
+=== matched: reference/plain, patched/plain, reference/drafter, patched/drafter, 3 alternated repetitions 2026-10-06T21:35:47+02:00
+[health 21:35:47] active active active active  temp=57.3C throttled=0x0 memavail=15336208kB
+--- matched/r1_ref_plain 21:35:47
+AB_DONE /home/pi/pigemma/results/fast3/matched/r1_ref_plain/ab.json
+[health 21:38:16] active active active active  temp=61.1C throttled=0x0 memavail=15327456kB
+--- matched/r1_fast_plain 21:38:16
+AB_DONE /home/pi/pigemma/results/fast3/matched/r1_fast_plain/ab.json
+[health 21:40:34] active active active active  temp=60.6C throttled=0x0 memavail=15342208kB
+--- matched/r1_ref_mtp 21:40:34
+AB_DONE /home/pi/pigemma/results/fast3/matched/r1_ref_mtp/ab.json
+[health 21:42:18] active active active active  temp=62.8C throttled=0x0 memavail=15329616kB
+--- matched/r1_fast_mtp 21:42:18
+AB_DONE /home/pi/pigemma/results/fast3/matched/r1_fast_mtp/ab.json
+[health 21:43:50] active active active active  temp=62.8C throttled=0x0 memavail=15331632kB
+--- matched/r2_ref_plain 21:43:50
+AB_DONE /home/pi/pigemma/results/fast3/matched/r2_ref_plain/ab.json
+[health 21:46:18] active active active active  temp=62.8C throttled=0x0 memavail=15338864kB
+--- matched/r2_fast_plain 21:46:18
+AB_DONE /home/pi/pigemma/results/fast3/matched/r2_fast_plain/ab.json
+[health 21:48:35] active active active active  temp=62.8C throttled=0x0 memavail=15331312kB
+--- matched/r2_ref_mtp 21:48:35
+AB_DONE /home/pi/pigemma/results/fast3/matched/r2_ref_mtp/ab.json
+[health 21:50:19] active active active active  temp=62.8C throttled=0x0 memavail=15330432kB
+--- matched/r2_fast_mtp 21:50:19
+AB_DONE /home/pi/pigemma/results/fast3/matched/r2_fast_mtp/ab.json
+[health 21:51:51] active active active active  temp=61.1C throttled=0x0 memavail=15326320kB
+--- matched/r3_ref_plain 21:51:51
+AB_DONE /home/pi/pigemma/results/fast3/matched/r3_ref_plain/ab.json
+[health 21:54:19] active active active active  temp=61.7C throttled=0x0 memavail=15320368kB
+--- matched/r3_fast_plain 21:54:19
+AB_DONE /home/pi/pigemma/results/fast3/matched/r3_fast_plain/ab.json
+[health 21:56:36] active active active active  temp=61.1C throttled=0x0 memavail=15336976kB
+--- matched/r3_ref_mtp 21:56:36
+AB_DONE /home/pi/pigemma/results/fast3/matched/r3_ref_mtp/ab.json
+[health 21:58:19] active active active active  temp=63.4C throttled=0x0 memavail=15326800kB
+--- matched/r3_fast_mtp 21:58:19
+AB_DONE /home/pi/pigemma/results/fast3/matched/r3_fast_mtp/ab.json
+=== ablation: each switch alone, patched binary 2026-10-06T21:59:51+02:00
+[health 21:59:51] active active active active  temp=61.7C throttled=0x0 memavail=15331584kB
+--- ablation/plain_none 21:59:51
+AB_DONE /home/pi/pigemma/results/fast3/ablation/plain_none/ab.json
+[health 22:01:25] active active active active  temp=61.7C throttled=0x0 memavail=15312112kB
+--- ablation/mtp3_none 22:01:25
+AB_DONE /home/pi/pigemma/results/fast3/ablation/mtp3_none/ab.json
+[health 22:02:31] active active active active  temp=61.7C throttled=0x0 memavail=15339584kB
+--- ablation/plain_strip 22:02:31
+AB_DONE /home/pi/pigemma/results/fast3/ablation/plain_strip/ab.json
+[health 22:03:55] active active active active  temp=61.7C throttled=0x0 memavail=15326032kB
+--- ablation/mtp3_strip 22:03:55
+AB_DONE /home/pi/pigemma/results/fast3/ablation/mtp3_strip/ab.json
+[health 22:04:51] active active active active  temp=61.1C throttled=0x0 memavail=15339600kB
+--- ablation/plain_pad 22:04:51
+AB_DONE /home/pi/pigemma/results/fast3/ablation/plain_pad/ab.json
+[health 22:06:25] active active active active  temp=62.2C throttled=0x0 memavail=15322528kB
+--- ablation/mtp3_pad 22:06:25
+AB_DONE /home/pi/pigemma/results/fast3/ablation/mtp3_pad/ab.json
+[health 22:07:30] active active active active  temp=63.9C throttled=0x0 memavail=15334640kB
+--- ablation/plain_chunk 22:07:30
+AB_DONE /home/pi/pigemma/results/fast3/ablation/plain_chunk/ab.json
+[health 22:09:04] active active active active  temp=60.6C throttled=0x0 memavail=15318848kB
+--- ablation/mtp3_chunk 22:09:04
+AB_DONE /home/pi/pigemma/results/fast3/ablation/mtp3_chunk/ab.json
+[health 22:10:10] active active active active  temp=61.1C throttled=0x0 memavail=15335360kB
+--- ablation/plain_all 22:10:10
+AB_DONE /home/pi/pigemma/results/fast3/ablation/plain_all/ab.json
+[health 22:11:34] active active active active  temp=61.7C throttled=0x0 memavail=15305104kB
+--- ablation/mtp3_all 22:11:34
+AB_DONE /home/pi/pigemma/results/fast3/ablation/mtp3_all/ab.json
+[health 22:12:28] active active active active  temp=62.2C throttled=0x0 memavail=15328480kB
+--- ablation/mtp2_none 22:12:28
+AB_DONE /home/pi/pigemma/results/fast3/ablation/mtp2_none/ab.json
+[health 22:14:04] active active active active  temp=62.8C throttled=0x0 memavail=15324144kB
+--- ablation/mtp2_pad 22:14:04
+AB_DONE /home/pi/pigemma/results/fast3/ablation/mtp2_pad/ab.json
+=== drafter vocabulary shortcut: dense head vs cluster head (32 and 64 clusters) 2026-10-06T22:15:13+02:00
+[health 22:15:13] active active active active  temp=62.8C throttled=0x0 memavail=15331184kB
+--- centroids/r1_dense 22:15:13
+AB_DONE /home/pi/pigemma/results/fast3/centroids/r1_dense/ab.json
+[health 22:19:33] active active active active  temp=61.1C throttled=0x0 memavail=15335232kB
+--- centroids/r1_cent32 22:19:33
+AB_DONE /home/pi/pigemma/results/fast3/centroids/r1_cent32/ab.json
+[health 22:23:51] active active active active  temp=61.1C throttled=0x0 memavail=15334816kB
+--- centroids/r1_cent64 22:23:51
+AB_DONE /home/pi/pigemma/results/fast3/centroids/r1_cent64/ab.json
+[health 22:28:13] active active active active  temp=61.7C throttled=0x0 memavail=15326624kB
+--- centroids/r2_cent32 22:28:13
+AB_DONE /home/pi/pigemma/results/fast3/centroids/r2_cent32/ab.json
+[health 22:32:30] active active active active  temp=61.1C throttled=0x0 memavail=15329968kB
+--- centroids/r2_dense 22:32:30
+AB_DONE /home/pi/pigemma/results/fast3/centroids/r2_dense/ab.json
+=== model screen, E2B, direct answers, task budgets 2026-10-06T22:36:50+02:00
+[health 22:36:50] active active active active  temp=62.8C throttled=0x0 memavail=15324528kB
+--- screen/e2b_ref_plain 22:36:50
+AB_DONE /home/pi/pigemma/results/fast3/screen/e2b_ref_plain/ab.json
+[health 22:44:51] active active active active  temp=62.2C throttled=0x0 memavail=15324944kB
+--- screen/e2b_fast_mtp 22:44:51
+AB_DONE /home/pi/pigemma/results/fast3/screen/e2b_fast_mtp/ab.json
+=== model screen, E4B 2026-10-06T22:48:30+02:00
+[health 22:48:30] active active active active  temp=61.7C throttled=0x0 memavail=15331920kB
+--- E4B prompt test and decode, reference vs patched (layer skip only)
+| gemma4 E4B Q4_0                |   4.79 GiB |     7.46 B | CPU        |       4 |           pp512 |         32.19 ± 0.05 |
+| gemma4 E4B Q4_0                |   4.79 GiB |     7.46 B | CPU        |       4 |            tg48 |          3.82 ± 0.03 |
+| gemma4 E4B Q4_0                |   4.79 GiB |     7.46 B | CPU        |       4 |           pp512 |         54.12 ± 0.11 |
+| gemma4 E4B Q4_0                |   4.79 GiB |     7.46 B | CPU        |       4 |            tg48 |          3.84 ± 0.01 |
+[health 22:50:45] active active active active  temp=68.3C throttled=0x0 memavail=15270800kB
+--- screen/e4b_ref_plain 22:50:45
+AB_DONE /home/pi/pigemma/results/fast3/screen/e4b_ref_plain/ab.json
+[health 23:02:12] active active active active  temp=61.1C throttled=0x0 memavail=15330768kB
+--- screen/e4b_fast_mtp 23:02:12
+AB_DONE /home/pi/pigemma/results/fast3/screen/e4b_fast_mtp/ab.json
+=== model screen, 26B-A4B (weights stay mapped: -nr), without and with its assistant 2026-10-06T23:07:06+02:00
+[health 23:07:06] active active active active  temp=62.8C throttled=0x0 memavail=15325264kB
+--- screen/26b_ref_plain 23:07:06
+AB_DONE /home/pi/pigemma/results/fast3/screen/26b_ref_plain/ab.json
+[health 23:25:57] active active active active  temp=61.1C throttled=0x0 memavail=15817776kB
+--- screen/26b_ref_mtp 23:25:57
+AB_DONE /home/pi/pigemma/results/fast3/screen/26b_ref_mtp/ab.json
+=== separately labelled: E2B with thinking enabled (default reasoning), 768-token budget 2026-10-06T23:38:11+02:00
+[health 23:38:11] active active active active  temp=63.4C throttled=0x0 memavail=15829392kB
+--- think/e2b_fast_mtp 23:38:11
+AB_DONE /home/pi/pigemma/results/fast3/think/e2b_fast_mtp/ab.json
+[health 00:02:31] active active active active  temp=62.8C throttled=0x0 memavail=15825680kB
+=== PHASE_B_DONE 2026-10-07T00:02:31+02:00
