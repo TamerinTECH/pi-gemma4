@@ -1392,6 +1392,718 @@
   }
  },
  "screen": {
+  "26b_ref_mtp": {
+   "verify_ms_per_cycle": null,
+   "drafted_per_cycle": null,
+   "requests": 44,
+   "gen_tokens": 1915,
+   "prompt_tokens": 3211,
+   "total_wall_s": 699.44,
+   "median_wall_s": 6.39,
+   "median_ttft_visible_s": 5.5565,
+   "decode_tok_s": 5.08,
+   "prompt_tok_s": 10.0,
+   "tokens_per_cycle": 3.371,
+   "ms_per_cycle": 663.9,
+   "accepted": 1347,
+   "drafted": 1599,
+   "acceptance": 0.842,
+   "draft_ms_per_cycle": null,
+   "draft_calls": 0,
+   "peak_rss_mb": 15202.0,
+   "rss_anon_mb": 1072.0,
+   "finish": {
+    "stop": 44
+   },
+   "reasoning_chars": 0,
+   "max_temp_c": 76.0,
+   "load_s": 19.0,
+   "quality": {
+    "correct": 42,
+    "total": 44,
+    "truncated": 0,
+    "by_lang": {
+     "en": "20/21",
+     "he": "12/13",
+     "de": "10/10"
+    },
+    "by_category": {
+     "negation": "8/8 (cut 0)",
+     "numbers": "10/10 (cut 0)",
+     "multilingual": "8/8 (cut 0)",
+     "extraction": "7/8 (cut 0)",
+     "code": "9/10 (cut 0)"
+    },
+    "truncated_and_wrong": 0
+   },
+   "p90_wall_s": 34.78,
+   "rows": [
+    {
+     "id": "neg-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 6.35
+    },
+    {
+     "id": "neg-en-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 5.09
+    },
+    {
+     "id": "neg-en-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 10,
+     "wall_s": 7.7
+    },
+    {
+     "id": "neg-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 5.14
+    },
+    {
+     "id": "neg-he-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 5.63
+    },
+    {
+     "id": "neg-he-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 5.85
+    },
+    {
+     "id": "neg-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 5,
+     "wall_s": 5.74
+    },
+    {
+     "id": "neg-de-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 5.71
+    },
+    {
+     "id": "num-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 5.0
+    },
+    {
+     "id": "num-en-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 6.1
+    },
+    {
+     "id": "num-en-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 5.04
+    },
+    {
+     "id": "num-en-04",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 4.18
+    },
+    {
+     "id": "num-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 5.98
+    },
+    {
+     "id": "num-he-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 7.83
+    },
+    {
+     "id": "num-he-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 6,
+     "wall_s": 6.42
+    },
+    {
+     "id": "num-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 5.0
+    },
+    {
+     "id": "num-de-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 6.36
+    },
+    {
+     "id": "num-de-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 5.81
+    },
+    {
+     "id": "ml-en-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 4.86
+    },
+    {
+     "id": "ml-en-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 3.37
+    },
+    {
+     "id": "ml-he-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 4.03
+    },
+    {
+     "id": "ml-he-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 4.63
+    },
+    {
+     "id": "ml-de-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 3.79
+    },
+    {
+     "id": "ml-de-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 6,
+     "wall_s": 5.14
+    },
+    {
+     "id": "ml-en-mix-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 4.21
+    },
+    {
+     "id": "ml-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 11,
+     "wall_s": 9.67
+    },
+    {
+     "id": "ext-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 76,
+     "wall_s": 29.97
+    },
+    {
+     "id": "ext-en-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 63,
+     "wall_s": 23.4
+    },
+    {
+     "id": "ext-en-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 53,
+     "wall_s": 20.49
+    },
+    {
+     "id": "ext-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 83,
+     "wall_s": 30.81
+    },
+    {
+     "id": "ext-he-02",
+     "pass": false,
+     "finish": "stop",
+     "gen_n": 86,
+     "wall_s": 27.25
+    },
+    {
+     "id": "ext-he-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 64,
+     "wall_s": 23.52
+    },
+    {
+     "id": "ext-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 77,
+     "wall_s": 25.31
+    },
+    {
+     "id": "ext-de-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 63,
+     "wall_s": 21.84
+    },
+    {
+     "id": "code-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 113,
+     "wall_s": 34.78
+    },
+    {
+     "id": "code-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 132,
+     "wall_s": 35.82
+    },
+    {
+     "id": "code-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 117,
+     "wall_s": 31.12
+    },
+    {
+     "id": "code-04",
+     "pass": false,
+     "finish": "stop",
+     "gen_n": 80,
+     "wall_s": 23.38
+    },
+    {
+     "id": "code-05",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 219,
+     "wall_s": 54.79
+    },
+    {
+     "id": "code-06",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 58,
+     "wall_s": 17.83
+    },
+    {
+     "id": "code-07",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 202,
+     "wall_s": 50.85
+    },
+    {
+     "id": "code-08",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 109,
+     "wall_s": 29.88
+    },
+    {
+     "id": "code-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 91,
+     "wall_s": 39.02
+    },
+    {
+     "id": "code-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 127,
+     "wall_s": 34.75
+    }
+   ]
+  },
+  "26b_ref_plain": {
+   "verify_ms_per_cycle": null,
+   "drafted_per_cycle": null,
+   "requests": 44,
+   "gen_tokens": 1917,
+   "prompt_tokens": 3211,
+   "total_wall_s": 929.06,
+   "median_wall_s": 9.25,
+   "median_ttft_visible_s": 8.315999999999999,
+   "decode_tok_s": 3.77,
+   "prompt_tok_s": 7.7,
+   "tokens_per_cycle": 1.0,
+   "ms_per_cycle": 265.2,
+   "accepted": 0,
+   "drafted": 0,
+   "acceptance": null,
+   "draft_ms_per_cycle": null,
+   "draft_calls": 0,
+   "peak_rss_mb": 14498.0,
+   "rss_anon_mb": 946.0,
+   "finish": {
+    "stop": 44
+   },
+   "reasoning_chars": 0,
+   "max_temp_c": 74.9,
+   "load_s": 143.1,
+   "quality": {
+    "correct": 42,
+    "total": 44,
+    "truncated": 0,
+    "by_lang": {
+     "en": "20/21",
+     "he": "12/13",
+     "de": "10/10"
+    },
+    "by_category": {
+     "negation": "8/8 (cut 0)",
+     "numbers": "10/10 (cut 0)",
+     "multilingual": "8/8 (cut 0)",
+     "extraction": "7/8 (cut 0)",
+     "code": "9/10 (cut 0)"
+    },
+    "truncated_and_wrong": 0
+   },
+   "p90_wall_s": 43.19,
+   "rows": [
+    {
+     "id": "neg-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 32.67
+    },
+    {
+     "id": "neg-en-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 11.63
+    },
+    {
+     "id": "neg-en-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 10,
+     "wall_s": 16.02
+    },
+    {
+     "id": "neg-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 9.6
+    },
+    {
+     "id": "neg-he-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 7.73
+    },
+    {
+     "id": "neg-he-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 7.5
+    },
+    {
+     "id": "neg-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 5,
+     "wall_s": 8.35
+    },
+    {
+     "id": "neg-de-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 6.71
+    },
+    {
+     "id": "num-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 7.33
+    },
+    {
+     "id": "num-en-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 7.74
+    },
+    {
+     "id": "num-en-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 5.99
+    },
+    {
+     "id": "num-en-04",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 4.58
+    },
+    {
+     "id": "num-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 6.7
+    },
+    {
+     "id": "num-he-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 8.91
+    },
+    {
+     "id": "num-he-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 6,
+     "wall_s": 7.51
+    },
+    {
+     "id": "num-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 5.34
+    },
+    {
+     "id": "num-de-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 6.9
+    },
+    {
+     "id": "num-de-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 6.15
+    },
+    {
+     "id": "ml-en-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 3.88
+    },
+    {
+     "id": "ml-en-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 3.38
+    },
+    {
+     "id": "ml-he-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 2,
+     "wall_s": 4.22
+    },
+    {
+     "id": "ml-he-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 4.71
+    },
+    {
+     "id": "ml-de-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 3,
+     "wall_s": 4.05
+    },
+    {
+     "id": "ml-de-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 6,
+     "wall_s": 5.32
+    },
+    {
+     "id": "ml-en-mix-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 4,
+     "wall_s": 5.09
+    },
+    {
+     "id": "ml-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 11,
+     "wall_s": 8.0
+    },
+    {
+     "id": "ext-en-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 76,
+     "wall_s": 43.39
+    },
+    {
+     "id": "ext-en-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 63,
+     "wall_s": 37.26
+    },
+    {
+     "id": "ext-en-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 53,
+     "wall_s": 30.04
+    },
+    {
+     "id": "ext-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 83,
+     "wall_s": 41.56
+    },
+    {
+     "id": "ext-he-02",
+     "pass": false,
+     "finish": "stop",
+     "gen_n": 86,
+     "wall_s": 39.44
+    },
+    {
+     "id": "ext-he-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 64,
+     "wall_s": 30.74
+    },
+    {
+     "id": "ext-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 77,
+     "wall_s": 34.26
+    },
+    {
+     "id": "ext-de-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 63,
+     "wall_s": 27.84
+    },
+    {
+     "id": "code-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 113,
+     "wall_s": 43.19
+    },
+    {
+     "id": "code-02",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 132,
+     "wall_s": 42.44
+    },
+    {
+     "id": "code-03",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 117,
+     "wall_s": 38.51
+    },
+    {
+     "id": "code-04",
+     "pass": false,
+     "finish": "stop",
+     "gen_n": 80,
+     "wall_s": 30.89
+    },
+    {
+     "id": "code-05",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 221,
+     "wall_s": 69.02
+    },
+    {
+     "id": "code-06",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 58,
+     "wall_s": 23.0
+    },
+    {
+     "id": "code-07",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 202,
+     "wall_s": 68.07
+    },
+    {
+     "id": "code-08",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 109,
+     "wall_s": 41.52
+    },
+    {
+     "id": "code-he-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 91,
+     "wall_s": 37.14
+    },
+    {
+     "id": "code-de-01",
+     "pass": true,
+     "finish": "stop",
+     "gen_n": 127,
+     "wall_s": 44.74
+    }
+   ]
+  },
   "e2b_fast_mtp": {
    "verify_ms_per_cycle": 149.8,
    "drafted_per_cycle": 3.0,

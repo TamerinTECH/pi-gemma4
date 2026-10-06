@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Phase C (after phase B): 26B per-operation profile, from-scratch build of patch v7 in a new directory with the
 # correctness scenarios, and the upstream-style patches on llama.cpp master on the Pi.
-#   run_phase_c.sh [steps]     steps = comma list out of: attrib,profile26,fresh7,upstream (default: all)
+#   run_phase_c.sh [steps]     steps = comma list out of: attrib,profile26,fresh7,upstream,draftlen (default: all)
 # Every step takes the bench lock itself, so they run one after the other.
 set -uo pipefail
 cd ~/pigemma/fast
-steps=",${1:-attrib,profile26,fresh7,upstream},"
+steps=",${1:-attrib,profile26,fresh7,upstream,draftlen},"
 want() { case "$steps" in *",$1,"*) return 0;; *) return 1;; esac; }
 E2B=/mnt/usb/pigemma/models/e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf
 if want attrib; then
@@ -33,5 +33,9 @@ fi
 if want upstream; then
   echo "=== upstream-style patches on master $(date -Is)"
   ./upstream/run_upstream_pi.sh
+fi
+if want draftlen; then
+  echo "=== draft length sweep $(date -Is)"
+  ./run_draftlen.sh
 fi
 echo "=== PHASE_C_DONE $(date -Is)"

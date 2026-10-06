@@ -213,6 +213,25 @@ def main():
                   f"draft ms/cycle {s.get('draft_ms_per_cycle')} | verify ms/cycle {s.get('verify_ms_per_cycle')} | accepted {s.get('accepted')}/{s.get('drafted')} = {s.get('acceptance')} | same text {ident[0]}/{ident[1]}")
             print("             " + " | ".join(f"{lang}: {v['decode_tok_s']} tok/s, {v['tokens_per_cycle']} tok/cycle, acc {v['acceptance']}" for lang, v in bylang.items()))
 
+    # ---- draft length sweep (phase C) ---------------------------------------------------------------------------
+    dl = {k[1]: v for k, v in runs.items() if k[0] == "draftlen"}
+    if dl:
+        base = runs.get(("centroids", "r1_dense"))
+        print("== draft length sweep (E2B fast profile, dense drafter head; baseline = 3 drafts per pass, no gate)")
+        summary["draftlen"] = {}
+        rows = ([("baseline n3_p00", base)] if base else []) + sorted(dl.items())
+        for n, run in rows:
+            x = agg(run)
+            ident = same_text(run, base) if base else (None, None, None)
+            bylang = {}
+            for lang in ("en", "he", "de", "code"):
+                y = agg(dict(run, requests=[r for r in run.get("requests") or [] if r["lang"] == lang]))
+                bylang[lang] = {k: y.get(k) for k in ("decode_tok_s", "tokens_per_cycle", "ms_per_cycle", "acceptance")}
+            summary["draftlen"][n] = dict(x, same_text=f"{ident[0]}/{ident[1]}", by_lang=bylang)
+            print(f"  {n:16s} total {x.get('total_wall_s')} s | decode {x.get('decode_tok_s')} tok/s | tok/cycle {x.get('tokens_per_cycle')} | ms/cycle {x.get('ms_per_cycle')} | "
+                  f"drafted per cycle {x.get('drafted_per_cycle')} | draft ms/cycle {x.get('draft_ms_per_cycle')} | accepted {x.get('accepted')}/{x.get('drafted')} = {x.get('acceptance')} | same text {ident[0]}/{ident[1]}")
+            print("                   " + " | ".join(f"{lang}: {v['decode_tok_s']} tok/s, {v['tokens_per_cycle']} tok/cycle" for lang, v in bylang.items()))
+
     # ---- model screen ----------------------------------------------------------------------------------------
     for step, title in (("screen", "model screen, direct answers (--reasoning off), task budgets"), ("think", "thinking enabled (separately labelled)")):
         sc = {k[1]: v for k, v in runs.items() if k[0] == step}
