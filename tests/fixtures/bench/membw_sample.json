@@ -1,0 +1,17 @@
+{
+  "tool": "membw",
+  "version": "1.0.0",
+  "host": "x86_64",
+  "sysname": "Linux",
+  "release": "5.15.167.4-microsoft-standard-WSL2",
+  "page_size": 4096,
+  "nproc_online": 12,
+  "size_mb": 64,
+  "reps": 5,
+  "units": "GB/s = 1e9 bytes/s, best of reps",
+  "bytes_counted": {"read": 67108864, "copy": 67108864, "triad": 67108800},
+  "results": [
+    {"threads": 1, "read_gbps": 30.608, "copy_gbps": 22.433, "triad_gbps": 21.132, "read_s": 0.002193, "copy_s": 0.002992, "triad_s": 0.003176},
+    {"threads": 2, "read_gbps": 35.703, "copy_gbps": 33.207, "triad_gbps": 28.380, "read_s": 0.001880, "copy_s": 0.002021, "triad_s": 0.002365}
+  ]
+}

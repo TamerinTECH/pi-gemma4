@@ -1,0 +1,681 @@
+{
+ "summary": "Final build manifest for REPO_ROOT (repo-relative paths below). Base = winner (bytes-moved-per-token systems design); grafts and fixes applied after re-verifying every load-bearing claim against third_party/llama.cpp @ a7b94df and the real GGUF headers today. Verified facts that shape the build: (1) default repack copies every Q4_0 tensor out of the mmap into CPU_REPACK anonymous memory (llama-model.cpp:1849-1870 mmaps only the default buft). (2) The winner's 'hybrid' `-ot \"ffn_(gate_up|down)_exps=CPU\"` does NOT keep experts mapped: an override to the CPU buft re-runs select_weight_buft over buft_list_cpu, which still contains CPU_REPACK (llama-model-loader.cpp:1240-1242), and `-ot` can only name default device bufts (arg.cpp:255-260). So the ONLY page-cache streaming mode at this commit is `-nr`/`--no-repack` (`--repack 0` in llama-bench): the whole file stays CPU_Mapped. Its kernel penalty is measured (E0), not assumed; the hybrid is kept only as a negative control. (3) gemma4 dense FFN emits `ffn_norm-<il>` (gate/up input), `ffn_geglu-<il>` (down input, [21504,T]) and `ffn_out-<il>` (down output, pre post-norm); MoE routing tensors are `ffn_moe_topk-<il>` (I32 view [8,T], nb[1]=512) and `ffn_moe_weights_norm-<il>` (F32 [1,8,T], sums to 1; gemma4 uses norm_w=true); warmup routes to ALL experts (llama-graph.cpp:1473) so the probe sets params.warmup=false (`--no-warmup` is not a COMMON flag). (4) `-md` is wired only for SPECULATIVE/SERVER/CLI/IMATRIX, so speculative decoding is measured through llama-server `timings.draft_n/draft_n_accepted` (the orchestrator's ad-hoc run already showed: MoE MTP never drafts, DFlash engages at 28% acceptance and is slower). (5) Load modes are `-lm auto|none|mmap|mlock|mmap+mlock|dio`; `--mlock/--no-mmap` are gone. (6) gguf-py ReaderTensor.data_offset is absolute. 26B: data_offset 15,823,936; 658 tensors; experts 12,846,366,720 B (gate_up 2,230,272 + down 1,115,136 = 3,345,408 B per expert-layer; 802,897,920 B/token worst case); non-expert 1,577,172,088 B (attn 624,885,760; tied Q6_K head 605,563,904 read every token; dense FFN 301,086,720; norms/router/scales 45,635,704). 31B: data_offset 15,833,440; 833 tensors; FFN 11,705,057,280 (65,028,096 per gate/up/down matrix, no scale tensors); attention 4,770,160,640; tied head 1,156,076,544. (7) Idle-machine desktop baseline already measured (results/desktop-baseline-2026-10-04.md): MoE tg32 15.18@4t, 13.52@6t, 12.79@12t; 31B tg32 2.44@6t; server MoE gen 16.03 tok/s; loads 12.7/13.3 s. (8) Disk: D: 32 GB free, C: 26 GB free (Docker VM vhdx lives on C:); Docker image pi-gemma4-build:latest exists; gguf-py header read takes ~11 s per model on Windows (cache map.json). Repo shape: `pigemma/` Python package (stdlib-only parts run on the Pi's Python 3.13), three tiny native tools (probe C++ cb_eval recorder, pinner C mlock daemon, membw C bandwidth bench) built in Docker and on the Pi from one CMake tree, `pc/` drivers (PowerShell for native Windows binaries, bash for Docker), `pi/` parametric runtime with host deny-list, `docs/`. 36 files in 6 dependency groups; all unit tests run on Windows without models via synthetic GGUFs/traces.",
+ "files": [
+  {
+   "path": "pyproject.toml",
+   "language": "TOML (+ requirements.txt, .gitignore additions)",
+   "purpose": "Installable `pigemma` package, pytest config, dependency pins, ignore rules for large artefacts.",
+   "spec": "[project] name=pigemma, requires-python>=3.12, dependencies: numpy>=2.0, psutil>=5.9. Optional extras: h2=[torch>=2.4], hf=[huggingface_hub>=0.30]. gguf is NOT a pip dep: pigemma/__init__.py inserts <repo>/third_party/llama.cpp/gguf-py at the front of sys.path if `import gguf` fails (same trick works on the Pi after pi/02 clones llama.cpp at a7b94df). [tool.pytest.ini_options] testpaths=['tests'], addopts='-q -m \"not integration\"', markers: integration (needs real GGUFs/Docker; run with `pytest -m integration`), linux (skipped on Windows). requirements.txt mirrors deps plus pytest>=8. .gitignore additions: models/ (exists), traces/**/*.moetrace, traces/**/*.bin, traces/**/*.npy, results/**/*.logits, results/**/*.log, tools/build-*/, **/__pycache__/, pi/out/; keep results/**/*.json and results/**/*.md tracked. No console_scripts: every CLI is `python -m pigemma.<module>`.",
+   "test": "`pip install -e .` then `python -c \"import pigemma, gguf\"` works on Windows; `pytest` collects and runs unit tests in < 60 s.",
+   "parallel_group": 0,
+   "depends_on": []
+  },
+  {
+   "path": "pigemma/paths.py",
+   "language": "Python 3.12+ (stdlib + psutil optional)",
+   "purpose": "Single source of truth for repo root, model registry, binary resolution per platform, host fingerprint, cheap model identity, free-disk check and the benchmark lock that serialises model-loading jobs across agents.",
+   "spec": "REPO_ROOT = parent of the package dir. MODELS dict (id -> dict(path, bytes, kind, quant, draft_of)): '26b-q4' models/google__gemma-4-26B-A4B-it-qat-q4_0-gguf/gemma-4-26B_q4_0-it.gguf 14439363584 moe; '31b-q4' models/google__gemma-4-31B-it-qat-q4_0-gguf/gemma-4-31B_q4_0-it.gguf 17651001568 dense; '26b-mtp' models/ggml-org__gemma-4-26B-A4B-it-GGUF/mtp-gemma-4-26B-A4B-it-Q4_0.gguf 251939520; '26b-dflash' models/ggml-org__gemma-4-26B-A4B-it-GGUF/dflash-gemma-4-26B-A4B-it-Q8_0.gguf 472433824; '31b-mtp' models/unsloth__gemma-4-31B-it-qat-GGUF/MTP/mtp-gemma-4-31B-it-Q4_0.gguf 279955968. `model_path(id_or_path)` accepts an id or a path; `require_model(id)` raises FileNotFoundError with the HF repo hint if missing or size differs. `bin(tool)` -> Path: Windows -> third_party/llama.cpp-win/<tool>.exe; Linux with /.dockerenv -> /work/third_party/llama.cpp/build-linux-x86/bin/<tool>; Linux aarch64 -> $LLAMA_DIR/build/bin/<tool> (default ~/llama.cpp); custom tools (pigemma-probe, pinner, membw) -> $PIGEMMA_TOOLS_BIN or tools/build-linux-x86/bin (Docker) or tools/build/bin (Pi). LLAMA_COMMIT='a7b94df', LLAMA_BUILD=11398 (assert against third_party/llama.cpp-win/VERSION when present; warn if different). `host_fingerprint()` -> dict(hostname, os, kernel, cpu (platform.processor() or /proc/cpuinfo 'model name'), n_logical, n_physical (psutil or os.cpu_count), ram_total_bytes, ram_avail_bytes, page_size (os.sysconf('SC_PAGE_SIZE') or 4096), in_container (/.dockerenv), cgroup_mem_max (read /sys/fs/cgroup/memory.max, None if absent/'max'), python). `sha256_prefix(path, n_bytes=16 MiB)` -> hex of first n bytes (cheap identity of 17 GB files) plus size. `free_disk_bytes(path)` via shutil.disk_usage. `bench_lock(min_free_gb=20)` context manager: creates results/.bench.lock with {pid, host, started, cmd}; if an existing lock's pid is alive (psutil.pid_exists) raise RuntimeError('another model-loading job is running'); if psutil.virtual_memory().available < min_free_gb GB raise; stale lock (dead pid) is replaced; env PIGEMMA_MIN_FREE_GB overrides. All commands that load a GGUF (bench, quality, trace_collect, pagecache_limit, h2 act-dump) must enter this lock; Docker runs enter it on the Windows side via `python -m pigemma.paths lock --hold -- <cmd>` (runs cmd under the lock, forwards exit code). Logging: one line per decision at INFO.",
+   "test": "tests/test_paths.py: registry sizes present; bin() per platform via monkeypatched sys.platform/env; sha256_prefix on a temp file equals hashlib of its first bytes; bench_lock refuses while a lock with the current pid exists and replaces a dead-pid lock; `--hold` runs a trivial command and forwards its exit code.",
+   "parallel_group": 0,
+   "depends_on": []
+  },
+  {
+   "path": "pigemma/results.py",
+   "language": "Python",
+   "purpose": "One results-JSON envelope for desktop, Docker and Pi numbers (measured / projected / assumed never mixed silently) plus the summariser that renders docs/results/*.md.",
+   "spec": "`write_result(path, **fields)`: validates required keys run_id (uuid4), experiment ('E0'...'E8' or 'adhoc'), created_at (ISO UTC), kind in {'measured','projected','assumed'}, host (paths.host_fingerprint()), llama_build, llama_commit, model {id,file,quant,bytes,sha_prefix}, variant (str), flags (list[str]), threads, n_ctx, and when kind != 'measured' a non-empty `assumptions` dict ({name: {value, unit, source}}) and `inputs` (list of result/trace paths used). Optional keys: pp {tok_s, sd, n}, tg {tok_s, sd, n}, load_s, rss_peak_mb, private_peak_mb, mapped_mb, buffer_split {CPU_REPACK_mib, CPU_Mapped_mib, CPU_mib}, read_bytes_per_token, majflt_per_token, io_rbytes_per_token, accept_rate, draft_n, draft_n_accepted, spec_type_effective, identical_to_plain, kld {mean, max, p999, same_top_p}, ppl, qa_score, qa_total, coherent, output_sample (<=2000 chars), notes (list[str]). Unknown keys allowed under `extra`. Raises ValueError listing missing keys. `load_results(dir_or_glob)` -> list[dict] (skips unparsable files with a warning). CLI `python -m pigemma.results summarize <dir...> --md <out.md> [--experiment E0]`: groups by experiment then model, renders markdown tables with three clearly labelled sections per experiment: MEASURED (kind=measured), PROJECTED (kind=projected, with an 'Assumptions used' sub-table listing name/value/unit/source), ASSUMED; missing metrics render as 'not run'. Also `python -m pigemma.results validate <file...>` -> exit 1 on schema errors.",
+   "test": "tests/test_results.py: missing `kind` rejected; projected without assumptions rejected; summarize renders a fixture dir with one measured + one projected file into markdown containing both section headers and 'not run'.",
+   "parallel_group": 0,
+   "depends_on": [
+    "pigemma/paths.py"
+   ]
+  },
+  {
+   "path": "pigemma/trace.py",
+   "language": "Python (numpy)",
+   "purpose": "Reference reader/writer/validator for the .moetrace routing-trace format, the tokens/acts sidecars, merge, and the H1 statistics (frequency skew, coverage, LRU stack-distance hit curve, token-adjacent reuse, cross-layer predictability).",
+   "spec": "Binary layout exactly as data_formats '.moetrace'. `TraceWriter(path, header: dict)`: writes magic, header, placeholder n_records=0xFFFFFFFFFFFFFFFF; `.write(token_index, pos, token_id, phase, chunk_id, ids: np.uint8[L,K], weights: np.float16[L,K], probs: optional np.ndarray[L,P] of (id,prob))`; `.close()` patches n_records; also appends token_id to `<stem>.tokens.bin` (i32 LE). `TraceReader(path)`: parses header; if n_records is the sentinel, infers count from file size and sets `.truncated=True` (warn); exposes `.header`, `.n`, `.ids` (uint8 [T,L,K]), `.weights` (float32 [T,L,K]), `.phase` (uint8 [T]), `.chunk` (uint8 [T]), `.token_index`, `.token_ids` (from tokens.bin if present), `.probs` (or None); loads lazily via np.memmap + structured dtype. `validate(path) -> list[str]`: magic, header keys present (format_version, model_name, gguf_path, gguf_size_bytes, llama_build, llama_commit, arch, n_layer, n_expert, n_expert_used, moe_layers, probs_top, weights_tensor, created_at, n_ctx, n_batch, n_ubatch, flags), record_size matches formula, ids < n_expert, K distinct ids per (token,layer), weights finite and sum within 0.02 of 1.0 (weights_tensor=='ffn_moe_weights_norm'), token_index contiguous from 0, tokens.bin length == n_records when present. `merge(paths, out)`: same model/n_layer/n_expert, renumbers token_index, chunk_id offsets, concatenates tokens.bin, header.sources=[...]. `stats(reader, train_frac=0.7, item='layer-expert') -> dict` (schema in data_formats 'stats.json'): per layer freq[128], entropy_bits, effective_experts, gini, coverage_at {8,16,32,48,64,96} by selection count and by weight mass; global: unique experts per token mean, token-adjacent reuse P(e in S_t+1 | e in S_t) per layer and mean, mean Jaccard(S_t,S_t+1), LRU stack-distance histogram over items (layer,expert) -> exact LRU hit-rate curve hit[C] for C in 1..3840 (one pass with an order-statistics structure or a simple list; T*L*K ~ 4M accesses fine), working set (distinct experts per layer per window 16/64/256/1024: median/p95), prefill vs generated frequency JS-divergence per layer, per-chunk-source (corpus id from header.chunks) top-32 Jaccard overlap matrix, cross-layer predictor: table P(e' in S_{l+1} | e in S_l) from train split, precision@8/@16 on test split vs static-top-16 baseline vs 'same ids as layer l' baseline, mutual information I(top1_l; top1_{l+1}); if probs present: p8-p9 margin distribution and 8th-expert weight mass. CLI: `python -m pigemma.trace validate <trace>`; `stats <trace> [--train-frac 0.7] --out <stats.json> [--csv-dir dir]`; `merge <out> <in...>`; `info <trace>` (prints header + counts). Sidecar helpers: `write_meta(stem, dict)`, `read_meta`, `read_acts_dir(dir) -> Acts(meta, get(layer, kind) -> np.float16 memmap [T, ne0], phase, token_ids)`.",
+   "test": "tests/test_trace.py: write 1000 synthetic records (L=4,K=8,E=16) read back bit-exact; sentinel n_records inferred with truncated=True; validate rejects bad id, duplicate ids, weight sum 1.5, truncated record; coverage curve monotone and 1.0 at K=E; single-hot-expert trace gives coverage@1 == 1.0 and entropy 0; stack-distance LRU curve equals cache_sim LRU hit rate within 1e-9 at 3 capacities (shared fixture via tests/synth.py); predictor precision@16 >= static baseline on a trace with injected layer correlation; merge renumbers token_index.",
+   "parallel_group": 0,
+   "depends_on": [
+    "pigemma/paths.py"
+   ]
+  },
+  {
+   "path": "pigemma/gguf_map.py",
+   "language": "Python (gguf-py, numpy)",
+   "purpose": "GGUF byte-range planner (every tensor and every expert slab as absolute file ranges, classified), per-token traffic accounting, hot-set planner that emits mlock ranges, and the catalog refresh.",
+   "spec": "`build_map(path, page_size=16384) -> GgufMap` using gguf.GGUFReader: reads KV gemma4.block_count, gemma4.expert_count (0 if absent), gemma4.expert_used_count, gemma4.embedding_length, gemma4.feed_forward_length, gemma4.expert_feed_forward_length, attention.head_count_kv (list), attention.key_length/key_length_swa, sliding_window, sliding_window_pattern; tensors: for each ReaderTensor record name, type name, shape (gguf-py order, ne[0] fastest), n_bytes, offset=data_offset (absolute, asserted by the unit test), kind in {token_embd, output, attn, ffn_dense, norm, router, expert_scale, expert, other} by regex (expert: `^blk\\.(\\d+)\\.ffn_(gate_up|gate|up|down)_exps\\.weight$`; router: ffn_gate_inp.*; expert_scale: ffn_.*_exps\\.scale), layer (int or null). Expert slabs: n_expert = shape[-1]; nb_expert = n_bytes // n_expert (assert divisible); expert e of that tensor = [offset + e*nb_expert, offset + (e+1)*nb_expert). map.json stores per layer {layer, gate_up:{offset, nb_expert}, down:{offset, nb_expert}} not 7680 rows. Summary: file_size, data_offset, nonexpert_bytes, expert_bytes, expert_unit_bytes (gate_up+down per expert), n_moe_layers, expert_bytes_per_token_worst = n_moe_layers*n_expert_used*unit, nonexpert_bytes_per_token = attn + ffn_dense + norm + router + expert_scale + (output bytes if a separate output tensor exists else token_embd bytes, because the tied head is read every token) + one embedding row, kv_bytes_per_token_f16 = sum over layers of n_head_kv[il]*(key_length_swa if sliding else key_length)*2*2 (K and V both counted: upper bound) and kv_bytes(n_ctx) = sum(min(n_ctx, 1024 if sliding else n_ctx) * per-layer bytes), and the expected numbers for 26B asserted in the integration test (expert_bytes 12846366720, unit 3345408, nonexpert 1577172088, worst/token 802897920). `aligned(offset, length, page)` floors start / ceils end; `merge_ranges`. CLI `python -m pigemma.gguf_map build <gguf> --out <map.json> [--page-size 16384]` (prints the summary table incl. GB per token). `python -m pigemma.gguf_map hotset --map map.json --stats stats.json --budget-bytes N [--page-size 16384] [--no-nonexpert] [--per-layer-min 0] [--rank count|weight] --out hotset.json`: ranges = all non-expert tensors first (mandatory unless --no-nonexpert; includes the tied head), then experts by descending stats.per_layer.freq (or weight mass) with at least per-layer-min per layer, until budget; page-align, merge adjacent, sort by offset; writes hotset.json (data_formats) AND hotset.ranges.txt (one 'offset length' per line, '#' comments) for the pinner; prints total bytes, expert count, expert_coverage_fraction = sum(freq of selected)/sum(all freq). Budget exceeded by at most one page per range. `python -m pigemma.gguf_map catalog-refresh` (PC only, huggingface_hub HfApi.model_info(files_metadata=True)) fills exact byte sizes and sha256 (LFS) for catalog entries with bytes_exact=false. Edge cases: non-MoE GGUF -> experts empty, n_expert 0; missing KV keys -> error naming the key.",
+   "test": "tests/test_gguf_map.py on the conftest synthetic GGUF (arch gemma4, 2 layers, 4 experts, n_embd 64, expert ff 32, Q4_0 expert tensors ne=[64,32,4]/[32,64,4] via gguf.quants.quantize, F32 norms, Q6_K-shaped token_embd replaced by F16 [64,16]): slab ranges contiguous and cover the tensor exactly; offsets equal GGUFWriter's data offsets; kinds; nonexpert+expert == sum of tensor bytes; 16 KiB alignment pads correctly; hotset respects budget (+<=1 page/range), always includes non-expert ranges unless --no-nonexpert, orders by freq, merges adjacent experts, coverage fraction correct, ranges.txt round-trips. @integration: real 26B constants above and 31B ffn matrix bytes 65028096.",
+   "parallel_group": 0,
+   "depends_on": [
+    "pigemma/paths.py"
+   ]
+  },
+  {
+   "path": "pigemma/data/catalog.json",
+   "language": "JSON",
+   "purpose": "Data-driven model catalog (HF repo, file, bytes, quant, drafts) and Pi device profiles with per-field provenance, consumed by feasibility, cache_sim projections, fetch and the docs.",
+   "spec": "{\"models\":[{id:'26b-q4', family:'26b', model:'gemma-4-26B-A4B-it', quant:'Q4_0', repo:'google/gemma-4-26B-A4B-it-qat-q4_0-gguf', file:'gemma-4-26B_q4_0-it.gguf', bytes:14439363584, bytes_exact:true, nonexpert_bytes:1577172088, expert_bytes:12846366720, expert_unit_bytes:3345408, n_moe_layers:30, n_expert:128, n_expert_used:8, drafts:['26b-mtp','26b-dflash']}, {id:'31b-q4', family:'31b', quant:'Q4_0', repo:'google/gemma-4-31B-it-qat-q4_0-gguf', file:'gemma-4-31B_q4_0-it.gguf', bytes:17651001568, bytes_exact:true, nonexpert_bytes:17635166448, expert_bytes:0, drafts:['31b-mtp']}, draft entries (26b-mtp 251939520, 26b-dflash 472433824 Q8_0, 31b-mtp 279955968, repos as in paths.py), and unsloth alternatives with bytes_exact:false and sizes from the task facts: 26b UD-IQ2_XXS 9.9e9, UD-Q2_K_XL 10.6e9, UD-IQ3_XXS 11.4e9, UD-Q3_K_M 12.7e9, UD-IQ4_XS 13.6e9 (repo 'unsloth/gemma-4-26B-A4B-it-GGUF'); 31b UD-IQ2_XXS 8.5e9, UD-Q2_K_XL 11.8e9, UD-IQ3_XXS 11.8e9, Q3_K_S 13.2e9, IQ4_XS 16.4e9 (repo 'unsloth/gemma-4-31B-it-GGUF'); for alternatives nonexpert/expert bytes are scaled from the Q4_0 ratio and flagged estimated:true; filenames are placeholders ('<fill from HF listing>') until catalog-refresh runs; fetch refuses placeholders], \"devices\":[{name:'pi5-4gb-microsd', ram_bytes:4.0e9, os_reserve_bytes:0.7e9, compute_buffers_bytes:0.3e9, n_ctx:2048, mem_bw_gbps:{value:10.0, source:'assumed; replace with results/pi/io_mem.json'}, storage:{type:'microsd', seq_read_mbps:{value:85,source:'assumed'}, rand_read_3mb_mbps:{value:60,source:'assumed'}, access_ms:{value:2.0,source:'assumed'}}}, 'pi5-8gb-usb3' (8.0e9, 0.8e9, 0.3e9, 4096, 10, usb-ssd 380/350/0.5), 'pi5-8gb-nvme-gen3' (8.0e9, 0.8e9, 0.3e9, 4096, 10, nvme 850/700/0.2), 'pi5-16gb-nvme-gen3' (16.0e9, 0.9e9, 0.4e9, 4096, 10, nvme 850/700/0.2), 'desktop-8400f' (64e9, 2e9, 0.5e9, 4096, mem_bw measured by membw when run, storage nvme measured by fio)], \"selection\":{\"stream_hit_rate_curve_assumed\":[[0.15,0.60],[0.25,0.74],[0.35,0.84],[0.45,0.88]] (fraction of experts resident -> LRU hit rate, source: research summary; replaced by results/h1/sim.json when present), \"viable_stream_tok_s\":1.0, \"good_stream_tok_s\":2.0}, \"protected_hosts\":[\"context-friend-1\"], \"protected_service_globs\":[\"contextfriend*\",\"context-friend*\"]}. Every assumed number carries source containing the word 'assumed'. Loader `pigemma.feasibility.load_catalog()` merges results/pi/io_mem.json (measured) over device fields when present.",
+   "test": "tests/test_catalog.py: schema (required keys, sources enumerate), model bytes for the 5 local files equal paths.MODELS, every assumed field's source contains 'assumed', merge of a measured io_mem fixture overrides values and sets source 'measured'.",
+   "parallel_group": 0,
+   "depends_on": []
+  },
+  {
+   "path": "docs/TRACE_FORMAT.md",
+   "language": "Markdown",
+   "purpose": "Normative spec frozen before coding so the C++ probe and the Python package agree byte-for-byte: .moetrace, tokens.bin, meta.json, stats.json, acts .npy dir, map.json, hotset.json/.ranges.txt, results envelope, facts.json, io_mem.json, sim and h2 result JSON.",
+   "spec": "Verbatim copy of every entry in data_formats of this manifest plus: byte-offset tables for the .moetrace header and record, worked record_size for 26B (736 B at K=8, L=30, P=0; 100k tokens = 73.6 MB), the tensor-name contract (ffn_moe_topk I32 [K,T] strided view nb[1]=n_expert*4; ffn_moe_weights_norm F32 [1,K,T]; ffn_moe_probs F32 [E,T]; ffn_norm F32 [n_embd,T]; ffn_geglu F32 [n_ff,T]; ffn_out F32 [n_embd,T]), the invariant list the validator enforces, and the npy header patching rule (fixed 128-byte header, shape rewritten at close).",
+   "test": "tests/test_trace.py asserts the constants documented here (magic, header offsets, record_size formula); tests/test_docs.py checks every relative link in docs/ resolves.",
+   "parallel_group": 0,
+   "depends_on": []
+  },
+  {
+   "path": "data/prompts/qa_set.json (+ data/prompts/gen_prompts.json)",
+   "language": "JSON (UTF-8)",
+   "purpose": "Fixed, licence-clean evaluation prompts: 16 scored Q&A items (EN/HE/arithmetic) and 8 generation prompts for benchmarks and traces; complements the existing data/calibration corpus.",
+   "spec": "qa_set.json: list of 16 items {id, lang:'en'|'he'|'num', prompt, kind:'contains'|'regex'|'number', expect:[...], tolerance (number kind only)}; 7 EN factual/one-word (e.g. capital of France -> ['Paris']), 6 HE (answers in Hebrew with final-form-insensitive matching, e.g. 'מהי בירת צרפת? ענה במילה אחת' -> ['פריז','פאריס']), 3 arithmetic/list ('What is 17*23? Answer with the number only' -> 391). gen_prompts.json: 8 items {id, lang, prompt, max_tokens:256}: 3 EN explain/story, 2 HE, 1 code (write a Python function), 2 mixed (EN question asking for a Hebrew answer). Prompts are plain user text; quality.py applies the Gemma chat template.",
+   "test": "tests/test_prompts.py: valid JSON/UTF-8, 16 items with >=1 expect each, both languages present, Hebrew items contain RTL characters, ids unique.",
+   "parallel_group": 0,
+   "depends_on": []
+  },
+  {
+   "path": "tests/conftest.py (+ tests/synth.py, tests/test_*.py per module)",
+   "language": "Python (pytest)",
+   "purpose": "Fixtures that let every unit test run on Windows in < 60 s with no model files: synthetic gemma4-shaped GGUFs, synthetic routing traces, fake Pi facts, captured stdout/JSON fixtures from the real binaries.",
+   "spec": "conftest.py fixtures (session-scoped, tmp_path_factory): `tiny_moe_gguf` -> path to a GGUF written with gguf.GGUFWriter: arch 'gemma4', KV block_count 2, expert_count 4, expert_used_count 2, embedding_length 64, feed_forward_length 48, expert_feed_forward_length 32, attention.head_count 2, head_count_kv [2,1], key_length 32, key_length_swa 16, sliding_window 8, sliding_window_pattern [True, False]; tensors per layer: attn_q/k/v/output Q4_0, ffn_gate/up/down Q4_0 [64,48]/[48,64], ffn_gate_up_exps Q4_0 ne=[64,64,4] (gate+up fused: 2*32), ffn_down_exps Q4_0 ne=[32,64,4], ffn_down_exps.scale F32 [4], ffn_gate_inp.weight F32 [64,4], norms F32; token_embd F16 [64,16], output_norm F32; returns also the writer's expected absolute offsets dict. `tiny_dense_gguf`: 2 layers, no experts, ffn gate/up/down Q4_0 [64,256]/[256,64]. `synth_trace(T=2000, L=4, K=8, E=16, alpha=1.2, layer_corr=0.0, seed=0)` from tests/synth.py: Zipf expert popularity per layer, optional cross-layer correlation, phase vector; `write_synth_trace(path, ...)` via pigemma.trace.TraceWriter. `fake_facts(name)` loads tests/fixtures/facts_<name>.json for pi5-4gb-microsd (the probed context-friend-1: MemTotal 4,039,000 kB, mmcblk0, page 16384, services contextfriend-*), pi5-8gb-usb3, pi5-8gb-nvme-gen3, pi5-16gb-nvme-gen3, generic-linux-nodisk. Fixture text files under tests/fixtures/: llama_bench_sample.json (from `llama-bench -o json`), completion_stderr_sample.txt (load/prompt eval/eval lines + 'load_tensors: CPU_REPACK model buffer size' / 'CPU_Mapped' lines), server_timings_sample.json (with draft_n/draft_n_accepted), perplexity_kld_sample.txt (Mean KLD / Maximum KLD / 99.9% KLD / Same top p lines), thinking_sample.txt, membw_sample.json, fio_sample.json; captured from the real binaries on first run and checked in. Test modules (each written by the implementer of its module, assertions listed in that module's test field): test_paths, test_results, test_trace, test_gguf_map, test_catalog, test_prompts, test_cache_sim, test_feasibility, test_bench_parse, test_quality, test_h2_decompose, test_h2_oracle, test_pi_scripts (bash -n via Git Bash on every pi/*.sh and pc/*.sh; shellcheck if on PATH), test_docs. Integration tests marked @pytest.mark.integration.",
+   "test": "`pytest` green on Windows without models; `pytest -m integration` requires models/Docker and is run by the orchestrator only.",
+   "parallel_group": 0,
+   "depends_on": [
+    "pigemma/trace.py",
+    "pigemma/paths.py"
+   ]
+  },
+  {
+   "path": "tools/CMakeLists.txt",
+   "language": "CMake",
+   "purpose": "One out-of-tree CMake project building pigemma-probe (C++), pinner (C, Linux) and membw (C) against the pinned llama.cpp without modifying it; used in Docker (x86) and on the Pi (aarch64).",
+   "spec": "cmake_minimum_required(VERSION 3.16); project(pigemma-tools C CXX); set(LLAMA_DIR \"${CMAKE_CURRENT_SOURCE_DIR}/../third_party/llama.cpp\" CACHE PATH); set CACHE FORCE: LLAMA_BUILD_COMMON ON, LLAMA_BUILD_TESTS OFF, LLAMA_BUILD_EXAMPLES OFF, LLAMA_BUILD_TOOLS OFF, LLAMA_BUILD_SERVER OFF, LLAMA_CURL OFF, BUILD_SHARED_LIBS OFF; add_subdirectory(${LLAMA_DIR} llama EXCLUDE_FROM_ALL); add_executable(pigemma-probe probe/probe.cpp); target_link_libraries(pigemma-probe PRIVATE llama-common llama ${CMAKE_THREAD_LIBS_INIT}) (exactly as examples/eval-callback/CMakeLists.txt); target_compile_features cxx_std_17; if(CMAKE_SYSTEM_NAME STREQUAL Linux) add_executable(pinner pinner/pinner.c) with -std=c11 -Wall -Wextra -Werror -O2 -D_GNU_SOURCE; add_executable(membw membw/membw.c) linked to Threads::Threads, same warning flags; set RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin for all. GGML_NATIVE and arch flags are passed on the command line (Docker: -DGGML_NATIVE=OFF -DGGML_AVX2=ON -DGGML_AVX512=ON; Pi: -DGGML_NATIVE=ON, fallback -DGGML_CPU_ARM_ARCH=armv8.2-a+dotprod+fp16). Header comment documents both invocations.",
+   "test": "Configures and builds in Docker via `pc/docker_run.sh build-tools`; `pigemma-probe --help` prints the llama.cpp COMMON help plus the PIGEMMA section; `membw --size-mb 64 --json` runs.",
+   "parallel_group": 0,
+   "depends_on": []
+  },
+  {
+   "path": "tools/membw/membw.c",
+   "language": "C11 + pthreads",
+   "purpose": "Memory-bandwidth micro-bench so the Pi's in-RAM tok/s ceiling and the desktop calibration use measured GB/s instead of a guess.",
+   "spec": "`membw [--size-mb 512] [--threads 1,2,4] [--reps 5] [--json]`. Allocates size_mb buffer per thread-set (page-touched), measures per thread count: read (sum of 64-bit words, result consumed to defeat DCE), copy (memcpy to a second buffer), triad (a[i]=b[i]+s*c[i], 3 arrays of size/3 each); best-of-reps GB/s (1e9 B/s). Threads split the buffer into equal contiguous chunks; barrier before timing. Output text table or JSON {\"size_mb\":512, \"results\":[{\"threads\":4,\"read_gbps\":x,\"copy_gbps\":y,\"triad_gbps\":z}], \"host\":\"<uname -m>\"}. Exit 1 on allocation failure. No external deps; builds with -Wall -Wextra -Werror.",
+   "test": "Builds warning-free in Docker; `membw --size-mb 64 --threads 1,2 --json` finishes < 5 s and all numbers > 0; JSON parses (tests/test_bench_parse.py parses membw_sample.json).",
+   "parallel_group": 0,
+   "depends_on": []
+  },
+  {
+   "path": "pigemma/cache_sim.py",
+   "language": "Python (numpy)",
+   "purpose": "Expert-cache simulator for H1: replays a trace at Pi byte budgets under LRU/LFU/static/Belady/prefetch policies, reports bytes/token and hit rates, projects tok/s per device profile with explicit assumptions.",
+   "spec": "Access sequence: for token t (in trace order), for il in moe_layers, for e in ids[t,il] -> item (il,e) of size expert_unit_bytes (gate_up+down, both read on a miss; from map.json); per-item cost rounded up to `--read-granularity` (default 131072 B) to model readahead. Policies: `lru` (OrderedDict), `lfu` (counts with exponential decay `--lfu-decay 0.999`/token, ties by recency), `static` (pre-filled with top-N items by frequency on the first `--train-split` fraction of tokens, never replaced; misses are read but not inserted; evaluated on the remaining tokens and reported separately), `belady` (offline optimal: next-use index precomputed), `lru_prefetch` (LRU plus: after layer il of token t, predict the set for il+1 from the cross-layer table P(e' in S_{il+1} | e in S_il) built on the train split (top-K by summed probability), issue reads for predicted misses; prefetch bytes counted separately as `prefetch_bytes`, wasted prefetch = predicted but unused; in the projection the overlapped part is min(prefetch_bytes, storage_bw * t_layer) where t_layer = t_ram_per_token / n_layers), `lru_perlayer` (budget split equally per layer; control). Warm-up: first `--warmup-tokens` (default 256) excluded from steady-state metrics (overall also reported). Metrics per run: hit_rate, weighted_hit_rate (by routing weight), miss_bytes_per_token {mean,p50,p95,max}, n_miss_per_token mean, cold_bytes, per_layer_hit_rate[L], prefetch_bytes_per_token, wasted_prefetch_fraction, unique_items_touched, capacity_items. Budgets: `--budgets-gb 0.5,1,2,3,4,5,6,8,12.85` and/or `--profiles <names>` which derive expert_cache_bytes = ram_bytes - os_reserve_bytes - nonexpert_bytes - kv_bytes(n_ctx, q8_0 = f16/2 + 1/32) - compute_buffers_bytes (if <= 0 -> verdict INFEASIBLE, still simulated at 0). Projection per profile (kind=projected): resident_bytes_per_token = nonexpert_bytes_per_token + hit_bytes (expert bytes served from RAM); t_ram = resident_bytes_per_token / (mem_bw_gbps * eff) where eff = llama_efficiency measured on the desktop (= tg_measured * bytes_per_token / membw_read_gbps from results/e0 if present, else 0.65 assumed); t_io = miss_bytes_per_token / rand_read_3mb_mbps + n_miss * access_ms; tg_serial = 1/(t_ram + t_io); tg_overlap = 1/max(t_ram, t_io - overlapped/storage_bw); floor_all_in_ram = (mem_bw*eff)/(nonexpert_bytes_per_token + worst_expert_bytes_per_token); dense line for 31B: bytes/token = file data bytes -> tok/s at mem_bw and at storage_bw. Verdict per (profile,policy): FITS_RAM | STREAM_GOOD (tg_overlap>=2.0 and tg_serial>=1.0) | STREAM_WEAK (tg_serial 0.5-1.0) | NOT_VIABLE. CLI: `python -m pigemma.cache_sim <trace> --map map.json --catalog pigemma/data/catalog.json [--policies lru,lfu,static,belady,lru_prefetch] [--budgets-gb ...] [--profiles all] [--train-split 0.3] [--warmup-tokens 256] [--read-granularity 131072] [--token-range A:B] --out results/h1/sim.json [--csv results/h1/sim.csv] [--series results/h1/sim_series.npz]`. Output schema in data_formats 'sim.json'. API: `simulate(reader, map, policy, budget_bytes, **opts) -> SimResult`; `project(sim_result, profile, map, calibration) -> dict`. Performance: pure Python dict/OrderedDict over ~4-5M accesses per run finishes in < 1 min; Belady uses precomputed next-use arrays (numpy). Logs one line per (policy,budget) with hit rate and MB/token.",
+   "test": "tests/test_cache_sim.py: infinite budget -> steady-state bytes 0 and cold_bytes == unique items * unit; zero budget -> bytes/token == L*K*unit; belady misses <= lru misses <= lru_perlayer misses on 30 random Zipf traces; cyclic pattern of budget+1 items -> LRU hit 0, Belady > 0; hit rate monotone in budget; lru_prefetch with a perfect predictor (table from the same trace, deterministic routing) -> stall bytes 0 and wasted 0; LRU hit rate equals trace.stats stack-distance curve within 1e-9; projection known-answer (hand-computed numbers); profile-derived budget formula; verdict thresholds.",
+   "parallel_group": 1,
+   "depends_on": [
+    "pigemma/trace.py",
+    "pigemma/gguf_map.py",
+    "pigemma/data/catalog.json",
+    "pigemma/results.py"
+   ]
+  },
+  {
+   "path": "pigemma/feasibility.py",
+   "language": "Python 3.12+ stdlib only (runs on the Pi)",
+   "purpose": "Pure decision logic for the Pi feasibility verdict: facts.json + catalog -> per model/quant verdict with reasons, recommended quant and llama.cpp flags, refusal on protected/busy hosts; exit codes drive every pi/*.sh.",
+   "spec": "`load_catalog(path, io_mem=None)`; `verdict(facts, catalog, want=None, sim=None) -> Verdict(ok, exit_code, rows, recommended, reasons, host_refused)`. Constants at top (documented): OS_RESERVE = catalog device os_reserve or 0.7e9 (<=4 GB) / 0.8e9 (8 GB) / 0.9e9 (>=16 GB); KV_Q8_4K = 160e6 (26B at 4096 ctx, q8_0 K/V; from gguf_map kv_bytes) and 420e6 for 31B; COMPUTE_BUFFERS = 0.3e9; MIN_STREAM_CACHE = 2.0e9; MIN_FREE_RAM_TO_RUN = 1.0e9. Per model row: usable = ram_total - OS_RESERVE - kv - COMPUTE_BUFFERS; FITS_MAPPED if file_bytes <= usable (run with -nr: file-backed, no anon copy, graceful under pressure); FITS_REPACKED additionally if file_bytes + 0.3e9 <= usable - 1.0e9 (repack keeps an anonymous copy; on a 16 GB Pi with Q4_0 this is expected FALSE -> flags say -nr); else STREAM: expert_cache = usable - nonexpert_bytes; resident_fraction = expert_cache / expert_bytes; hit = interpolate catalog.selection.stream_hit_rate_curve_assumed (or sim.json LRU at that budget when --sim given, source then 'simulated'); miss_bytes = (1-hit) * 802897920; t_io = miss_bytes / storage.rand_read_3mb_mbps + n_miss*access_ms where n_miss = (1-hit)*240; t_ram = (nonexpert_bytes_per_token + hit*802897920) / (mem_bw*0.65); tok_s = 1/(t_ram+t_io); STREAM_OK if expert_cache >= MIN_STREAM_CACHE and storage.type in {nvme, usb-ssd} and tok_s >= 1.0; STREAM_SLOW if tok_s in [0.3,1.0) or storage microsd with tok_s>=0.3; NOT_VIABLE otherwise; dense (expert_bytes==0) streaming -> NEVER_GOOD_SPEED with the arithmetic string (file_bytes / storage_bw s per token). NO_DISK if free_disk < 1.05*file_bytes and the file is not already present. Host refusal (exit 4, ok=False, no rows evaluated for heavy work): hostname in catalog.protected_hosts, or any running service matches protected_service_globs, unless facts.override == 'PIGEMMA_I_KNOW'; busy refusal (exit 4): loadavg1 > 2.0 or ram_available < MIN_FREE_RAM_TO_RUN. Exit codes: 0 some row FITS_* or STREAM_OK; 2 best is STREAM_SLOW; 3 nothing viable / NO_DISK; 4 refused. `recommended` = best row by (FITS_MAPPED > STREAM_OK > STREAM_SLOW), tie-break higher-bit quant, with `flags`: FITS_MAPPED -> '-nr -lm mmap+mlock -t 4 -c 4096 -fa on -ctk q8_0 -ctv q8_0'; FITS_REPACKED -> '-lm mmap -t 4 -c 4096 -fa on -ctk q8_0 -ctv q8_0'; STREAM_* -> '-nr -lm mmap -t 4 -c 4096 -ctk q8_0 -ctv q8_0 -b 256 -ub 64'. Always appends the recommendation line 'Pi 5 16 GB + NVMe Gen3: 26B-A4B fits in RAM (-nr); 8 GB + NVMe Gen3: stream experts (~40% cached); 8 GB + USB3: weak; 4 GB or microSD: not viable; 31B dense: never good speed on any Pi 5'. CLI: `python3 -m pigemma.feasibility --facts facts.json [--catalog pigemma/data/catalog.json] [--want 26b|31b] [--sim results/h1/sim.json] [--json out.json] [--emit env]` prints a table (model, quant, bytes, verdict, projected tok/s with source, reason) and, with --emit env, shell-safe `MODEL_ID= MODEL_REPO= MODEL_FILE= MODEL_BYTES= LLAMA_FLAGS='...' DRAFT_REPO= DRAFT_FILE= PIN_BUDGET_BYTES=` lines; exits with the verdict code.",
+   "test": "tests/test_feasibility.py with the five facts fixtures: 4GB+microSD -> NOT_VIABLE for all, exit 3 (and exit 4 when the services list contains contextfriend-*); 8GB+USB3 -> 26b STREAM_SLOW/OK per curve, exit 2 or 0 as computed and asserted against hand arithmetic; 8GB+NVMe -> STREAM_OK exit 0 with flags containing '-nr'; 16GB+NVMe -> 26b-q4 FITS_MAPPED, FITS_REPACKED false, flags contain '-nr -lm mmap+mlock'; 31b always NEVER_GOOD_SPEED with the s/token string; busy facts -> exit 4; --emit env output is shell-safe (no unquoted spaces); --sim overrides the assumed curve.",
+   "parallel_group": 1,
+   "depends_on": [
+    "pigemma/data/catalog.json"
+   ]
+  },
+  {
+   "path": "pigemma/bench.py",
+   "language": "Python (subprocess, psutil, http.client)",
+   "purpose": "Wrapper for llama-bench / llama-completion / llama-server on every platform: runs variant matrices, parses outputs, samples memory, measures bytes read, writes results-envelope JSON. Speculative decoding goes through llama-server timings.",
+   "spec": "Binary resolution via paths.bin. Variants -> flags: default: []; norepack: llama-bench `--repack 0`, others `-nr`; hybrid_negctrl: `-ot \"ffn_(gate_up|down)_exps=CPU\"` (negative control: expected to still repack); nommap: `-lm none`; mlock: `-lm mmap+mlock`; kvq8: `-fa on -ctk q8_0 -ctv q8_0`. Subcommands: (a) `matrix --model <id|path> --threads 4,6,12 --pp 128 --tg 32 -r 3 --variants default,norepack,hybrid_negctrl,nommap [--kvq8] --out <dir>` -> one llama-bench process per variant with `-m F -t <list> -p PP -n TG -r R -o json [flags]`; parse the JSON array rows (build_commit, build_number, cpu_info, model_size, n_threads, n_prompt, n_gen, avg_ts, stddev_ts, type_k/type_v, flash_attn); write one result per (variant, threads, pp|tg) with experiment E0, kind measured. (b) `completion --model F --prompt-file P -n 128 --threads 6 --variant V [--chat] --out <dir>` -> `llama-completion -m F -f P -n N --temp 0 -t T -c 4096 [flags]` (prompt chat-wrapped if --chat); memory sampler thread (0.25 s): Windows psutil memory_info().rss (working set) and memory_full_info().private peaks; Linux /proc/<pid>/status VmHWM, RssAnon, RssFile peaks and /proc/<pid>/io read_bytes delta; parse stderr: `load time = X ms`, `prompt eval time = ... (X tokens per second)`, `eval time = ... (X tokens per second)`, and buffer lines `load_tensors:\\s+(\\S+) model buffer size =\\s+([\\d.]+) MiB` into buffer_split; capture stdout text as output_sample; coherence via quality.is_coherent. (c) `server-spec --model F --variant plain|mtp|mtp-explicit|dflash|dflash-explicit|ngram --prompts data/prompts/gen_prompts.json -n 200 --threads 6 --port 18080 --out <dir>`: starts its OWN `llama-server -m F -t T -c 4096 -np 1 --host 127.0.0.1 --port P [-md DRAFT] [--spec-type draft-mtp|draft-dflash|ngram-simple] [--spec-draft-n-max 6]` (draft path from catalog drafts), polls /health until {\"status\":\"ok\"} (timeout 300 s, records load_time_s), one warm-up /completion of 16 tokens, then per prompt POST /completion {prompt: chat-wrapped, n_predict, temperature 0, cache_prompt false}; records timings (prompt_n, prompt_per_second, predicted_n, predicted_per_second, draft_n, draft_n_accepted), content; accept_rate = sum(draft_n_accepted)/sum(draft_n) or None; spec_active = draft_n > 0 on every request; spec_type_effective = 'inferred' | 'explicit:<type>' | 'none'; if variant mtp shows draft_n == 0/absent, the driver (not this function) also runs mtp-explicit; identical_to_plain computed by quality.visible_text equality vs the plain run's content per prompt; terminates only its own child (terminate, then kill after 10 s); never touches other llama-server processes. (d) `parse` helpers exported for tests: parse_bench_json, parse_completion_stderr, parse_buffer_split, parse_timings. All subcommands run under paths.bench_lock() and write results.write_result files named <experiment>_<model>_<variant>_<threads>_<ts>.json. Edge: llama-completion exit != 0 -> result with notes=['failed: <last stderr lines>'] and no tok/s; server never healthy -> same.",
+   "test": "tests/test_bench_parse.py with checked-in fixtures: llama-bench JSON rows parsed (avg_ts/stddev_ts, n_threads); completion stderr lines parsed to load_s/pp/tg; buffer_split picks CPU_REPACK and CPU_Mapped MiB; server timings -> accept_rate and spec_active; a fake local HTTP server (threading.HTTPServer) exercises server-spec request/response shaping and the identical_to_plain logic without a model; variant->flags mapping exact strings.",
+   "parallel_group": 1,
+   "depends_on": [
+    "pigemma/paths.py",
+    "pigemma/results.py",
+    "pigemma/data/catalog.json"
+   ]
+  },
+  {
+   "path": "pigemma/h2/decompose.py",
+   "language": "Python (numpy; torch CPU for low-rank, imported lazily)",
+   "purpose": "H2 step 1: load real Q4_0 matrices by byte range, dequantize, build cheap bases (2/3-bit group quant, low-rank), split the residual into input-column groups with per-group spectral-norm bounds and byte accounting.",
+   "spec": "Quantization helpers: `dequant_q4_0(buf: bytes, n_rows, n_cols) -> np.float32[n_rows, n_cols]` (ggml layout: block of 32 = f16 scale d + 16 bytes; low nibbles are elements 0..15, high nibbles 16..31; value = d*(q-8); rows = ne[1], each row ne[0] contiguous) cross-checked bit-exactly against gguf.quants.dequantize; `load_matrix(map_or_gguf, tensor_name) -> np.float32[n_out, n_in]` reads only that tensor's byte range via np.memmap (y = W @ x; GGUF ne=[n_in, n_out]); `ffn_names(layer)` -> gate/up/down names; `group_quant(W, bits, block=32) -> (W_hat, bytes)` symmetric absmax per block with f16 scale (bytes/elem = bits/8 + 2/block; q2 = 0.3125, q3 = 0.4375, q4 = 0.5625); `lowrank(W, r) -> (U f16 [n_out,r], S, Vt f16 [r,n_in], bytes = 2*r*(n_in+n_out))` via torch.svd_lowrank(q=r+32, niter=3) (numpy fallback: randomized range finder). `decompose(W, base='q2'|'q3'|'lowrank256'|'lowrank512'|'q2+lowrank128', group_cols=128, res_bits=4|8|16) -> Decomp(W_base_hat f32, base_bytes, groups: list[Group(cols: slice, R_hat f32 [n_out, g] (residual quantized at res_bits per block 32, or exact for 16), bytes_g, norm2_g, normF_g)], total_residual_bytes, meta)`; norm2_g = largest singular value of R_g (np.linalg.svd(compute_uv=False) on [n_out, g], ~fast for g<=128), normF_g Frobenius. Memory discipline: one f32 matrix at a time (31B gate/up/down are 5376x21504 = 462 MB f32); residual groups stored as f16 to halve memory; explicit del + gc between matrices. CLI `python -m pigemma.h2.decompose --map traces/h2/map31.json --layers 5,20,35,50 --mats gate,up,down --bases q2,lowrank256 --group 128 --res-bits 4 --out traces/h2/decomp/` writes per (layer,mat,base) an .npz (W_base_hat f16, per-group R_hat f16 stacked [G, n_out, g], norm2[G], normF[G], bytes_g[G], base_bytes, cols) and prints bytes accounting vs Q4_0 (65,028,096 B per 31B matrix). Prints an ETA after the first matrix. Edge: n_in not divisible by group -> last group shorter (5376/128 = 42 exact; 21504/128 = 168 exact).",
+   "test": "tests/test_h2_decompose.py: random f32 [64,256] -> gguf.quants.quantize(Q4_0) -> dequant_q4_0 equals gguf.quants.dequantize bit-exactly; group_quant(4) error <= Q4_0 reference error*1.05 on Gaussian data and bytes/elem formula; lowrank(r=min(dims)) reconstructs a rank-r matrix to 1e-4; decompose with res_bits=16: W_base_hat + sum_g R_g == W within 1e-5; bound soundness: for 1000 random x, ||R_g x_g|| <= norm2_g*||x_g|| always (and <= normF_g*||x_g||); bytes accounting = base + sum(bytes_g).",
+   "parallel_group": 1,
+   "depends_on": [
+    "pigemma/gguf_map.py"
+   ]
+  },
+  {
+   "path": "tools/probe/probe.cpp",
+   "language": "C++17 against llama-common + llama (built in Docker and on the Pi)",
+   "purpose": "The one custom llama.cpp program (`pigemma-probe`): a cb_eval recorder with three modes (names, moe-trace, act-dump), teacher-forced replay of a fixed token stream, greedy generation, and per-token I/O accounting on Linux. Everything llama.cpp lacks for H1/H2 measurement, nothing else.",
+   "spec": "Pre-scan argv and pop probe flags before `common_params_parse(argc, argv, params, LLAMA_EXAMPLE_COMMON)`: `--mode names|moe-trace|act-dump` (required), `--trace-out F` (moe-trace), `--gen N` (greedy tokens after each chunk, default 0), `--probs-top K` (store top-K router probs from ffn_moe_probs, default 0), `--chunk-tokens N` (split the prompt into fresh-context chunks, default 1024), `--chat` (wrap each prompt in `<start_of_turn>user\\n…<end_of_turn>\\n<start_of_turn>model\\n`), `--gen-prompts FILE.json` (list of prompts, each a separate chunk with --gen), `--replay tokens.bin` (teacher-forced replay of an i32 stream; ignores -p/-f; split by --chunk-tokens and `--replay-chunks FILE` boundaries if given), `--replay-range A:B`, `--io-csv F` (Linux: per processed token/ubatch row 'token_index,phase,wall_ms,read_bytes_delta,majflt_delta,rss_anon_kb,rss_file_kb' from /proc/self/io, /proc/self/stat field 12, /proc/self/status), `--layers 5,20,35,50` and `--kinds ffn_norm,ffn_geglu,ffn_out` and `--tokens T` and `--act-out DIR` (act-dump), `--corpus-id S`. Standard args work: -m -f -p -t -c -b -ub -nr -lm -ctk -ctv -fa. Mandatory: params.cb_eval = probe_cb; params.cb_eval_user_data = &state; params.warmup = false (otherwise routing uses all experts, llama-graph.cpp:1473). Init: `auto init = common_init_from_params(params); model = init->model(); ctx = init->context();` vocab = llama_model_get_vocab; n_layer = llama_model_n_layer; arch = meta 'general.architecture'; n_expert/n_expert_used from meta `<arch>.expert_count` / `<arch>.expert_used_count` (0 => moe-trace refuses with a clear error). Callback `static bool probe_cb(ggml_tensor* t, bool ask, void* ud)`: parse name prefix (up to the last '-') and layer il = strtol after the last '-'; wanted set by mode: names -> on ask collect every name once into a std::set (return false), print sorted at exit; moe-trace -> {ffn_moe_topk, ffn_moe_weights_norm[, ffn_moe_probs]}; act-dump -> kinds x layers. On ask return true only for wanted names. On data: if !ggml_backend_buffer_is_host(t->buffer) use ggml_backend_tensor_get into a scratch buffer, else read t->data; ALWAYS honour nb[] strides: ffn_moe_topk is I32 ne=[K, T] with nb[1]=n_expert*4 (a view of the argsort); ffn_moe_weights_norm F32 ne=[1, K, T]; ffn_moe_probs F32 ne=[E, T]; activations F32 ne=[ne0, T] (each token vector contiguous when nb[0]==4). First sight of each name asserts type and ne[0]/ne[1] against expectations (K == n_expert_used, E == n_expert) else exit 4 with a message naming the tensor. Append the T columns to per-layer accumulators (std::vector per layer per kind). Processing loop per chunk: `llama_memory_clear(llama_get_memory(ctx), true)`; `common_batch batch = common_batch_get_one(ctx, tokens_chunk); if (llama_process(ctx, LLAMA_PROCESS_TYPE_DECODE, batch.get()) != 0) exit 3;` (n_batch >= chunk so one call; ubatches accumulate in order); after return assert every wanted layer accumulated exactly chunk_len columns (else exit 4 'layer %d got %d columns, expected %d'), flush one record per token (phase 0, pos = index in chunk, token_index = running counter, chunk_id = chunk number mod 256), append token ids to `<trace>.tokens.bin`, clear accumulators; then generation: `float* lg = llama_get_logits_ith(ctx, -1)`; argmax over llama_vocab_n_tokens; stop at llama_vocab_is_eog or N; `common_batch b = common_batch_get_one(ctx, &tok, 1)` (positions continue from memory) -> llama_process -> flush one record (phase 1, token_id = tok); accumulate the piece (common_token_to_piece) into `<trace>.gen.txt` with a '\\n--- chunk i ---\\n' separator. Trace file: header JSON written at start (format_version 1, model_name from meta general.name, gguf_path, gguf_size_bytes (stat), llama_build LLAMA_BUILD_NUMBER, llama_commit LLAMA_COMMIT, arch, n_layer, n_expert, n_expert_used, moe_layers (layers whose ffn_moe_topk was seen in the first chunk; record order), n_embd, probs_top, weights_tensor 'ffn_moe_weights_norm', corpus_id, created_at, n_ctx, n_batch, n_ubatch, n_threads, flags = argv, chunks: [{chunk_id, source, n_prompt, n_gen}] patched at close); n_records patched at close (also from a SIGINT handler). act-dump: for each (layer, kind) open DIR/L<il>.<kind>.npy with a fixed 128-byte npy v1.0 header '{\"descr\": \"<f2\", \"fortran_order\": False, \"shape\": (T_MAX, ne0), }' space-padded; append rows converted with ggml_fp32_to_fp16_row; at close rewrite shape with the real T and ftruncate; write DIR/meta.json {model, gguf_path, layers, kinds:{name: ne0}, n_tokens, phase_file 'phase.u8', tokens_file 'tokens.bin', chunks, llama_build, n_ubatch, flags}; stops after --tokens total tokens. Summary JSON on stderr at exit: n_prompt, n_gen, t_load_ms, t_p_eval_ms, t_eval_ms (llama_perf_context), tok/s, callback overhead (sum of time inside the callback). Exit codes: 0 ok, 2 usage, 3 load/compute failure, 4 tensor contract violation.",
+   "test": "Integration (Docker, needs the 26B): `pc/trace_collect.sh --smoke` (64 prompt tokens + 8 generated) -> `python -m pigemma.trace validate` passes, n_records == 72, all layers 0..29 present, weights sum to 1; `--mode names` output contains ffn_moe_topk-0, ffn_moe_weights_norm-0, ffn_norm_2-0; act-dump smoke on the 31B with `--layers 0 --tokens 8` yields L0.ffn_geglu.npy shape (8, 21504) and L0.ffn_out.npy (8, 5376) loadable by numpy; the smoke trace is checked in as tests/fixtures/golden_26b_72tok.moetrace and validated by tests/test_trace.py. Unit: tests/test_pi_scripts.py checks the wrapper argv builders.",
+   "parallel_group": 1,
+   "depends_on": [
+    "tools/CMakeLists.txt",
+    "docs/TRACE_FORMAT.md"
+   ]
+  },
+  {
+   "path": "tools/pinner/pinner.c",
+   "language": "C11, Linux only (mmap/mlock/mincore)",
+   "purpose": "Hot-set pinning daemon: MAP_SHARED-maps the GGUF and mlocks the hot byte ranges so the kernel page cache keeps them resident for llama.cpp's own mapping of the same file while cold experts stream; verifies residency; reports and holds until SIGTERM.",
+   "spec": "`pinner --gguf FILE --ranges hotset.ranges.txt [--verify] [--once] [--max-bytes N] [--pidfile P] [--json]`. Reads ranges file ('offset length' per line, '#' comments, decimal); page = sysconf(_SC_PAGESIZE) (16384 on the Pi kernel); each range aligned down/up; total requested computed first and compared with --max-bytes and with MemAvailable from /proc/meminfo minus 512 MiB: refuse (exit 3) with the numbers if too large. open O_RDONLY, fstat, mmap(NULL, size, PROT_READ, MAP_SHARED) whole file; for each range: madvise(MADV_WILLNEED) then mlock(addr+off, len); on failure record errno (EPERM/ENOMEM -> RLIMIT_MEMLOCK: print getrlimit(RLIMIT_MEMLOCK) and the fix 'ulimit -l unlimited' / /etc/security/limits.d/90-pigemma.conf / CAP_IPC_LOCK; EAGAIN -> retry once after touching pages). --verify: mincore() per range -> resident bytes; print per-kind totals if the ranges file has '# kind=' comments, else total. Summary line (JSON with --json): {\"requested_bytes\",\"locked_bytes\",\"resident_bytes\",\"ranges\",\"failed\",\"page_size\",\"memlock_limit\",\"vm_lck_kb\" (from /proc/self/status VmLck)}. Then: --once -> exit (locks released; warm-up only); else write pidfile, block in sigwait for SIGTERM/SIGINT, munlockall, munmap, remove pidfile, exit 0. Exit codes: 0 all locked, 2 partial (prints count), 3 refused/permission, 1 usage/IO error. No cross-process madvise claims (MADV_RANDOM from here does not affect llama.cpp's mapping); readahead is controlled by the device read_ahead_kb (pi/01). Builds with -Wall -Wextra -Werror; #error on non-Linux.",
+   "test": "Integration in Docker (tests/test_pi_scripts.py @integration @linux): create a 64 MiB random file, ranges of 3 regions, run `pinner --verify --once --json` -> resident_bytes == requested (page-aligned) and VmLck > 0 during the run (checked via a --hold-seconds 2 debug flag); with `ulimit -l 64` -> exit 3 and the hint text; malformed ranges line -> exit 1.",
+   "parallel_group": 1,
+   "depends_on": [
+    "docs/TRACE_FORMAT.md"
+   ]
+  },
+  {
+   "path": "pc/docker_run.sh",
+   "language": "bash (Git Bash on Windows -> Docker Desktop Linux)",
+   "purpose": "The one Docker wrapper every pc/*.sh uses (fixes the MSYS path-mangling gotcha, memory/cpu caps, volumes) plus the tools build subcommand.",
+   "spec": "`pc/docker_run.sh [--memory 6g] [--cpus 6] [--volume pigemma-models:/models:ro] [--name N] -- <command...>` => `MSYS_NO_PATHCONV=1 docker run --rm -i $([ -t 0 ] && echo -t) -v \"REPO_ROOT:/work\" -w /work ${MEM:+--memory=$MEM --memory-swap=$MEM} ${CPUS:+--cpus=$CPUS} ${VOL:+-v $VOL} pi-gemma4-build:latest \"$@\"`. Repo path derived from the script location (`cd \"$(dirname \"$0\")/..\" && pwd -W`), image overridable via PIGEMMA_IMAGE. Refuses if `docker info` fails. Subcommand `build-tools [--clean]`: runs inside the container `cmake -S /work/tools -B /work/tools/build-linux-x86 -G Ninja -DLLAMA_DIR=/work/third_party/llama.cpp -DGGML_NATIVE=OFF -DGGML_AVX2=ON -DGGML_AVX512=ON -DCMAKE_BUILD_TYPE=Release && cmake --build /work/tools/build-linux-x86 -j12 --target pigemma-probe pinner membw`, then prints the three binary paths and `pigemma-probe --help | head -3`. Subcommand `vm-df`: prints `docker run --rm alpine df -B1 /` (VM root free bytes) and `docker system df`, used by pagecache_limit.sh to gate the volume copy. Exit code forwarded.",
+   "test": "`pc/docker_run.sh -- ls /work/models` lists the model directories (bind mount non-empty); `pc/docker_run.sh build-tools` exits 0 and the binaries exist; `bash -n` in tests/test_pi_scripts.py.",
+   "parallel_group": 1,
+   "depends_on": [
+    "tools/CMakeLists.txt",
+    "pigemma/paths.py"
+   ]
+  },
+  {
+   "path": "pigemma/quality.py",
+   "language": "Python",
+   "purpose": "Cheap quality metrics: KL-divergence vs the Q4_0 reference via llama-perplexity, the fixed Q&A set with Hebrew-aware grading, thinking-channel stripping, repetition/coherence check, and the lossless check for speculative variants.",
+   "spec": "`strip_thinking(text) -> (visible, thinking_chars)`: removes `<|channel>thought ... <channel|>` blocks (DOTALL, also unterminated), a leading bare `<channel|>` or `<|channel>` token (observed in the server outputs), and `<end_of_turn>`; `is_coherent(text) -> (bool, reason)`: >= 60% of chars are letters/digits/space/punct, no 4-gram repeated >= 6 times, no 6-gram repeated > 3 times; `grade(item, visible) -> bool`: contains = any expected substring after normalisation (casefold, NFKC, Hebrew final forms ךםןףץ -> כמנפצ, strip niqqud U+0591-U+05C7, collapse whitespace, strip punctuation); regex = re.search; number = first number in the text within tolerance. `chat_wrap(user_text)` -> Gemma template. Subcommands: (a) `qa --model F --threads 6 [--server-variant plain|mtp|dflash] -n 160 --out results/quality/qa_<model>_<variant>.json`: uses bench.server-spec machinery (one server, 16 requests, temperature 0) or llama-completion per item when --no-server; records items [{id, lang, visible, thinking_chars, pass}], qa_score, qa_total, per-language scores, exact_match_vs_plain (fraction of items whose visible text equals the plain run's, None if plain not present); kind measured. (b) `kld-base --model F --text data/calibration/all.txt -c 512 --chunks 6 --out results/quality/ref_<model>.logits`: size_estimate = chunks*ctx*262144*2 bytes (6 chunks = 1.61 GB); refuses unless free disk >= 2*estimate (prints both numbers); runs `llama-perplexity -m F -f TEXT -c 512 --chunks N -t T --save-all-logits OUT`; verifies the file size afterwards. (c) `kld --model F --base results/quality/ref_<model>.logits --variant norepack|hybrid_negctrl|<quant-id> --out ...`: runs `llama-perplexity -m F -f TEXT -c 512 --chunks N -t T --kl-divergence --kl-divergence-base BASE [flags]`; parses `Mean    KLD: x ± y`, `Maximum KLD: x`, `99.9%   KLD: x`, `Mean PPL(Q)`, `Mean PPL(base)`, and the `Same top p` / `Mean Δp` lines (parser tolerant to spacing; missing -> None). (d) `ppl --model F ...` parses `Final estimate: PPL = x +/- y`. All model-loading paths under paths.bench_lock. Corpus: data/calibration/all.txt built by concatenating the existing calibration files (helper `build_corpus()`; sha256 recorded).",
+   "test": "tests/test_quality.py: strip_thinking on fixtures incl. unterminated block and leading `<channel|>`; grader on Hebrew with final forms/niqqud and on numbers with tolerance; is_coherent flags a repetition loop; KLD/PPL line parsers on the checked-in fixture; disk gate arithmetic; exact_match_vs_plain computed on fixture outputs.",
+   "parallel_group": 2,
+   "depends_on": [
+    "pigemma/bench.py",
+    "pigemma/paths.py",
+    "data/prompts/qa_set.json"
+   ]
+  },
+  {
+   "path": "pigemma/h2/oracle.py",
+   "language": "Python (numpy)",
+   "purpose": "H2 step 2: with real FFN-input activations, measure per token how much residual an oracle needs, how much the norm bound certifies, soundness, the iso-byte competitor (plain lower-bit quant), and the implied Pi bytes/token; renders the H2 results markdown.",
+   "spec": "Inputs: decomp .npz files, acts dir (meta.json, L<il>.ffn_norm.npy for gate/up, L<il>.ffn_geglu.npy for down, L<il>.ffn_out.npy for the sanity check, phase.u8). For each (layer, mat, base): X = rows of the matching kind (first --tokens tokens, both phases; stats reported separately for phase 0 (teacher-forced) and 1 (generated)); y_ref = W_q4 @ x (W_q4 = exact dequant of the Q4_0 matrix, the thing llama.cpp computes); SANITY (down only): rel_err(W_down_q4 @ geglu_t, ffn_out_t) median over tokens, expect < 0.03 (llama.cpp quantises activations to Q8 for the matmul); abort with a clear message if > 0.1 (orientation/scale bug). Per token (batched 32 tokens at a time to bound memory: contributions C[g] = R_g @ x_g for all groups = [G, n_out] per token): err_base = ||y_ref - W_base x|| / ||y_ref||; ORACLE: sort groups by ||C_g|| desc, add until rel error <= eps for eps in {0.01, 0.03, 0.10}; record k_oracle, residual byte fraction = sum(bytes_g selected)/total_residual_bytes, and the error-vs-bytes curve at byte fractions 0,0.05,...,1.0 (mean, p95 over tokens). BOUND: b_g = norm2_g * ||x_g||; certified-skip set = longest prefix of groups sorted by b_g ascending such that B = sum_prefix b_g <= eps * ||y_hat|| / (1+eps) where y_hat = y_ref - sum_prefix C_g (sound: ||y_ref - y_hat|| <= B and ||y_ref|| >= ||y_hat|| - B); record certified_skip_fraction (bytes), realised error after skipping (must be <= eps: soundness_violations counter must stay 0), certification_efficiency = certified bytes skipped / oracle bytes skipped at the same eps, tightness ratios ||C_g||/b_g (p10/p50/p90), Spearman rank correlation between b_g and ||C_g||. ISO-BYTE control: at byte budgets equal to uniform q2 and q3 full reads (and the oracle's bytes at eps=0.03), compare rel error of plain uniform group quant vs base+oracle vs base+certified. Aggregation: per (layer, mat, base, phase) means/p95; summary: median residual fraction at eps 0.03, median certification efficiency, implied bytes/token for 60 layers = 60*(sum over gate/up/down of base_bytes + mean selected residual bytes at eps 0.03) + attention 4,770,160,640 + head 1,156,076,544 (labelled PROJECTED/extrapolated from sampled layers) vs 17,635,166,448 (Q4_0) and 8.5e9 (IQ2_XXS); projected s/token on a Pi at 850 MB/s and at 10 GB/s in RAM; verdict PROMISING | WEAK | NOT_SUPPORTED | NO_ADVANTAGE by the E7 thresholds. CLI `python -m pigemma.h2.oracle --decomp traces/h2/decomp/ --acts traces/h2/acts/31b/ --tokens 512 --eps 0.01,0.03,0.10 --out results/h2/oracle.json --md docs/results/H2_RESULTS.md [--batch 32]`; prints ETA after the first matrix; writes JSON (schema data_formats 'h2.json', kind measured for errors/fractions, projected block with assumptions) and the markdown (tables: sanity, per layer/matrix/base fractions, bound tightness, iso-byte, extrapolation, verdict with the rule quoted).",
+   "test": "tests/test_h2_oracle.py on synthetic [64,256] matrices and a synthetic acts dir: W with a planted residual concentrated in 10% of column groups -> oracle fraction <= 0.15 at eps 0.01 and certified set never contains a planted group; fraction non-increasing in eps; eps=inf -> 0 groups; W_base == W -> 0; soundness_violations == 0 over 200 random cases; Spearman in [-1,1]; sanity check passes on synthetic ffn_out = W_down @ geglu; markdown renders and contains the verdict string.",
+   "parallel_group": 2,
+   "depends_on": [
+    "pigemma/h2/decompose.py",
+    "pigemma/trace.py",
+    "pigemma/results.py"
+   ]
+  },
+  {
+   "path": "pc/trace_collect.sh",
+   "language": "bash (Git Bash -> Docker)",
+   "purpose": "E3 driver: runs pigemma-probe --mode moe-trace in Docker on the calibration corpus plus generation prompts, in tiers sized for today, then validates, merges and computes stats.",
+   "spec": "`pc/trace_collect.sh [--smoke|--quick|--full] [--gen N] [--threads 12] [--probs-top K] [--out traces/26b]`. Tiers: --smoke = first 64 tokens of en_tech + --gen 8 (validation only); --quick (default) = all data/calibration text/code files (concatenated per file, chunk 1024, --gen 128 per chunk; ~12-14k prefill + ~1.7k generated) + gen_prompts.json with --gen 256 (+2k generated); --full = quick with chunk 2048 and --gen 256 per chunk. One probe process per corpus file (fresh context per chunk inside): `pc/docker_run.sh -- python -m pigemma.paths lock --hold -- tools/build-linux-x86/bin/pigemma-probe --mode moe-trace -m /work/<26B> -f /work/data/calibration/<file> -nr -t 12 -c 4096 -b 2048 -ub 256 --chunk-tokens 1024 --gen N [--chat for gen prompts] [--probs-top K] --corpus-id <stem> --trace-out /work/traces/26b/<stem>.moetrace` (`-nr` so the 31 GB Docker VM holds the file in page cache instead of a 14 GB repack copy; warns that the first read through the bind mount takes minutes). After each run: `python -m pigemma.trace validate`; writes <stem>.meta.json (host, sha256_prefix of the GGUF, corpus sha256, argv, wall time, coherent flag of gen.txt via quality.is_coherent). Then `python -m pigemma.trace merge traces/26b/all.moetrace traces/26b/*.moetrace` and `python -m pigemma.trace stats traces/26b/all.moetrace --out traces/26b/all.stats.json --csv-dir results/h1/`. Prints the tok/s reported by the probe so the full tier can be sized. Refuses if the 26B file is missing or if results/.bench.lock is held.",
+   "test": "--smoke passes validate with 72 records and all 30 layers; --quick asserts token_count >= 10000 prefill and >= 2000 generated and every chunk coherent; `bash -n`.",
+   "parallel_group": 2,
+   "depends_on": [
+    "tools/probe/probe.cpp",
+    "pc/docker_run.sh",
+    "pigemma/trace.py",
+    "pigemma/quality.py"
+   ]
+  },
+  {
+   "path": "pc/pagecache_limit.sh",
+   "language": "bash (host side + inner container script in the same file via --inner)",
+   "purpose": "E5/E6: the desktop proxy for a RAM-limited Pi. Runs the probe in replay mode under a cgroup memory cap against the model in a Docker ext4 volume, measures real bytes read per token, and A/B tests hot-set pinning in the same cgroup; then compares with the simulator.",
+   "spec": "`pc/pagecache_limit.sh [--mem 3,4,5,6,8] [--tokens traces/26b/all.moetrace] [--range 0:1500] [--pin] [--skip-copy] [--allow-bind-mount] [--out results/h1/validation.json]`. Step 0 gates: `pc/docker_run.sh vm-df` -> VM root free >= 16 GB AND Windows C: free >= 18 GB (the WSL2 vhdx grows on C:), else print 'docker builder prune would reclaim ~20 GB' and refuse unless --allow-bind-mount (bind-mount fallback: bytes/token = majflt*4096 lower bound only, results flagged notes=['bind-mount proxy: lower-bound bytes, timings not representative']). Step 1 (once): `docker volume create pigemma-models`; copy the 26B GGUF with `docker run --rm -v pigemma-models:/models -v <repo>:/work pi-gemma4-build cp /work/models/.../gemma-4-26B_q4_0-it.gguf /models/` showing progress; verify size. Step 2 per cap M: `pc/docker_run.sh --memory ${M}g --cpus 6 --volume pigemma-models:/models:ro -- bash /work/pc/pagecache_limit.sh --inner ...` where --inner (running in the container) does: record /sys/fs/cgroup/memory.max, read_ahead_kb of the volume device if visible; `vmtouch -e /models/<gguf>` (cold start); fio tier characterisation once per cap: `fio --name=tier --filename=/models/<gguf> --rw=randread --bs=3345k --direct=1 --readonly --iodepth=1 --runtime=15 --time_based --output-format=json` -> tier_rand_read_3mb_mbps; optionally start `pinner --gguf /models/<gguf> --ranges /work/results/h1/hotset_<M>.ranges.txt --verify --json --pidfile /tmp/pinner.pid &` (hotset generated on the host beforehand with budget = M*1e9 - 0.6e9 anon - 0.3e9 slack, i.e. non-expert 1.577 GB + hottest experts) and wait for its summary; run `tools/build-linux-x86/bin/pigemma-probe --mode moe-trace -m /models/<gguf> --replay /work/traces/26b/all.moetrace.tokens.bin --replay-range A:B -ub 1 -nr -t 6 -c 2048 --io-csv /tmp/io.csv --trace-out /tmp/replay.moetrace` (ubatch 1 = decode-like access pattern identical to the simulator's sequence); after exit record /sys/fs/cgroup/memory.stat (anon, file, file_mapped), memory.events (oom_kill count -> run marked OOM), io.stat rbytes sum if present, exit code; also a plain `llama-completion -m /models/<gguf> -nr -t 6 -c 2048 -n 64 --temp 0 -f /work/data/calibration/en_tech_moe_streaming.txt` for a natural-generation tok/s under the cap; stop the pinner (SIGTERM to the pidfile only). Copies io.csv to results/h1/io_<M>[_pin].csv. Step 3 (host): `python -m pigemma.cache_sim traces/26b/all.moetrace --map results/map26.json --policies lru,belady --budgets-gb <M - anon_rss_measured - 1.577 - 0.1> --token-range A:B --warmup-tokens 200` and compare: measured bytes/token = mean read_bytes_delta over tokens after the warm-up window; ratio sim_lru/measured; time model: predicted tok/s with ram_bw calibrated from the uncapped (M=20 or native) run and storage_bw = tier measurement vs measured 1000/mean(wall_ms); writes results/h1/validation.json (points: [{mem_cap_bytes, pinned, anon_rss_bytes, file_cache_bytes, tier_mbps, measured_bytes_per_token, measured_majflt_per_token, sim_lru_bytes_per_token, sim_belady_bytes_per_token, ratio, measured_tok_s, predicted_tok_s, oom:bool}], kind measured + projected sub-blocks). Logs every gate decision.",
+   "test": "Integration today (E5/E6 thresholds); `bash -n`; the comparison step is unit-tested in tests/test_cache_sim.py via a fixture io.csv.",
+   "parallel_group": 2,
+   "depends_on": [
+    "tools/pinner/pinner.c",
+    "tools/probe/probe.cpp",
+    "pigemma/cache_sim.py",
+    "pigemma/gguf_map.py",
+    "pc/docker_run.sh"
+   ]
+  },
+  {
+   "path": "pi/lib/common.sh (+ pi/pi_config.env)",
+   "language": "bash (Debian 13 on the Pi; lint-tested under Git Bash)",
+   "purpose": "Shared helpers and the single parameter file for all Pi scripts: fact collection into facts.json, production-host refusal, verdict gate, logging and exit-code conventions. Never kills or restarts anything; reads /proc and /sys only.",
+   "spec": "pi_config.env (sourced first; every script prints the effective values): PIGEMMA_HOME (repo dir), MODEL_DIR (default $PIGEMMA_HOME/models; set to the NVMe mount), LLAMA_DIR (~/llama.cpp), LLAMA_COMMIT=a7b94df, THREADS=4, CTX=4096, QUANT_OVERRIDE=, OS_RESERVE_GIB=, MIN_FREE_DISK_FACTOR=1.1, DENY_HOSTS='context-friend-1', PROTECTED_SERVICE_GLOBS='contextfriend* context-friend*', TUNE_APPLY=0, TUNE_NVME_GEN3=0, TUNE_GOVERNOR=performance, TUNE_SWAPPINESS=10, TUNE_READAHEAD_KB=2048, TUNE_MEMLOCK=1, BUILD_JOBS=auto, HF_LIMIT_RATE=, PIN_BUDGET_BYTES=auto, PIGEMMA_I_KNOW=0. common.sh functions: `log`, `die <code> <msg>`, `need_cmd`, `collect_facts > pi/out/facts.json` (hostname, kernel, `getconf PAGESIZE`, cpu model + flags from /proc/cpuinfo (asimddp, i8mm, sve presence), nproc, MemTotal/MemAvailable/SwapTotal in kB, loadavg1, model_dir, storage: device via `findmnt -T $MODEL_DIR -o SOURCE`, type from the device name and sysfs: mmcblk* -> microsd, nvme* -> nvme with /sys/class/nvme/*/device/current_link_speed and current_link_width, sd* with transport usb (`lsblk -d -o TRAN`) -> usb-ssd else unknown, rotational flag, read_ahead_kb; free_disk via df -B1; running services from `systemctl list-units --type=service --state=running --no-legend`; hat from /proc/device-tree/hat/product if present; pciex1_gen from /boot/firmware/config.txt; governor; `ulimit -l`; tool versions cmake/gcc/git/python3; override='PIGEMMA_I_KNOW' when PIGEMMA_I_KNOW=1), `assert_safe_host` (die 4 if hostname in DENY_HOSTS or a running service matches PROTECTED_SERVICE_GLOBS, unless PIGEMMA_I_KNOW=1), `require_verdict_ok [--want X]` (runs `python3 -m pigemma.feasibility --facts pi/out/facts.json --json pi/out/feasibility.json`; die with its code if != 0 unless the caller allows 2), `pick_jobs` = min(nproc, floor(MemAvailable_GiB/1.2), 4), `fmt_gb`. Exit-code convention for every pi script: 0 ok, 2 only slow streaming possible, 3 not viable / precondition failed, 4 refused (protected or busy host). Testability: PIGEMMA_FAKE_PROC=<dir> redirects /proc/meminfo, /proc/cpuinfo, /proc/loadavg, hostname and the systemctl/findmnt/lsblk/df outputs to fixture files so lib functions run under Git Bash.",
+   "test": "tests/test_pi_scripts.py: `bash -n` on every pi/*.sh and pc/*.sh; with PIGEMMA_FAKE_PROC=tests/fixtures/pi_proc_4gb collect_facts produces JSON with MemTotal 4039000, storage type microsd, page_size 16384 and assert_safe_host exits 4 (hostname context-friend-1); the 16 GB fixture passes.",
+   "parallel_group": 2,
+   "depends_on": [
+    "pigemma/feasibility.py",
+    "pigemma/data/catalog.json"
+   ]
+  },
+  {
+   "path": "pc/desktop_bench.ps1",
+   "language": "PowerShell 5.1",
+   "purpose": "Desktop driver for E0 (bench matrix + repack/mmap evidence), E1 (speculative via llama-server) and E2 (quality: KLD + Q&A) using the native Windows binaries, resumable and time-boxed.",
+   "spec": "`.\\pc\\desktop_bench.ps1 -Stage bench,spec,quality [-Models 26b,31b] [-Threads 4,6,12] [-Quick] [-Force] [-AllowDownload] [-DryRun]`. Results dir results/<yyyy-mm-dd>/; a stage/model/variant is skipped if its result file exists unless -Force; -DryRun prints command lines. Stage bench (E0): `python -m pigemma.bench matrix --model <id> --threads 4,6,12 --pp 128 --tg 32 -r 3 --variants default,norepack,hybrid_negctrl,nommap` (31B: threads 6,12, -r 2, tg 16; -Quick: threads 6 only, r 1) then `bench completion` per variant (-n 64, 6 threads, EN prompt) to capture load_s, working-set/private peaks and the buffer_split lines; then asserts the E0 gate: norepack run shows CPU_Mapped MiB >= 0.95 * file MiB and no CPU_REPACK line, private peak < 1.5 GB; hybrid_negctrl shows a CPU_REPACK line (documents that -ot does not stream); prints PASS/FAIL per gate and writes results/<date>/E0_GATE.md. Stage spec (E1): `python -m pigemma.bench server-spec --model 26b-q4 --variant plain,mtp,dflash,ngram -n 200`; if mtp reports spec_active=false run mtp-explicit (`--spec-type draft-mtp`) and dflash-explicit; 31B: plain, mtp, mtp-explicit; records speedup vs plain, accept_rate, identical_to_plain (via quality.visible_text), spec_type_effective. Stage quality (E2): builds data/calibration/all.txt, `python -m pigemma.quality kld-base` per model (6 chunks, disk-gated), `kld --variant norepack` and `--variant hybrid_negctrl` per model (expect ~0), `qa` per model (plain; and mtp/dflash variants only if spec_active was true); with -AllowDownload and >= 1.3x free disk, downloads one lower quant per model via huggingface_hub (26b UD-Q3_K_M, 31b UD-IQ2_XXS) and runs kld + qa on it (default off: D: has 32 GB free). Each step runs under the bench lock (the python side enforces it); the script never runs two model jobs at once and prints free disk before each heavy step. Ends with `python -m pigemma.results summarize results/<date> --md docs/results/DESKTOP_<date>.md`.",
+   "test": "-DryRun prints every command; parsing covered by tests/test_bench_parse.py and tests/test_quality.py; integration today.",
+   "parallel_group": 3,
+   "depends_on": [
+    "pigemma/bench.py",
+    "pigemma/quality.py",
+    "pigemma/results.py"
+   ]
+  },
+  {
+   "path": "pi/00_feasibility.sh",
+   "language": "bash",
+   "purpose": "Step 0 on any Pi: read-only fact collection + verdict table + recommendation; the only script allowed to run on an unknown or protected host; exit code gates everything heavier.",
+   "spec": "`pi/00_feasibility.sh [--want 26b|31b] [--json pi/out/feasibility.json] [--sim results/h1/sim.json]`. Sources pi_config.env + lib/common.sh; collect_facts; runs `python3 -m pigemma.feasibility --facts pi/out/facts.json --catalog pigemma/data/catalog.json [--want] [--sim] --json ...` and prints: host facts (RAM total/available, storage type + link speed + read_ahead_kb, free disk, page size, CPU flags with 'asimddp: yes, i8mm: no' style, kernel, governor, HAT product if any, protected-host flag), the per-model verdict table with projected tok/s and its source (assumed curve or sim), the recommended model/quant/flags, and the fixed recommendation line (16 GB + NVMe Gen3 = fits; 8 GB + NVMe = stream; 4 GB/microSD = not viable; 31B dense never good speed). Never modifies anything; exit code = verdict code (0/2/3/4). Prints a loud banner when the host is protected (the probed context-friend-1) and that all other scripts will refuse.",
+   "test": "Fixture-driven: PIGEMMA_FAKE_PROC 4 GB fixture -> exit 3/4 table printed; 16 GB fixture -> exit 0; `bash -n`; also runs inside the Docker image (generic Linux: storage unknown tolerated).",
+   "parallel_group": 3,
+   "depends_on": [
+    "pi/lib/common.sh",
+    "pigemma/feasibility.py"
+   ]
+  },
+  {
+   "path": "pi/01_tune_os.sh",
+   "language": "bash (sudo for --apply)",
+   "purpose": "Print-first OS tuning for the Pi: NVMe Gen3, governor, swappiness, read-ahead, memlock limits; refuses on protected hosts and when an AI HAT occupies the PCIe lane.",
+   "spec": "`pi/01_tune_os.sh [--apply] [--no-pcie]` (TUNE_* flags from pi_config.env select items). Shows current vs proposed for: (a) /boot/firmware/config.txt `dtparam=pciex1_gen=3` under [all] — only if an NVMe is present AND /proc/device-tree/hat/product and lspci do not show Hailo/'AI HAT' (then prints 'PCIe lane used by the AI HAT: NVMe impossible without a dual-slot HAT' and skips); appended once (grep guard); prints REBOOT REQUIRED, never reboots; (b) governor performance via /sys/devices/system/cpu/cpufreq/policy*/scaling_governor + a systemd oneshot unit pigemma-governor.service to persist; (c) /etc/sysctl.d/90-pigemma.conf vm.swappiness=10, vm.vfs_cache_pressure=50 + sysctl --system; (d) read_ahead_kb on the model device (/sys/block/<dev>/queue/read_ahead_kb -> TUNE_READAHEAD_KB; expert slabs are 1.1-2.2 MB contiguous) + a udev rule for persistence; (e) /etc/security/limits.d/90-pigemma.conf '* soft memlock unlimited' / hard + /etc/systemd/system.conf.d/pigemma.conf DefaultLimitMEMLOCK=infinity (note: re-login needed); (f) advice only: zram/swap, Active Cooler (throttling at 80 C). Dry run prints the exact commands; --apply executes idempotently and prints before/after values. assert_safe_host first (exit 4).",
+   "test": "`bash -n`; dry-run inside Docker prints the plan without touching files; a fixture test ensures the config.txt line is not duplicated on a second --apply (grep guard) using a temp copy via PIGEMMA_BOOT_CONFIG override.",
+   "parallel_group": 3,
+   "depends_on": [
+    "pi/lib/common.sh"
+   ]
+  },
+  {
+   "path": "pi/02_build_llama.sh",
+   "language": "bash",
+   "purpose": "Native llama.cpp + pigemma tools build on the Pi at the pinned commit, RAM-aware, refusing on protected hosts.",
+   "spec": "`pi/02_build_llama.sh [--commit a7b94df] [--jobs N] [--with-tools] [--from-desktop user@host:REPO_ROOT/third_party/llama.cpp]`. Preconditions: assert_safe_host; free disk >= 3 GB; MemAvailable >= 1.5 GB; cmake/gcc/git present (apt hint otherwise). Source: `git clone --filter=blob:none https://github.com/ggml-org/llama.cpp $LLAMA_DIR && git -C $LLAMA_DIR fetch --depth 1 origin $COMMIT && git -C $LLAMA_DIR checkout $COMMIT` (or rsync --from-desktop). Configure: `cmake -S $LLAMA_DIR -B $LLAMA_DIR/build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=ON -DLLAMA_CURL=OFF -DBUILD_SHARED_LIBS=OFF -DLLAMA_BUILD_TESTS=OFF`; if configure fails on arch detection retry with `-DGGML_NATIVE=OFF -DGGML_CPU_ARM_ARCH=armv8.2-a+dotprod+fp16`. Build: `nice -n 10 cmake --build $LLAMA_DIR/build -j $(pick_jobs) --target llama-cli llama-completion llama-bench llama-perplexity llama-server` (jobs = min(nproc, floor(MemAvailable_GiB/1.2)); 2 on a 4 GB board). --with-tools: `cmake -S $PIGEMMA_HOME/tools -B $PIGEMMA_HOME/tools/build -DLLAMA_DIR=$LLAMA_DIR -DGGML_NATIVE=ON -DCMAKE_BUILD_TYPE=Release && cmake --build ... --target pigemma-probe pinner membw`. Prints binary paths and `llama-bench --help | head -1`; records versions into pi/out/build.json.",
+   "test": "`bash -n`; the identical CMake invocations (minus the ARM arch string) are exercised in Docker by `pc/docker_run.sh build-tools`.",
+   "parallel_group": 3,
+   "depends_on": [
+    "pi/lib/common.sh",
+    "tools/CMakeLists.txt"
+   ]
+  },
+  {
+   "path": "pi/03_bench_io_mem.sh",
+   "language": "bash (fio + tools/membw)",
+   "purpose": "Measures the two constants the projections depend on, storage random-read at expert-slab granularity and memory bandwidth, and writes them where the catalog loader overrides the assumed values.",
+   "spec": "`pi/03_bench_io_mem.sh [--file <path>] [--size-mb 2048] [--seconds 20] [--quick]`. assert_safe_host; free disk >= 1.2x size unless --file points at an existing GGUF (read-only use). fio jobs (--output-format=json, --direct=1, --readonly when using a GGUF): seq read bs=1M iodepth=1 and 8; randread bs=3345k iodepth=1 and 4 (expert-slab size); randread bs=16k iodepth=1 (16 KiB page faults, IOPS); each --runtime=$SECONDS --time_based. membw: `tools/build/bin/membw --size-mb 512 --threads 1,2,4 --json`. Writes results/pi/io_mem.json (schema data_formats) with host facts, device, and for each metric {value, unit, source:'measured', cmd}; prints a table and the derived numbers: in-RAM ceiling tok/s for the 26B = mem_bw_read*0.65/2.38 GB (eff flagged assumed until pi/05 calibrates it), streamed MB/token the storage can serve per second. Deletes the fio test file afterwards. fio missing -> prints the apt command and uses a dd fallback for seq read only (flagged).",
+   "test": "`bash -n`; fio job strings validated with `fio --parse-only` in Docker; tests/test_catalog.py checks the merge of a fixture io_mem.json into the device profile.",
+   "parallel_group": 3,
+   "depends_on": [
+    "pi/lib/common.sh",
+    "tools/membw/membw.c",
+    "pigemma/data/catalog.json"
+   ]
+  },
+  {
+   "path": "pi/04_fetch_model.sh",
+   "language": "bash (curl; python3 for selection)",
+   "purpose": "Downloads the quant the verdict recommends (or an explicit one) with resume, size and sha256 verification, plus the draft sidecar, within the disk budget; or rsyncs from the desktop over LAN.",
+   "spec": "`pi/04_fetch_model.sh [--model 26b|31b] [--quant auto|Q4_0|UD-Q3_K_M|...] [--draft] [--dest $MODEL_DIR] [--from-desktop user@host:REPO_ROOT/models] [--dry-run]`. assert_safe_host; `eval $(python3 -m pigemma.feasibility --facts pi/out/facts.json --emit env [--want])` unless --quant given (then catalog lookup); refuses placeholder filenames (catalog-refresh needed) and free disk < MIN_FREE_DISK_FACTOR x bytes; prints URL, size and ETA at a measured 10 MB/s probe (first 20 MB timed). Download: `curl -L -C - --retry 10 --retry-delay 5 ${HF_LIMIT_RATE:+--limit-rate $HF_LIMIT_RATE} -o $DEST/$FILE https://huggingface.co/$REPO/resolve/main/$FILE`; verify byte size == catalog bytes; sha256 verified when the catalog has one (from catalog-refresh) or the response's x-linked-etag carries it; --draft fetches the family's MTP sidecar the same way. --from-desktop uses `rsync -aP --partial`. Writes pi/out/fetch.json {model_id, file, bytes, sha256_verified, seconds}.",
+   "test": "`bash -n`; --dry-run selection matrix through the feasibility fixtures (16 GB -> 26b Q4_0; 8 GB NVMe -> 26b Q4_0 streaming; 4 GB -> refuses); URL construction unit test in tests/test_pi_scripts.py.",
+   "parallel_group": 3,
+   "depends_on": [
+    "pi/lib/common.sh",
+    "pigemma/feasibility.py",
+    "pigemma/data/catalog.json"
+   ]
+  },
+  {
+   "path": "pi/05_run.sh",
+   "language": "bash (+ python3 pigemma.bench for parsing)",
+   "purpose": "Run / bench / stream-bench on the Pi with the verdict's flags: llama-bench variants (default vs -nr), a completion run that measures real bytes read per token, and the chat/server modes.",
+   "spec": "`pi/05_run.sh bench|stream-bench|chat|server [--model <gguf>] [--draft <gguf>] [--variants default,norepack] [--pin] [-p 'text']`. assert_safe_host; require_verdict_ok (allows 2); flags from pi/out/feasibility.json (`-nr` whenever not FITS_REPACKED). bench: `llama-bench -m $MODEL -t 2,3,4 -p 64 -n 32 -r 3 -o json [--repack 0] [-lm ...]` per variant (refuses the default/repack variant when FITS_REPACKED is false — it would allocate a 14 GB anon copy) -> results/pi/bench_<variant>.json via `python3 -m pigemma.bench parse-bench` (same envelope as the desktop). stream-bench: `llama-completion -m $MODEL $LLAMA_FLAGS -n 64 --temp 0 -f data/calibration/en_tech_moe_streaming.txt` wrapped by `python3 -m pigemma.bench completion` which on Linux samples /proc/<pid>/io read_bytes, majflt, RssAnon/RssFile and `vmstat 1` during generation -> read_bytes_per_token, tok/s, and prints the EN+HE sample output; --pin starts pi/06 first. chat: `llama-cli -m $MODEL $LLAMA_FLAGS [-md $DRAFT]`; server: `llama-server -m $MODEL $LLAMA_FLAGS --host 0.0.0.0 --port 8080 [-md $DRAFT]`. Refuses (exit 3) if MemAvailable < nonexpert_bytes + 0.5 GB (streaming) or < file bytes + 0.5 GB (fits mode). Calibration: writes the measured in-RAM efficiency (tg * bytes/token / membw) into results/pi/calibration.json for cache_sim projections.",
+   "test": "`bash -n`; argument parsing and refusal paths with the fake-proc fixtures; bench parse covered by tests/test_bench_parse.py.",
+   "parallel_group": 3,
+   "depends_on": [
+    "pi/lib/common.sh",
+    "pigemma/bench.py",
+    "pigemma/feasibility.py"
+   ]
+  },
+  {
+   "path": "pc/h2_run.ps1",
+   "language": "PowerShell 5.1 (calls bash for the Docker step)",
+   "purpose": "E7 driver: activation capture of the 31B in Docker, then decompose -> oracle -> markdown natively on Windows, with sampling knobs that keep it under one hour.",
+   "spec": "`.\\pc\\h2_run.ps1 [-Layers 5,20,35,50] [-Tokens 512] [-Group 128] [-Bases q2,lowrank256] [-ResBits 4] [-Force] [-SkipActs] [-Quick]`. Refuses > 8 layers or > 1024 tokens without -Force (prints the ETA formula: ~60 s per (layer,matrix,base) on the 8400F). Step 1 (unless -SkipActs or acts exist): `bash pc/docker_run.sh -- python -m pigemma.paths lock --hold -- tools/build-linux-x86/bin/pigemma-probe --mode act-dump -m /work/<31B> -f /work/data/calibration/all.txt --chunk-tokens 384 --gen 128 -nr -t 12 -c 1024 -b 512 -ub 128 --layers <L> --kinds ffn_norm,ffn_geglu,ffn_out --tokens <T> --act-out /work/traces/h2/acts/31b` (prefill 384 + 128 generated per chunk until T tokens; both phases recorded). Step 2: `python -m pigemma.gguf_map build <31B> --out traces/h2/map31.json` (cached), `python -m pigemma.h2.decompose --map ... --layers <L> --mats gate,up,down --bases <B> --group <G> --res-bits <R> --out traces/h2/decomp/`. Step 3: `python -m pigemma.h2.oracle --decomp traces/h2/decomp/ --acts traces/h2/acts/31b/ --tokens <T> --eps 0.01,0.03,0.10 --out results/h2/oracle.json --md docs/results/H2_RESULTS.md`. -Quick: layers 20,45; tokens 128; bases q2; group 128. Prints wall time per step and the verdict line at the end.",
+   "test": "Pipeline unit-tested with synthetic acts (tests/test_h2_oracle.py); -Quick integration today once the probe is built.",
+   "parallel_group": 3,
+   "depends_on": [
+    "tools/probe/probe.cpp",
+    "pc/docker_run.sh",
+    "pigemma/h2/decompose.py",
+    "pigemma/h2/oracle.py",
+    "pigemma/gguf_map.py"
+   ]
+  },
+  {
+   "path": "pi/06_pin_hotset.sh",
+   "language": "bash",
+   "purpose": "A/B of hot-set pinning on the Pi: generates the ranges from the desktop trace statistics, runs the pinner, benchmarks hybrid streaming with and without it, reports read_bytes/token and tok/s for both.",
+   "spec": "`pi/06_pin_hotset.sh start|stop|status|ab [--model <gguf>] [--map results/map26.json] [--stats traces/26b/all.stats.json] [--budget-bytes N]`. assert_safe_host; requires `ulimit -l` unlimited (points at pi/01). Budget auto = MemAvailable - KV(ctx) - 0.3e9 compute - 0.5e9 headroom (the non-expert 1.577 GB is part of the pinned set). start: `python3 -m pigemma.gguf_map hotset --map $MAP --stats $STATS --budget-bytes $B --page-size $(getconf PAGESIZE) --out pi/out/hotset.json` (map built on the Pi from the local GGUF if absent; falls back to non-expert-only pinning when no stats are shipped), then `nohup tools/build/bin/pinner --gguf $MODEL --ranges pi/out/hotset.ranges.txt --verify --json --pidfile pi/out/pinner.pid > pi/out/pinner.log &`, waits for the summary line, prints locked/resident bytes and expert coverage. stop: SIGTERM to pi/out/pinner.pid only. status: VmLck of that pid + mincore summary via `pinner --verify --once`. ab: runs `pi/05_run.sh stream-bench` unpinned, then start, stream-bench again, stop; writes results/pi/pin_ab.json with both tok/s and read_bytes_per_token and the ratio.",
+   "test": "`bash -n`; hotset unit tests; the same code path exercised in Docker by pc/pagecache_limit.sh --pin.",
+   "parallel_group": 4,
+   "depends_on": [
+    "tools/pinner/pinner.c",
+    "pigemma/gguf_map.py",
+    "pi/05_run.sh"
+   ]
+  },
+  {
+   "path": "README.md",
+   "language": "Markdown",
+   "purpose": "Honest front page: goal, non-goals, what is measured vs projected, quick start for desktop (today) and Pi (later), repository map, and the recommendation.",
+   "spec": "Sections: What this is (download a full Gemma 4 and run it on a Pi 5 'with good speed and quality' is the question, not the claim); The two models and their byte budgets (table from gguf_map: 26B-A4B 1.577 GB non-expert incl. the 0.606 GB tied head + 803 MB/token worst-case experts; 31B 17.64 GB/token); The one llama.cpp fact everything depends on (default repack copies weights out of the mmap; `-nr` is the only streaming mode at a7b94df; `-ot ...=CPU` still repacks — with line references); Honest status table with MEASURED / PROJECTED / ASSUMED columns (desktop numbers from results/desktop-baseline-2026-10-04.md and docs/results/*, Pi projections from E4, assumptions from the catalog); Hypotheses H1/H2 in one paragraph each with a link to docs/HYPOTHESES.md and the pre-registered thresholds; Quick start desktop: `pip install -e . && pytest`, `bash pc/docker_run.sh build-tools`, `.\\pc\\desktop_bench.ps1 -Stage bench,spec,quality`, `bash pc/trace_collect.sh --quick`, `python -m pigemma.cache_sim ...`, `bash pc/pagecache_limit.sh --mem 4,5,6,8 --pin`, `.\\pc\\h2_run.ps1`; Quick start Pi: pi/00 -> 06 in order with the refusal rules; The plain statements: the dense 31B cannot reach good speed on any Pi 5 with known post-training techniques (17.6 GB/token: ~22 s/token from NVMe Gen3, ~1.3 tok/s even if it were all in a 16 GB board's RAM — which it is not), H2 is a measurement; the MoE is the realistic tier and Pi 5 16 GB + NVMe Gen3 is the configuration where it fits in RAM; Repository map; Safety: never run heavy scripts on context-friend-1 (deny-listed). Links to every doc.",
+   "test": "tests/test_docs.py: all relative links resolve; the numbers quoted for the byte budgets match pigemma/data/catalog.json.",
+   "parallel_group": 5,
+   "depends_on": [
+    "docs/HYPOTHESES.md",
+    "docs/EXPERIMENT_PLAN.md",
+    "docs/PI_RUNBOOK.md"
+   ]
+  },
+  {
+   "path": "docs/HYPOTHESES.md",
+   "language": "Markdown",
+   "purpose": "H1 and H2 stated as falsifiable hypotheses with the arithmetic, the Pi 5 hardware budget tables, what each configuration implies in tok/s, and what would change our minds.",
+   "spec": "H1 (MoE small active set): per-token traffic model t = resident/mem_bw + miss_bytes/storage_bw + n_miss*latency; what a cache must achieve at each Pi budget (expert cache bytes per profile from the catalog formula; 8 GB NVMe ~5.2 GB = 40% of experts); literature priors (LRU 15%->60%, 25%->74%, 35%->84%, 45%->88%; Qwen3-30B-A3B reuse 0.444) flagged as priors to be replaced by E3/E4; pre-registered thresholds (E3 coverage@32 >= 0.70 strong skew; E4 STREAM_GOOD if tg_overlap >= 2.0 and tg_serial >= 1.0 with LRU; E5 sim within +-30%; E6 pinning >= 15%). H2 (dense staged residuals): W = W_base + sum_g R_g, bound ||R_g x_g|| <= ||R_g||_2 ||x_g||_2, why groups are input-column groups stored group-major, expected looseness ~1/sqrt(g) for random directions, the oracle definition, the sound certification rule used in oracle.py, the iso-byte competitor, thresholds (PROMISING only if residual fraction <= 25% at eps 3% AND certification efficiency >= 50% AND implied bytes/token < 8.5 GB), and the non-promise: even a perfect H2 leaves attention + head = 5.9 GB/token. Hardware budget section: Pi 5 physics with sources (LPDDR4X ~10 GB/s effective, microSD 85-90 MB/s, USB3 SSD 360-416 MB/s, NVMe Gen2 x1 ~450, Gen3 x1 784-894 MB/s; Cortex-A76 dotprod yes, i8mm/SVE no; 16 KiB pages; one PCIe lane: Hailo HAT excludes NVMe), RAM worksheets per configuration (OS reserve, non-expert resident, KV at 4096 ctx q8_0 ~160 MB, compute buffers, expert cache), the desktop calibration (MoE 15.18 tok/s x 2.38 GB = 36 GB/s effective; 31B 2.44 x 17.64 = 43 GB/s), the in-RAM ceiling on a Pi (~10 GB/s x eff / 2.38 GB = 2.7-4 tok/s) and the dense line (17.64 GB/token). Every constant here is the same as in pigemma/data/catalog.json.",
+   "test": "tests/test_docs.py greps the catalog's assumed constants (storage MB/s, mem_bw, os_reserve) and asserts they appear in this file.",
+   "parallel_group": 5,
+   "depends_on": [
+    "pigemma/data/catalog.json",
+    "pigemma/gguf_map.py"
+   ]
+  },
+  {
+   "path": "docs/EXPERIMENT_PLAN.md",
+   "language": "Markdown",
+   "purpose": "E0-E8 procedures, metrics, pass/fail thresholds, runtime estimates, controls, and the results template with separate Measured / Projected / Assumed tables.",
+   "spec": "One section per experiment copied from this manifest's experiments list (hypothesis, exact commands, metrics, thresholds, runtime), the controls (hybrid_negctrl, KLD of -nr vs default, teacher-forced vs generated routing, stack-distance vs simulator, iso-byte for H2, ffn_out sanity), the day's run order, and the results template: for each experiment a table skeleton with columns Metric | MEASURED (host, date, result file) | PROJECTED (inputs, assumptions) | ASSUMED (value, source), a 'Verdict vs pre-registered threshold' line and a 'What would change this conclusion' line. docs/results/ holds the rendered outputs (DESKTOP_<date>.md from results.summarize, H1_RESULTS.md from cache_sim + validation, H2_RESULTS.md from oracle).",
+   "test": "tests/test_docs.py link check; experiment ids match the ones used in results files (E0..E8).",
+   "parallel_group": 5,
+   "depends_on": [
+    "pigemma/results.py"
+   ]
+  },
+  {
+   "path": "docs/PI_RUNBOOK.md",
+   "language": "Markdown",
+   "purpose": "Ordered procedure for the moment the right Pi is known: what each pi/ script does, refuses, needs, and produces; how to fill pi_config.env; how measured values replace assumed ones.",
+   "spec": "Steps 00 -> 06 with the command, expected output, exit codes (0/2/3/4) and the refusal rules (deny-listed hostname context-friend-1, protected service globs, busy host, insufficient RAM/disk, AI HAT on the PCIe lane); prerequisites (apt: build-essential cmake git fio python3; Active Cooler; NVMe HAT; `ulimit -l unlimited` re-login); the flags per verdict (FITS_MAPPED '-nr -lm mmap+mlock ...', STREAM '-nr -lm mmap -b 256 -ub 64 ...') and why the default/repack mode is refused when the anon copy would not fit; shipping desktop artefacts to the Pi (results/map26.json, traces/26b/all.stats.json, hotset) via rsync; how pi/03 and pi/05 results overwrite catalog assumptions (source:'measured') and re-running cache_sim projections; the smoke tests (normal chat in EN+HE, stream-bench numbers, pin A/B); troubleshooting (OOM on load = repack mode without room, ETIMEDOUT downloads at 10 MB/s, memlock EPERM, read_ahead thrash, thermal throttling).",
+   "test": "tests/test_docs.py link check; commands in the runbook are the same strings as the scripts' usage lines (grep).",
+   "parallel_group": 5,
+   "depends_on": [
+    "pi/lib/common.sh",
+    "pi/00_feasibility.sh",
+    "pi/06_pin_hotset.sh"
+   ]
+  }
+ ],
+ "data_formats": [
+  {
+   "name": ".moetrace (expert routing trace, binary, little-endian)",
+   "spec": "HEADER: bytes 0-7 magic ASCII 'MOETRC01'; 8-11 u32 header_json_len (UTF-8 JSON, space-padded to a multiple of 8); 12-15 u32 record_size; 16-23 u64 n_records (0xFFFFFFFFFFFFFFFF while open, patched at close; readers infer from file size and flag truncated=True if unpatched); 24-31 u64 reserved=0; then the JSON header; records begin at 32 + header_json_len. JSON header keys (all required): format_version:1, model_name, gguf_path, gguf_size_bytes, llama_build:11398, llama_commit:'a7b94df', arch:'gemma4', n_layer:30, n_expert:128, n_expert_used:8, moe_layers:[0..29] (record order), n_embd:2816, probs_top:P (0 = none), weights_tensor:'ffn_moe_weights_norm', corpus_id, created_at (ISO UTC), n_ctx, n_batch, n_ubatch, n_threads, flags:[argv], chunks:[{chunk_id, source, n_prompt, n_gen}] (patched at close). RECORD (fixed size = 16 + L*K*3 + L*P*3 bytes; 26B with P=0: 736 B): u32 token_index (0-based position in this trace's token stream = index into tokens.bin) | u32 pos (position inside its chunk/context) | i32 token_id (the INPUT token at that position) | u8 phase (0 = prefill/teacher-forced, 1 = generated) | u8 chunk_id | u16 reserved=0 | for each il in moe_layers: K x u8 expert_id in ffn_moe_topk order (descending prob) then K x f16 normalised routing weight (ffn_moe_weights_norm; sum ~ 1) | if P>0, for each il: P x (u8 id, f16 prob) descending from softmax(ffn_moe_probs). Invariants enforced by validate(): ids < n_expert, K distinct ids per (token, layer), weights finite and sum within 0.02 of 1, token_index contiguous from 0, n_expert <= 256. Sidecars next to the trace: `<stem>.tokens.bin` (raw i32 LE token ids in stream order, one per record), `<stem>.gen.txt` (generated text per chunk), `<stem>.meta.json` (host fingerprint, gguf sha256_prefix, corpus files + sha256, argv, wall_ms, tok/s, callback_overhead_ms, coherent:bool), `<stem>.stats.json` (see stats.json)."
+  },
+  {
+   "name": "stats.json (trace statistics)",
+   "spec": "{trace, n_tokens, n_prefill, n_gen, train_frac, per_layer:[{layer, freq:[128 ints], weight_mass:[128 floats], entropy_bits, effective_experts, gini, coverage_at:{'8':..,'16':..,'32':..,'48':..,'64':..,'96':..}, coverage_weight_at:{...}, adjacent_reuse, jaccard_next_mean, working_set:{'16':{median,p95},'64':...,'256':...,'1024':...}, prefill_vs_gen_js_bits}], global:{unique_experts_per_token_mean, items_never_used, lru_hit_curve:[[capacity_items, hit_rate], ... for every capacity 1..L*E] (from the stack-distance histogram), stack_distance_hist:[counts], adjacent_reuse_mean, corpus_overlap:{'<a>|<b>': jaccard_top32}}, cross_layer:{precision_at_8, precision_at_16, baseline_static_top16, baseline_same_ids, mutual_info_bits_mean}, probs:{margin_p8_p9:{p10,p50,p90}, eighth_expert_mass_mean} (only if probs_top>0)}."
+  },
+  {
+   "name": "map.json (GGUF byte-range map)",
+   "spec": "{gguf, file_size, data_offset, alignment, page_size, arch, n_layer, n_expert, n_expert_used, n_embd, n_ff, n_ff_exp, head_count_kv:[...], key_length, key_length_swa, sliding_window, sliding_pattern:[bool], tensors:[{name, type, shape:[ne0,ne1,ne2?], n_bytes, offset (absolute file offset), kind:'token_embd'|'output'|'attn'|'ffn_dense'|'norm'|'router'|'expert_scale'|'expert'|'other', layer:int|null}], expert_layers:[{layer, gate_up:{offset, n_bytes, nb_expert}, down:{offset, n_bytes, nb_expert}}] (slab e = offset + e*nb_expert), summary:{nonexpert_bytes, expert_bytes, expert_unit_bytes, n_moe_layers, expert_bytes_per_token_worst, nonexpert_bytes_per_token, kv_bytes_per_token_f16, kv_bytes_f16_at_4096, kv_bytes_q8_at_4096, bytes_per_kind:{kind: bytes}}}. For the 26B: data_offset 15823936, expert_unit_bytes 3345408, expert_bytes 12846366720, nonexpert_bytes 1577172088, expert_bytes_per_token_worst 802897920."
+  },
+  {
+   "name": "hotset.json + hotset.ranges.txt",
+   "spec": "hotset.json: {gguf, map_sha256, stats (path or null), page_size, budget_bytes, total_bytes, nonexpert_included:bool, n_experts, expert_coverage_fraction, rank:'count'|'weight', ranges:[{offset, length, kind, layer, expert, hits}] sorted by offset, page-aligned, adjacent ranges merged}. hotset.ranges.txt: line 1 '# pigemma-ranges v1 gguf=<basename> size=<bytes> page=<page> budget=<bytes>'; then one range per line 'offset length' in decimal, optionally followed by '# kind=<kind> layer=<l> expert=<e>'; '#' lines are comments. This is what tools/pinner reads (no JSON parser in C)."
+  },
+  {
+   "name": "acts dump directory (H2 activations)",
+   "spec": "Directory traces/h2/acts/<model_tag>/ with meta.json {model, gguf_path, layers:[...], kinds:{'ffn_norm':5376,'ffn_geglu':21504,'ffn_out':5376}, n_tokens, phase_file:'phase.u8', tokens_file:'tokens.bin', chunks:[{chunk_id, source, n_prompt, n_gen}], llama_build, n_ubatch, flags}; `L<il>.<kind>.npy` = NumPy .npy v1.0, fixed 128-byte header, dtype '<f2', shape (n_tokens, ne0), C order, one row per token in stream order (header shape rewritten at close); `phase.u8` (one byte per token: 0 prefill, 1 generated); `tokens.bin` (i32 LE). For the 31B with 512 tokens: 5.5 MB + 22 MB + 5.5 MB per layer."
+  },
+  {
+   "name": "results JSON envelope (one file per run)",
+   "spec": "{run_id, experiment:'E0'..'E8'|'adhoc', created_at, kind:'measured'|'projected'|'assumed', host:{hostname, os, kernel, cpu, n_logical, n_physical, ram_total_bytes, page_size, in_container, cgroup_mem_max}, llama_build, llama_commit, model:{id, file, quant, bytes, sha_prefix}, variant, flags:[...], threads, n_ctx, assumptions:{name:{value, unit, source}} (required when kind != measured), inputs:[paths], pp:{tok_s, sd, n}, tg:{tok_s, sd, n}, load_s, rss_peak_mb, private_peak_mb, mapped_mb, buffer_split:{CPU_REPACK_mib, CPU_Mapped_mib, CPU_mib}, read_bytes_per_token, majflt_per_token, io_rbytes_per_token, accept_rate, draft_n, draft_n_accepted, spec_type_effective, spec_active, identical_to_plain, kld:{mean, max, p999, same_top_p, ppl_q, ppl_base}, ppl, qa_score, qa_total, coherent, output_sample, notes:[...], extra:{}}."
+  },
+  {
+   "name": "sim.json (cache simulation output)",
+   "spec": "{trace, map, catalog, token_range, warmup_tokens, read_granularity, train_split, runs:[{policy, budget_bytes, capacity_items, profile:null|name, steady:{hit_rate, weighted_hit_rate, miss_bytes_per_token:{mean,p50,p95,max}, n_miss_per_token, prefetch_bytes_per_token, wasted_prefetch_fraction}, overall:{...}, cold_bytes, per_layer_hit_rate:[30], projection:{resident_bytes_per_token, t_ram_s, t_io_s, tg_serial, tg_overlap, floor_all_in_ram_tok_s, verdict:'FITS_RAM'|'STREAM_GOOD'|'STREAM_WEAK'|'NOT_VIABLE', kind:'projected', assumptions:{mem_bw_gbps:{value,source}, llama_efficiency:{value,source}, rand_read_3mb_mbps:{value,source}, access_ms:{value,source}, os_reserve_bytes:{...}, kv_bytes:{...}}}|null}], dense_31b_line:{bytes_per_token, tok_s_at_mem_bw, s_per_token_at_storage_bw}}; sim.csv columns: policy,budget_gb,profile,hit_rate_ss,weighted_hit_ss,miss_mb_tok_mean,miss_mb_tok_p95,tg_serial,tg_overlap,verdict."
+  },
+  {
+   "name": "validation.json (E5/E6 proxy) + io.csv",
+   "spec": "io.csv (probe --io-csv): header 'token_index,phase,wall_ms,read_bytes_delta,majflt_delta,rss_anon_kb,rss_file_kb', one row per processed token. validation.json: {gguf, volume:'pigemma-models'|'bind-mount', token_range, warmup_tokens, points:[{mem_cap_bytes, pinned:bool, pin_budget_bytes, pin_locked_bytes, anon_rss_bytes, file_cache_bytes, tier_rand_read_3mb_mbps, measured_bytes_per_token, measured_majflt_per_token, measured_tok_s, sim_budget_bytes, sim_lru_bytes_per_token, sim_belady_bytes_per_token, ratio_sim_lru_over_measured, predicted_tok_s, oom:bool, notes:[...]}], kind:'measured' with a 'projected' sub-block per point for predicted_tok_s and its assumptions}."
+  },
+  {
+   "name": "h2 oracle.json",
+   "spec": "{model, acts_dir, decomp_dir, sampling:{layers, mats, bases, group_cols, res_bits, n_tokens, eps:[0.01,0.03,0.10]}, sanity:[{layer, rel_err_median, rel_err_p95, pass:bool}], per_case:[{layer, mat, base, phase:'prefill'|'gen'|'all', n_tokens, bytes_q4_0, base_bytes, residual_bytes_total, err_base_mean, oracle:{'0.01':{frac_bytes_mean, frac_bytes_p90, k_groups_mean}, '0.03':{...}, '0.10':{...}}, curve:[[bytes_frac, rel_err_mean, rel_err_p95], ...], bound:{'0.01':{certified_frac_bytes_mean, realised_err_mean, soundness_violations, certification_efficiency}, '0.03':{...}, '0.10':{...}}, tightness:{p10,p50,p90}, spearman_bound_vs_actual, iso_byte:[{bytes_per_elem, uniform_err, base_plus_oracle_err, base_plus_certified_err}], seconds}], summary:{frac_0_03_median, cert_eff_median, soundness_violations_total, implied_bytes_per_token:{attention:4770160640, head:1156076544, ffn_base, ffn_residual_at_0_03, total, kind:'projected', note:'extrapolated from sampled layers'}, s_per_token_nvme_850mbps, tok_s_in_ram_10gbps, verdict:'PROMISING'|'WEAK'|'NOT_SUPPORTED'|'NO_ADVANTAGE', rule:'<threshold text>'}}."
+  },
+  {
+   "name": "facts.json (Pi feasibility input)",
+   "spec": "{hostname, kernel, page_size, cpu_model, cpu_flags:[...], nproc, ram_total_kb, ram_available_kb, swap_total_kb, loadavg1, model_dir, storage:{dev, type:'nvme'|'usb-ssd'|'microsd'|'unknown', rotational:bool, pcie_link_speed:'8.0 GT/s PCIe'|'5.0 GT/s PCIe'|null, pcie_link_width, read_ahead_kb}, free_disk_bytes, running_services:[names], hat_product:str|null, pciex1_gen_cfg:int|null, governor, memlock_limit:'unlimited'|int, tools:{cmake, gcc, git, python3}, override:'PIGEMMA_I_KNOW'|null, collected_at}."
+  },
+  {
+   "name": "io_mem.json (Pi measured constants) and device profile override",
+   "spec": "{host, device, collected_at, storage:{seq_read_mbps_qd1:{value,source:'measured',cmd}, seq_read_mbps_qd8:{...}, rand_read_3mb_mbps_qd1:{...}, rand_read_3mb_mbps_qd4:{...}, rand_read_16k_iops:{...}, access_ms:{...derived from 16k latency}}, memory:{read_gbps_by_threads:{'1':..,'2':..,'4':..}, copy_gbps, triad_gbps, source:'measured'}}. feasibility.load_catalog(io_mem=...) overwrites the matching device profile fields (storage.*, mem_bw_gbps) and sets source:'measured'; results/pi/calibration.json {llama_efficiency:{value, source:'measured', from:[tg tok/s, bytes/token, membw]}} overrides the 0.65 assumption in projections."
+  },
+  {
+   "name": "catalog.json",
+   "spec": "See pigemma/data/catalog.json spec: models[] (id, family, quant, repo, file, bytes, bytes_exact, sha256?, nonexpert_bytes, expert_bytes, expert_unit_bytes, n_moe_layers, n_expert, n_expert_used, drafts[], estimated?), devices[] (name, ram_bytes, os_reserve_bytes, compute_buffers_bytes, n_ctx, mem_bw_gbps{value,source}, storage{type, seq_read_mbps{value,source}, rand_read_3mb_mbps{value,source}, access_ms{value,source}}), selection{stream_hit_rate_curve_assumed, viable_stream_tok_s, good_stream_tok_s}, protected_hosts[], protected_service_globs[]. Rule: any numeric that was not measured carries a source string containing 'assumed'."
+  }
+ ],
+ "experiments": [
+  {
+   "id": "E0-desktop-baseline-and-repack-gate",
+   "hypothesis": "Both Q4_0 models run end-to-end on the 8400F; the MoE is bandwidth-bound and peaks at 4 threads (~15 tok/s), the dense 31B at ~2.4 tok/s; `-nr` keeps the whole file CPU_Mapped with anon RSS < 1.5 GB at a measurable kernel penalty, while `-ot \"ffn_(gate_up|down)_exps=CPU\"` still repacks (negative control). Variants differ in speed, not output.",
+   "procedure": ".\\pc\\desktop_bench.ps1 -Stage bench: llama-bench.exe -t 4,6,12 -p 128 -n 32 -r 3 -o json for variants default / --repack 0 / -ot hybrid_negctrl / -lm none on both GGUFs (31B: -t 6,12, -n 16, -r 2); then llama-completion.exe -n 64 --temp 0 per variant capturing load time, working-set and private-bytes peaks and the 'load_tensors: <buft> model buffer size' lines.",
+   "metrics": [
+    "pp128 and tg tok/s per thread count and variant (mean, sd)",
+    "norepack penalty = tg(norepack)/tg(default) per model",
+    "load_s",
+    "rss_peak_mb vs private_peak_mb vs mapped_mb",
+    "buffer_split: CPU_REPACK vs CPU_Mapped MiB per variant"
+   ],
+   "runtime_estimate": "~35 min (31B dominates)",
+   "thresholds": "PASS if 26B tg@4t within +-20% of 15.18 and tg@6t within +-20% of 13.5 (idle-machine reference), 31B tg@6t within +-20% of 2.44; REPACK GATE PASS if the norepack variant logs CPU_Mapped >= 95% of the file size with no CPU_REPACK line and private peak < 1.5 GB, AND hybrid_negctrl logs a CPU_REPACK line (confirms -ot does not stream). If the gate fails, stop all streaming work (E5/E6/Pi) until the flags are fixed. The norepack penalty is reported as the cost of streaming mode (expected 10-40%)."
+  },
+  {
+   "id": "E1-speculative-via-server",
+   "hypothesis": "At b11398 the Gemma 4 MTP sidecars load but do not draft in the server slot (ad-hoc evidence), DFlash drafts at ~28% acceptance and is slower on the CPU-bound MoE; an explicit `--spec-type` may activate MTP; any active drafter must be greedy-lossless.",
+   "procedure": ".\\pc\\desktop_bench.ps1 -Stage spec: pigemma.bench server-spec on the 26B for plain, mtp, mtp-explicit (--spec-type draft-mtp), dflash, dflash-explicit, ngram (--spec-type ngram-simple) and on the 31B for plain, mtp, mtp-explicit; 8 prompts, -n 200, temperature 0, -t 6, -c 4096; record timings.draft_n / draft_n_accepted per request and compare visible text with the plain run.",
+   "metrics": [
+    "tg tok/s per variant and speedup vs plain",
+    "accept_rate = sum(draft_n_accepted)/sum(draft_n)",
+    "spec_active (draft_n > 0 on every request) and spec_type_effective",
+    "identical_to_plain fraction",
+    "load_time_s and peak private bytes with the draft loaded"
+   ],
+   "runtime_estimate": "~30 min",
+   "thresholds": "A variant counts as ACTIVE only if spec_active; report 'useful' if speedup >= 1.2x with identical_to_plain >= 0.95 on >= 6 of 8 prompts; 'inactive' (MTP never drafting) and 'slower' (DFlash) are recorded as findings, not failures; any non-identical greedy output with an active drafter is a bug noted in results and that draft is excluded from the Pi recommendation."
+  },
+  {
+   "id": "E2-quality",
+   "hypothesis": "-nr and the -ot negative control are numerically identical to the default run (KLD ~ 0); both Q4_0 models answer the fixed EN/HE/arithmetic set; lower quants (optional) degrade measurably.",
+   "procedure": ".\\pc\\desktop_bench.ps1 -Stage quality: llama-perplexity.exe --save-all-logits on data/calibration/all.txt (-c 512 --chunks 6 = 1.61 GB per model, disk-gated) for each Q4_0 model; --kl-divergence --kl-divergence-base for variants norepack and hybrid_negctrl (and a lower quant only with -AllowDownload and >= 1.3x free disk); pigemma.quality qa (16 items) per model via llama-server, plus mtp/dflash variants only when E1 found them active.",
+   "metrics": [
+    "KLD mean / max / p99.9 and same-top-p per variant",
+    "PPL per model",
+    "qa_score /16 overall and per language",
+    "coherent flag and thinking_chars share",
+    "exact_match_vs_plain for speculative variants"
+   ],
+   "runtime_estimate": "~40 min for both models (+30 min per optional quant)",
+   "thresholds": "PASS: norepack and hybrid_negctrl KLD mean < 0.001 and same-top-p > 99.5% (proves the streaming mode is numerically neutral); qa_score >= 13/16 for both models and Hebrew subset >= 4/6 (else document a Hebrew caveat). Quant tiers for the Pi recommendation: KLD mean < 0.05 'acceptable', < 0.15 'degraded', else 'not recommended'."
+  },
+  {
+   "id": "E3-routing-trace",
+   "hypothesis": "Expert routing on real mixed EN/HE/code text is skewed and temporally sticky: per layer, the 32 hottest of 128 experts cover >= 70% of selections and >= 40% of a token's experts were used by the previous token in the same layer; Hebrew and code use partly different experts than English.",
+   "procedure": "bash pc/docker_run.sh build-tools; bash pc/trace_collect.sh --smoke (validate 72 records, commit as golden fixture); bash pc/trace_collect.sh --quick (all calibration files, chunk 1024, --gen 128 per chunk, plus 8 gen prompts x 256, -nr -t 12 -ub 256, warmup off); merge; python -m pigemma.trace stats.",
+   "metrics": [
+    "n_prefill, n_gen, all 30 layers present, validate() clean",
+    "per-layer coverage@8/16/32/48/64 (count and weight mass), entropy, Gini",
+    "adjacent reuse and Jaccard, working sets",
+    "LRU stack-distance hit curve",
+    "cross-layer predictor precision@16 vs static and same-ids baselines",
+    "per-corpus top-32 overlap (EN vs HE vs code)",
+    "probe tok/s and callback overhead"
+   ],
+   "runtime_estimate": "build 5-8 min; smoke 3 min (first bind-mount read of the GGUF dominates); quick ~20-25 min",
+   "thresholds": "Trace VALID if validate() passes, >= 10k prefill + >= 2k generated tokens, generated text coherent. H1 precondition MET ('strong skew') if mean coverage@32 >= 0.70 or adjacent reuse >= 0.40; 'moderate' 0.5-0.7; 'near-uniform' < 0.5 (then LRU alone is the plan and static hot sets are dropped). Prefetch worth modelling only if predictor precision@16 beats the static baseline by >= 0.1."
+  },
+  {
+   "id": "E4-cache-simulation",
+   "hypothesis": "At the 8 GB + NVMe Gen3 budget (~5.2 GB expert cache, ~40% of experts) LRU reaches >= 60% hit rate on real text (miss bytes <= ~320 MB/token) giving a projected 1.5-2.5 tok/s streaming; 4 GB / microSD is < 0.3 tok/s under every policy; 16 GB holds everything and is RAM-bandwidth-bound at ~3-4 tok/s.",
+   "procedure": "python -m pigemma.cache_sim traces/26b/all.moetrace --map results/map26.json --policies lru,lfu,static,belady,lru_prefetch,lru_perlayer --budgets-gb 0.5,1,2,3,4,5,6,8,12.85 --profiles all --train-split 0.3 --warmup-tokens 256 --out results/h1/sim.json; projections use the catalog device profiles (assumed) and the desktop-calibrated llama_efficiency; python -m pigemma.results summarize -> docs/results/H1_RESULTS.md.",
+   "metrics": [
+    "hit_rate, weighted_hit_rate, miss MB/token (mean, p95) per policy x budget",
+    "Belady gap = LRU miss bytes / Belady miss bytes",
+    "per-layer hit rate",
+    "projected tg_serial and tg_overlap per Pi profile with assumptions listed (kind=projected)",
+    "stack-distance curve vs simulator LRU agreement"
+   ],
+   "runtime_estimate": "< 10 min",
+   "thresholds": "Decision rule for the Pi recommendation: a configuration is 'viable for streaming' if LRU (no oracle) gives tg_overlap >= 2.0 and tg_serial >= 1.0 tok/s; 'weak' if tg_serial 0.5-1.0; else not viable. Belady reported as the upper bound only. If LRU bytes/token > 1.5x Belady, prefetch/static policies are worth implementing on the Pi; if static is within 10% of LRU, hot-set pinning is the simpler deployment. Any projection whose inputs are still 'assumed' is printed with that word."
+  },
+  {
+   "id": "E5-pagecache-validation",
+   "hypothesis": "With `-nr`, the simulator's LRU bytes/token predicts real page-cache behaviour within +-30% when the cache budget equals the cgroup limit minus anon RSS minus the resident non-expert bytes, and the time model predicts tok/s within +-35% using the measured proxy tier bandwidth.",
+   "procedure": "bash pc/pagecache_limit.sh --mem 3,4,5,6,8 --range 0:1500: 26B GGUF copied once into the ext4 Docker volume (VM/C: disk gated), per cap: vmtouch -e, fio randread bs=3345k on the volume (tier bandwidth), pigemma-probe --replay all.moetrace.tokens.bin -ub 1 -nr -t 6 --io-csv under --memory=<N>g --memory-swap=<N>g --cpus 6, record /proc/self/io read_bytes and majflt per token, cgroup memory.stat and memory.events (OOM detection), plus a plain llama-completion -nr -n 64 tok/s; compare with cache_sim lru/belady at budget = cap - anon_rss - 1.577 GB - 0.1 GB on the same token range after a 200-token warm-up.",
+   "metrics": [
+    "measured read bytes per token and majflt per token per cap",
+    "measured tok/s (replay -ub 1 and natural generation) per cap",
+    "tier bandwidth",
+    "sim LRU and Belady bytes/token at the matching budget and the ratio",
+    "predicted vs measured tok/s",
+    "OOM events (must be 0 with -nr)"
+   ],
+   "runtime_estimate": "volume copy ~10-15 min once; ~5 min per cap (load storm under the cap + 1500 tokens at -ub 1) -> ~45 min",
+   "thresholds": "PASS if |sim_lru/measured - 1| <= 0.30 for caps 4-8 GB and measured lies within [0.8 x Belady, 1.3 x LRU]; time model PASS if |predicted/measured - 1| <= 0.35 on >= 3 caps. If measured >> sim: readahead inflation (record the VM device read_ahead_kb, feed the inflation factor into --read-granularity and document). If measured << sim: the kernel keeps more than the limit charged (compare memory.stat file vs anon) -> adjust the budget formula and document. Any OOM means repack leaked (check buffer_split) -> fix before continuing."
+  },
+  {
+   "id": "E6-hotset-pinning-proxy",
+   "hypothesis": "mlock-pinning the non-expert weights plus the hottest experts beats plain page-cache LRU at the same memory cap by >= 15% tok/s or >= 20% fewer bytes/token, because LRU otherwise evicts always-needed attention/head/dense pages under pressure.",
+   "procedure": "Same as E5 at caps 5 and 6 GB with --pin: hotset from results/map26.json + all.stats.json at budget = cap - 0.6 GB anon - 0.3 GB slack (non-expert 1.577 GB first, then hottest experts), pinner --verify in the same container/cgroup before the run, compared against the unpinned run of E5.",
+   "metrics": [
+    "tok/s pinned vs unpinned",
+    "read bytes/token pinned vs unpinned",
+    "pinner resident fraction (mincore) before and after the run",
+    "locked bytes vs requested"
+   ],
+   "runtime_estimate": "~20 min",
+   "thresholds": "PASS if pinned tg >= 1.15x unpinned at 5 GB OR bytes/token reduced >= 20%. If no gain, document that the kernel LRU already keeps the hot pages and make pinning optional (not default) in pi/05; if the pinner cannot lock the full budget (exit 2), report the achieved fraction."
+  },
+  {
+   "id": "E7-h2-dense-oracle",
+   "hypothesis": "For the dense 31B, W = W_base + sum R_g with a cheap base (2-bit group quant or rank-256) needs only a minority of residual bytes per token to keep FFN output error <= 3%, the norm bound certifies a useful share of the skippable groups, and this beats plain lower-bit quantisation at equal bytes. Expected honest outcome: the bound is loose (~1/sqrt(g)) and the bytes saved do not approach what a Pi needs.",
+   "procedure": ".\\pc\\h2_run.ps1 -Layers 5,20,35,50 -Tokens 512 -Group 128 -Bases q2,lowrank256: act-dump of ffn_norm / ffn_geglu / ffn_out in Docker (-nr, 384 prefill + 128 generated per chunk); decompose (q2 block-32, randomized SVD rank 256, groups of 128 input columns, spectral norms, residual at 4 bits); oracle at eps 1/3/10% with the sound certification rule, iso-byte control, teacher-forced vs generated split, extrapolation to 60 layers.",
+   "metrics": [
+    "sanity rel_err of W_down_q4 @ ffn_geglu vs captured ffn_out (median)",
+    "oracle residual byte fraction at eps 1/3/10% (mean, p90) per layer x matrix x base x phase",
+    "error-vs-bytes curve",
+    "certified-skip fraction, certification efficiency, soundness violations, tightness p10/p50/p90, Spearman",
+    "iso-byte: uniform q2/q3 error vs base+oracle vs base+certified",
+    "implied bytes/token (attention 4.77 GB + head 1.16 GB + FFN) vs 17.64 GB (Q4_0) and 8.5 GB (IQ2_XXS), s/token at 850 MB/s, tok/s at 10 GB/s"
+   ],
+   "runtime_estimate": "act-dump ~20 min (17.65 GB first read through the bind mount + 512 tokens at ~10 tok/s prefill); decompose + oracle ~25-35 min for 4 layers x 3 matrices x 2 bases",
+   "thresholds": "Pipeline VALID only if sanity median rel_err < 0.03 and soundness_violations == 0. PROMISING only if at eps 3% the oracle residual fraction <= 25% AND certification efficiency >= 50% AND implied bytes/token < 8.5 GB AND base+oracle error < uniform-quant error at equal bytes; WEAK if fraction <= 50% or efficiency 0.2-0.5; NO_ADVANTAGE if uniform q3 error <= 1.2x the oracle error at equal bytes; NOT_SUPPORTED otherwise. Regardless: report s/token on a Pi (any number > 2 GB/token is < 0.5 tok/s from NVMe) and that attention + head alone (5.9 GB/token) cap the dense model at ~1.7 tok/s even if it were entirely in RAM."
+  },
+  {
+   "id": "E8-pi-runtime-dry-run",
+   "hypothesis": "The Pi scripts are correct before a Pi exists: verdict logic, flag selection, safety refusals, and the native build tree configure on generic Linux.",
+   "procedure": "pytest tests/test_feasibility.py tests/test_pi_scripts.py tests/test_catalog.py (fixtures: 4GB+microSD/context-friend-1, 8GB+USB3, 8GB+NVMe, 16GB+NVMe, busy host); bash -n and shellcheck on pi/*.sh and pc/*.sh; `pc/docker_run.sh -- bash pi/00_feasibility.sh` and `-- bash pi/01_tune_os.sh` (dry run) inside the image; pinner integration on a 64 MiB synthetic file in Docker; no command is ever run on context-friend-1.",
+   "metrics": [
+    "tests green",
+    "lint clean",
+    "verdict table renders for every fixture with the expected codes",
+    "pinner locks and verifies the synthetic file"
+   ],
+   "runtime_estimate": "10 min",
+   "thresholds": "PASS: 4 GB + microSD -> NOT_VIABLE (exit 3; exit 4 with the protected services present); 8 GB + USB3 -> STREAM_SLOW or STREAM_OK as computed (asserted against hand arithmetic); 8 GB + NVMe -> STREAM_OK with flags containing -nr; 16 GB -> FITS_MAPPED with -nr -lm mmap+mlock and FITS_REPACKED false; busy -> exit 4; all scripts lint clean. On the real Pi later: pi/03 and pi/05 replace 'assumed' inputs and E4 projections are recomputed."
+  }
+ ],
+ "run_order_today": [
+  "0. Orchestrator (10 min): freeze docs/TRACE_FORMAT.md, pigemma/data/catalog.json and the results envelope from this manifest; commit the existing results/ and data/calibration; create results/<date>/.",
+  "1. Group 0 in parallel (5 agents, ~45 min): pyproject + paths + results | trace.py | gguf_map.py (run `build` on both real GGUFs immediately: expect 802,897,920 B/token and the verified constants) | catalog.json + prompts + TRACE_FORMAT.md | tests/conftest + synth + tools/CMakeLists + membw.c.",
+  "2. Group 1 in parallel (5 agents, ~60 min): LANE A probe.cpp + pc/docker_run.sh build-tools (run `--mode names` on the 26B first, then --smoke trace, commit the golden fixture) | LANE B bench.py and start E0 on the 26B natively right away (E0 gate decides everything downstream) | LANE C cache_sim.py validated on synthetic traces | LANE D h2/decompose.py + a dequant sanity run on one real 31B tensor | LANE E feasibility.py + pi/lib/common.sh + fixtures (E8 tests).",
+  "3. Group 2 (~45 min): quality.py (then E2 KLD base for both models runs in the background under the bench lock, serialized after E0) | h2/oracle.py on synthetic acts | pc/trace_collect.sh --quick on the 26B in Docker (E3, ~25 min, bench lock) | pc/pagecache_limit.sh (volume copy can start as soon as E0's repack gate passed and the Docker VM disk check passes) | pi/* scripts.",
+  "4. Group 3 (~60 min): desktop_bench.ps1 -Stage spec,quality (E1, E2) natively while E3 finishes in Docker only if free RAM >= 20 GB (bench lock enforces) | pi/00-05 + h2_run.ps1 (E7 act-dump on the 31B in Docker runs after E3 releases the lock; decompose/oracle run natively afterwards, ~35 min).",
+  "5. Integration (~60 min): E4 cache_sim + stats -> docs/results/H1_RESULTS.md; E5 pagecache_limit --mem 3,4,5,6,8 then E6 --pin at 5,6 GB (Docker, bench lock); E7 oracle -> docs/results/H2_RESULTS.md; pi/06 + E8 checks.",
+  "6. Write-up (~30 min): python -m pigemma.results summarize results/<date> -> docs/results/DESKTOP_<date>.md; README + HYPOTHESES + EXPERIMENT_PLAN + PI_RUNBOOK finalized with MEASURED / PROJECTED / ASSUMED tables, the repack finding with line references, the Pi recommendation (16 GB + NVMe Gen3) and the plain dense-31B statement; commit results JSON + md (traces/npy/logits stay untracked).",
+  "Rules: never two model-loading jobs at once (results/.bench.lock + 20 GB free-RAM check, Docker runs included); the 31B-dependent steps (E0-31B, E7 act-dump) are scheduled last in their lanes; every heavy script prints free disk first (D: 32 GB, C: 26 GB); nothing is ever run on context-friend-1."
+ ],
+ "risks": [
+  {
+   "risk": "Repack leakage: any run without `-nr` copies all Q4_0 tensors into CPU_REPACK anonymous memory (verified llama-model.cpp:1849-1870 + llama-model-loader.cpp:1240-1242), so 'streaming' silently becomes a 14 GB anon allocation that OOMs under a cgroup cap or on an 8 GB Pi, and pinned file pages are never read by the inference process.",
+   "mitigation": "`-nr` (llama-bench `--repack 0`) is the only streaming mode; the hybrid `-ot ...=CPU` is kept purely as a negative control. E0 asserts the 'CPU_Mapped model buffer size' line covers >= 95% of the file with no CPU_REPACK line and private bytes < 1.5 GB before any streaming experiment; pagecache_limit.sh reads memory.events oom_kill and marks runs; feasibility refuses the repack/default mode whenever the anon copy would not fit (FITS_REPACKED false on a 16 GB Pi with Q4_0). Follow-up (not today): a ~30-line llama.cpp patch adding a tensor-name pattern that skips extra bufts would give the true hybrid (repacked attention/head, mapped experts); its hook is create_tensor in llama-model-loader.cpp."
+  },
+  {
+   "risk": "The non-repacked Q4_0 kernels are slower (x86 AVX-512 and especially ARM NEON dotprod vs Q4_0_4x4), so the measured streaming tok/s and the Pi in-RAM ceiling are lower than the repacked desktop numbers suggest.",
+   "mitigation": "E0 measures the norepack penalty on both models; pi/05 measures default vs norepack on the Pi when it exists; projections use the norepack efficiency (calibration.json) and label the repacked number as the ceiling of a future hybrid patch."
+  },
+  {
+   "risk": "Trace pollution or misread tensors: warmup routes to all experts (llama-graph.cpp:1473); ffn_moe_topk is a strided I32 view; the pre-normalisation `ffn_moe_weights` does not sum to 1 while `ffn_moe_weights_norm` does; ubatch splitting could misalign records.",
+   "mitigation": "probe sets params.warmup=false, reads with nb[] strides, hooks ffn_moe_weights_norm, asserts tensor type/shape on first sight (exit 4), flushes only after llama_process returns with an equal-column assertion per layer, and the validator rejects != 8 distinct ids, ids >= 128 or weight sums off by > 0.02; `--mode names` runs first and the 72-token golden trace is checked in."
+  },
+  {
+   "risk": "Speculative decoding plumbing: `-md` is rejected by llama-completion/llama-bench; the MoE MTP sidecar loads but never drafts in the server at b11398; DFlash drafts at 28% acceptance and is slower.",
+   "mitigation": "All speculative measurement goes through llama-server timings (draft_n / draft_n_accepted) with an explicit --spec-type retry and spec_type_effective recorded; inactive drafters are reported as 'inactive' rather than a 1.0x speed-up; the dense +24% seen with llama-cli stays 'unconfirmed' unless the server shows draft_n > 0 with identical greedy output."
+  },
+  {
+   "risk": "Docker Desktop constraints: first reads of 14-18 GB GGUFs through the 9p bind mount take minutes; the VM has 31 GB RAM (both GGUFs cannot be cached at once); the ext4 volume copy for E5 needs ~15 GB on the VM disk whose vhdx grows on C: (26 GB free); cgroup io.stat may be empty and /proc/pid/io read_bytes is not accounted for bind-mount reads; load under a cap triggers a MAP_POPULATE/MADV_WILLNEED storm (llama-mmap.cpp:493-515) through the whole file.",
+   "mitigation": "-nr in all Docker runs (no 14 GB anon copy); one model job at a time (bench lock); pagecache_limit.sh gates the volume copy on `docker run alpine df` and C: free space and offers `docker builder prune` (20 GB reclaimable) as a human decision, with a bind-mount fallback that records majflt-based lower bounds flagged 'not representative'; bytes/token measured via /proc/self/io read_bytes AND majflt, warm-up tokens excluded so the load storm does not pollute steady-state numbers; the real validation is repeated on the Pi via pi/05 stream-bench and pi/06."
+  },
+  {
+   "risk": "Honesty of projections: Pi memory/storage bandwidth, access latency, OS reserve and the llama.cpp efficiency factor are assumptions until a Pi is measured; the desktop proxy's slow tier is a virtual disk, not NVMe over a Pi's PCIe lane.",
+   "mitigation": "results envelope forces kind in {measured, projected, assumed} with a non-empty assumptions block for projections; every catalog number carries source:'assumed'/'measured'; projections are recomputed automatically once pi/03 (io_mem.json) and pi/05 (calibration.json) exist; docs carry three-column tables and E5 is described as validating the cache model, not Pi NVMe speed."
+  },
+  {
+   "risk": "The wrong Pi: context-friend-1 (4 GB, microSD, Hailo on the single PCIe lane, production ContextFriend services) must not be touched; the right Pi's RAM/storage are unknown.",
+   "mitigation": "Every pi/*.sh sources assert_safe_host (hostname deny-list + running-service globs, exit 4 unless PIGEMMA_I_KNOW=1), collects facts and requires a passing verdict before download/build/run; 01_tune_os refuses pciex1_gen=3 when a HAT occupies the lane; E8 is fixture-driven and nothing is executed on context-friend-1; the verdict names the recommended configuration (16 GB + NVMe Gen3) with the arithmetic for 8 GB + NVMe streaming."
+  },
+  {
+   "risk": "16 KiB pages on the Pi kernel and unaligned expert slabs (2,230,272 / 1,115,136 B) mean adjacent experts share pages; RLIMIT_MEMLOCK defaults are tiny; mlock of file pages from a separate process cannot change llama.cpp's own madvise/readahead behaviour.",
+   "mitigation": "All alignment uses the runtime page size (getconf PAGESIZE / sysconf), hotset merges adjacent ranges and reports page overhead, pinner reports partial locks (exit 2) and the exact ulimit/limits.d fix, 01_tune_os installs memlock unlimited and sets device read_ahead_kb (the lever that actually controls readahead for every mapping); the cross-process MADV_RANDOM idea was dropped."
+  },
+  {
+   "risk": "Disk space: D: 32 GB and C: 26 GB free must hold KLD reference logits (1.61 GB per model at 6 chunks; 20 chunks would be 5.4 GB), optional extra quants (9-13 GB each), traces, acts and the Docker volume growth on C:.",
+   "mitigation": "KLD chunks default 6 with a 2x free-space gate; extra-quant downloads only with -AllowDownload and a 1.3x gate; traces (~15 MB) and acts (~130 MB) are small; every heavy script prints free disk before writing; large outputs are gitignored."
+  },
+  {
+   "risk": "H2 compute/memory on the desktop: 5376x21504 f32 matrices (462 MB each), randomized SVD and 512-token group products for 4 layers x 3 matrices x 2 bases could exceed the one-hour budget or RAM while benchmarks run.",
+   "mitigation": "One matrix at a time with explicit frees, f16 residual groups, token batches of 32, torch.svd_lowrank with niter=3, group 128, an ETA printed after the first matrix, refusal above 8 layers/1024 tokens without -Force, -Quick (2 layers, 128 tokens, q2 only), the ffn_out sanity check aborts early on an orientation bug, and the run is serialized behind the bench lock so it never overlaps a model benchmark."
+  },
+  {
+   "risk": "Even a perfect H1 outcome gives only ~3-4 tok/s in RAM on a Pi 5 (2.38 GB RAM traffic per token at ~10 GB/s), and streaming on 8 GB + NVMe is bandwidth-limited to roughly 1.5-2.5 tok/s; the dense 31B is 17.6 GB/token (~22 s/token from NVMe). 'Good speed' on a Pi may not be reachable with this model family.",
+   "mitigation": "State the arithmetic up front in README/HYPOTHESES with the measured desktop calibration, keep all Pi numbers labelled projected until measured, and list what would change the number (a working high-acceptance drafter, the hybrid repack patch, a lower-bit expert quant with KLD evidence, 16 GB + NVMe Gen3 hardware) so the conclusion is actionable rather than only negative."
+  },
+  {
+   "risk": "Several agents implementing the same formats (C++ probe, Python reader, bash wrappers) drift, or gguf-py offset semantics are misread and shift every byte range.",
+   "mitigation": "docs/TRACE_FORMAT.md is frozen first; constants are asserted on both sides (magic, header offsets, record_size formula); the C++-produced golden trace is validated by the Python reader in CI; tests/test_gguf_map.py round-trips a GGUFWriter file and the integration test asserts the verified 26B constants (data_offset 15,823,936; unit 3,345,408; experts 12,846,366,720)."
+  }
+ ],
+ "grafted_from_other_designs": [
+  "From design #0: all speculative measurement through llama-server with timings.draft_n / draft_n_accepted, the explicit --spec-type retry and spec_type_effective, and 'speculation active only if draft_n > 0 on every request' (bench.py server-spec, E1).",
+  "From design #0: thinking-channel stripping (incl. the leading bare <channel|> seen in real outputs), thinking_chars share, exact_match_vs_plain as the losslessness gate, Hebrew-aware grading (quality.py).",
+  "From design #0: the dequant-pipeline sanity check W_down_q4 @ ffn_geglu vs the captured ffn_out before trusting any H2 number (oracle.py); tensor name corrected to ffn_geglu after verifying gemma4's GELU+PAR branch.",
+  "From design #0: results/.bench.lock + psutil free-RAM check so parallel agents never co-load two GGUFs; --quick/-Quick and skip-if-result-exists on every driver; WorkingSet vs PrivateBytes split in memory reporting; disk-gated KLD base files with the computed size.",
+  "From design #0: stdlib-only Pi Python with fixture facts for the four reference configurations AND the probed context-friend-1; AI-HAT-on-PCIe detection refusing pciex1_gen=3; RAM-scaled build jobs.",
+  "From design #2: ffn_moe_weights_norm as the recorded routing weight (gemma4 passes norm_w=true) and the weights-sum invariant in the validator.",
+  "From design #2: fixed token-stream replay (tokens.bin, probe --replay with -ub 1) so the Docker proxy processes exactly the simulator's access sequence, and per-token io.csv (read_bytes, majflt, wall_ms, RssAnon/RssFile) as the primary bytes/token measurement.",
+  "From design #2: LRU stack-distance histogram -> exact hit-rate curve cross-checked against the simulator to 1e-9; cross-layer predictability (precision@8/16 vs static-top-16 and same-ids baselines, mutual information) to decide whether prefetch is worth building; weighted hit rate; teacher-forced vs generated routing split; probs-based margin stats.",
+  "From design #2: H2 controls — iso-byte uniform-quant competitor, bound tightness p10/p50/p90 + Spearman, teacher-forced vs free-running activations, explicit NO_ADVANTAGE / bound-useless outcomes; a sound certification rule (B <= eps*||y_hat||/(1+eps)) replaces the winner's loose tau.",
+  "From design #2: pi_config.env single parameter surface, DENY_HOSTS + PROTECTED_SERVICE_GLOBS with the 0/2/3/4 exit-code convention, PIGEMMA_FAKE_PROC fixture harness for lib.sh under Git Bash, HF ETag/catalog sha256 verification, udev-persisted read_ahead_kb.",
+  "Fixes to the winner from verification: the 'hybrid -ot' streaming mode replaced by -nr (an override to the CPU buft still selects CPU_REPACK; -ot cannot name extra bufts); act-dump now captures ffn_norm + ffn_geglu + ffn_out; compute_tg_in_ram replaced by a desktop-calibrated efficiency times measured/assumed memory bandwidth; --random-rest dropped (cross-process madvise is ineffective); KLD chunks 6 not 20; extra-quant downloads optional; a --quick trace tier (~14k prefill + ~4k generated tokens from the existing calibration corpus) replaces the 55k-token Docker job on the critical path; probe flushes after llama_process returns with per-layer column assertions."
+ ]
+}

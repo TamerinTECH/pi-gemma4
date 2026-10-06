@@ -1,0 +1,10 @@
+# Linux build/run environment for pi-gemma4 on an x86-64 dev box (no GPU).
+# Used because the Windows host has no C/C++ toolchain; the Pi builds natively.
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential cmake ninja-build git ca-certificates curl \
+      libcurl4-openssl-dev python3 python3-pip python3-venv pkg-config \
+      fio vmtouch time \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

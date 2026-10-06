@@ -1,0 +1,115 @@
+{
+ "schema": "x2-prompts/1",
+ "note": "Pre-rendered with pigemma.workloads.render_gemma4 (GGUF Gemma 4 chat template, thinking disabled = empty thought block, bos=False; the server adds BOS). Identical bytes are sent to both engines via POST /completion. Tuning items are used ONLY to choose settings, held-out items ONLY for the evaluation. The warm-up prompt belongs to no set and its result is discarded.",
+ "source_sha256": {
+  "tuning": "e999533a300c6caf6b23d636101668e345995ae54ab9725e0c54b80d39b21f99",
+  "heldout": "8f55067d91d488be62332ab89ab510c1e3c6e07a8c6242bc54939c331ea6967e"
+ },
+ "prompts": [
+  {
+   "id": "warmup",
+   "set": "none",
+   "lang": "en",
+   "category": "warmup",
+   "max_tokens": 16,
+   "user_text": "Reply with the single word: ready",
+   "prompt": "<|turn>user\nReply with the single word: ready<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Reply with the single word: ready"
+    }
+   ]
+  },
+  {
+   "id": "tun-01",
+   "set": "tuning",
+   "lang": "en",
+   "category": "chat",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 30,
+   "prompt": "<|turn>user\nWhy do onions make people cry while they are being cut? Answer in two sentences.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Why do onions make people cry while they are being cut? Answer in two sentences."
+    }
+   ]
+  },
+  {
+   "id": "tun-06",
+   "set": "tuning",
+   "lang": "en",
+   "category": "extraction",
+   "max_tokens": 80,
+   "prompt_tokens_expected_a7b94df_tokenizer": 687,
+   "prompt": "<|turn>user\nRead the annual report below and give me a JSON object with the fields members_end_of_year, total_loans, most_borrowed_item, surplus_pounds and second_location_opening (as YYYY-MM-DD). No other text.\n\nElmstead Tool Library - Annual Report 2024\n\nThe Elmstead Tool Library lends tools, garden equipment and household appliances to residents of Elmstead and the surrounding villages. It is run entirely by volunteers from a converted garage behind the parish hall. This report covers January to December 2024.\n\nMembership and use\nWe started the year with 212 members and ended it with 287. Most new members joined after the spring repair cafe, which brought in 31 sign-ups in a single afternoon. Members borrowed items 1,964 times during the year, compared with 1,410 in 2023. The busiest month was May, with 254 loans, and the quietest was January, with 71. The most borrowed item was again the cordless hedge trimmer (96 loans), followed by the carpet cleaner (88) and the pressure washer (79). Fourteen items were retired because they could no longer be repaired safely.\n\nVolunteers\nThirty-two volunteers gave about 2,300 hours in total. The Saturday morning shift remains the hardest to staff. Two volunteers completed a portable appliance testing course in October, so we no longer need to pay an external electrician to check every electrical item before it goes back on the shelf.\n\nFinances\nIncome came from membership fees (5,740 pounds), donations (2,180 pounds) and a grant from the county environment fund (3,000 pounds). The largest costs were insurance (1,320 pounds), replacement parts and new tools (2,860 pounds) and our share of the parish hall electricity bill (640 pounds). We closed the year with a surplus of 4,110 pounds, most of which is set aside for the second location described below.\n\nLate returns and damage\nLate returns fell after we introduced text-message reminders in March: in the second half of the year only 6 percent of loans came back late, against 15 percent in the first half. Damage remained rare. In 23 cases an item came back broken; in 19 of them the borrower paid towards the repair.\n\nPlans for 2025\nThe main project for 2025 is a second, smaller lending point in the library of Westbury village. The parish council has agreed to provide a room free of charge, and we plan to open it on Saturday, 5 April 2025, with around 60 items. We also want to add a Wednesday evening session from 18:00 to 20:00 if at least six new volunteers can be found. Finally, we will run two repair cafes instead of one, in April and October.\n\nThanks\nWe thank every member who returned a tool clean and on time, the parish council for the use of the garage, and the county environment fund for its support.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Read the annual report below and give me a JSON object with the fields members_end_of_year, total_loans, most_borrowed_item, surplus_pounds and second_location_opening (as YYYY-MM-DD). No other text.\n\nElmstead Tool Library - Annual Report 2024\n\nThe Elmstead Tool Library lends tools, garden equipment and household appliances to residents of Elmstead and the surrounding villages. It is run entirely by volunteers from a converted garage behind the parish hall. This report covers January to December 2024.\n\nMembership and use\nWe started the year with 212 members and ended it with 287. Most new members joined after the spring repair cafe, which brought in 31 sign-ups in a single afternoon. Members borrowed items 1,964 times during the year, compared with 1,410 in 2023. The busiest month was May, with 254 loans, and the quietest was January, with 71. The most borrowed item was again the cordless hedge trimmer (96 loans), followed by the carpet cleaner (88) and the pressure washer (79). Fourteen items were retired because they could no longer be repaired safely.\n\nVolunteers\nThirty-two volunteers gave about 2,300 hours in total. The Saturday morning shift remains the hardest to staff. Two volunteers completed a portable appliance testing course in October, so we no longer need to pay an external electrician to check every electrical item before it goes back on the shelf.\n\nFinances\nIncome came from membership fees (5,740 pounds), donations (2,180 pounds) and a grant from the county environment fund (3,000 pounds). The largest costs were insurance (1,320 pounds), replacement parts and new tools (2,860 pounds) and our share of the parish hall electricity bill (640 pounds). We closed the year with a surplus of 4,110 pounds, most of which is set aside for the second location described below.\n\nLate returns and damage\nLate returns fell after we introduced text-message reminders in March: in the second half of the year only 6 percent of loans came back late, against 15 percent in the first half. Damage remained rare. In 23 cases an item came back broken; in 19 of them the borrower paid towards the repair.\n\nPlans for 2025\nThe main project for 2025 is a second, smaller lending point in the library of Westbury village. The parish council has agreed to provide a room free of charge, and we plan to open it on Saturday, 5 April 2025, with around 60 items. We also want to add a Wednesday evening session from 18:00 to 20:00 if at least six new volunteers can be found. Finally, we will run two repair cafes instead of one, in April and October.\n\nThanks\nWe thank every member who returned a tool clean and on time, the parish council for the use of the garage, and the county environment fund for its support."
+    }
+   ]
+  },
+  {
+   "id": "ho-01",
+   "set": "heldout",
+   "lang": "en",
+   "category": "chat",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 33,
+   "prompt": "<|turn>user\nExplain in two sentences why a metal spoon feels colder than a wooden spoon at the same room temperature.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Explain in two sentences why a metal spoon feels colder than a wooden spoon at the same room temperature."
+    }
+   ]
+  },
+  {
+   "id": "ho-03",
+   "set": "heldout",
+   "lang": "he",
+   "category": "chat",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 40,
+   "prompt": "<|turn>user\nמדוע לחם מתייבש מהר יותר במקרר מאשר על השיש? הסבר בשני משפטים.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+   "messages": [
+    {
+     "role": "user",
+     "content": "מדוע לחם מתייבש מהר יותר במקרר מאשר על השיש? הסבר בשני משפטים."
+    }
+   ]
+  },
+  {
+   "id": "ho-05",
+   "set": "heldout",
+   "lang": "de",
+   "category": "chat",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 36,
+   "prompt": "<|turn>user\nWarum beschlagen Brillengläser, wenn man im Winter einen warmen Raum betritt? Zwei Sätze.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Warum beschlagen Brillengläser, wenn man im Winter einen warmen Raum betritt? Zwei Sätze."
+    }
+   ]
+  },
+  {
+   "id": "ho-13",
+   "set": "heldout",
+   "lang": "he",
+   "category": "summarization",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 884,
+   "prompt": "<|turn>user\nסכם את הדו\"ח הבא בשלוש נקודות קצרות: הישג אחד, קושי אחד ותוכנית אחת לשנה הבאה.\n\nגינה קהילתית נווה אלון – דו\"ח שנתי לשנת 2024\n\nהגינה הקהילתית בשכונת נווה אלון פועלת זו השנה הרביעית על מגרש של כדונם וחצי, שהעירייה העמידה לרשות התושבים ליד המרכז הקהילתי. את הגינה מנהל צוות של שבעה מתנדבים מהשכונה, בתיאום עם רכזת הקהילה של המרכז, מיכל ברק.\n\nמשתתפים ופעילות\nבתחילת השנה היו בגינה 34 ערוגות משפחתיות, ובסופה 41. שבע הערוגות החדשות נבנו בחודש מרץ בעזרת תלמידי שכבת ח' של בית הספר \"הרימון\", שמאז מטפלים גם בערוגה משותפת של צמחי תבלין. בכל יום שישי בבוקר מתקיים מפגש עבודה פתוח לכל תושבי השכונה, ובממוצע הגיעו אליו כעשרים משתתפים. במהלך השנה נערכו בגינה תשע סדנאות, ובהן סדנת קומפוסט, סדנת השקיה חסכונית וסדנה לגידול עגבניות בעציצים למי שגר בדירה בלי חצר.\n\nמים והשקיה\nאחרי שבקיץ 2023 נרשמה צריכת מים גבוהה מהצפוי, הותקנה באביב מערכת השקיה בטפטוף עם מחשב השקיה ושני חיישני לחות. בעקבות זאת ירדה צריכת המים השנתית מ-610 קוב ל-430 קוב, ירידה של כשלושים אחוז. חשבון המים, שמשולם מתקציב המרכז הקהילתי, ירד בהתאם.\n\nיבול וחלוקה\nמהיבול של הערוגה המשותפת נמסרו במהלך השנה כ-380 קילוגרם ירקות לבית התמחוי השכונתי. בנוסף, בחודש אוקטובר התקיים בגינה שוק קטן לתוצרת עודפת, וההכנסות ממנו, 2,300 שקלים, הוקדשו לקניית שתילים לעונה הבאה.\n\nקשיים\nהקושי העיקרי השנה היה ונדליזם: בשלוש הזדמנויות נפרץ המחסן ונגנבו כלי עבודה. לאחר המקרה השלישי הותקנו מנעול חדש ותאורה עם חיישן תנועה, ומאז לא נרשמו פריצות נוספות. קושי נוסף הוא מחסור במתנדבים בחודשי הקיץ, כשמשפחות רבות נוסעות לחופשה והערוגות נשארות בלי טיפול.\n\nתוכניות לשנה הבאה\nבשנה הבאה מתכנן הצוות להקים פינת ישיבה מוצלת עם פרגולה, להוסיף שתי ערוגות מוגבהות שיתאימו לתושבים מבוגרים ולאנשים בכיסא גלגלים, ולהפעיל לוח תורנויות קיץ כדי שאף ערוגה לא תישאר מוזנחת. הצוות מזמין תושבים חדשים להצטרף למפגש של יום שישי או לפנות למיכל ברק במרכז הקהילתי.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+   "messages": [
+    {
+     "role": "user",
+     "content": "סכם את הדו\"ח הבא בשלוש נקודות קצרות: הישג אחד, קושי אחד ותוכנית אחת לשנה הבאה.\n\nגינה קהילתית נווה אלון – דו\"ח שנתי לשנת 2024\n\nהגינה הקהילתית בשכונת נווה אלון פועלת זו השנה הרביעית על מגרש של כדונם וחצי, שהעירייה העמידה לרשות התושבים ליד המרכז הקהילתי. את הגינה מנהל צוות של שבעה מתנדבים מהשכונה, בתיאום עם רכזת הקהילה של המרכז, מיכל ברק.\n\nמשתתפים ופעילות\nבתחילת השנה היו בגינה 34 ערוגות משפחתיות, ובסופה 41. שבע הערוגות החדשות נבנו בחודש מרץ בעזרת תלמידי שכבת ח' של בית הספר \"הרימון\", שמאז מטפלים גם בערוגה משותפת של צמחי תבלין. בכל יום שישי בבוקר מתקיים מפגש עבודה פתוח לכל תושבי השכונה, ובממוצע הגיעו אליו כעשרים משתתפים. במהלך השנה נערכו בגינה תשע סדנאות, ובהן סדנת קומפוסט, סדנת השקיה חסכונית וסדנה לגידול עגבניות בעציצים למי שגר בדירה בלי חצר.\n\nמים והשקיה\nאחרי שבקיץ 2023 נרשמה צריכת מים גבוהה מהצפוי, הותקנה באביב מערכת השקיה בטפטוף עם מחשב השקיה ושני חיישני לחות. בעקבות זאת ירדה צריכת המים השנתית מ-610 קוב ל-430 קוב, ירידה של כשלושים אחוז. חשבון המים, שמשולם מתקציב המרכז הקהילתי, ירד בהתאם.\n\nיבול וחלוקה\nמהיבול של הערוגה המשותפת נמסרו במהלך השנה כ-380 קילוגרם ירקות לבית התמחוי השכונתי. בנוסף, בחודש אוקטובר התקיים בגינה שוק קטן לתוצרת עודפת, וההכנסות ממנו, 2,300 שקלים, הוקדשו לקניית שתילים לעונה הבאה.\n\nקשיים\nהקושי העיקרי השנה היה ונדליזם: בשלוש הזדמנויות נפרץ המחסן ונגנבו כלי עבודה. לאחר המקרה השלישי הותקנו מנעול חדש ותאורה עם חיישן תנועה, ומאז לא נרשמו פריצות נוספות. קושי נוסף הוא מחסור במתנדבים בחודשי הקיץ, כשמשפחות רבות נוסעות לחופשה והערוגות נשארות בלי טיפול.\n\nתוכניות לשנה הבאה\nבשנה הבאה מתכנן הצוות להקים פינת ישיבה מוצלת עם פרגולה, להוסיף שתי ערוגות מוגבהות שיתאימו לתושבים מבוגרים ולאנשים בכיסא גלגלים, ולהפעיל לוח תורנויות קיץ כדי שאף ערוגה לא תישאר מוזנחת. הצוות מזמין תושבים חדשים להצטרף למפגש של יום שישי או לפנות למיכל ברק במרכז הקהילתי."
+    }
+   ]
+  }
+ ]
+}

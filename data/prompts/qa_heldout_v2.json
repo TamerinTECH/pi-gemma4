@@ -1,0 +1,1500 @@
+{
+ "format": "pigemma-qa/2",
+ "description": "Held-out harder Q&A for MODEL QUALITY (brief 2026-10-05 section 7): negation, multi-step numbers, multilingual instructions (EN/HE/DE), structured extraction graded by JSON field match, executable code graded by running tests in a sandboxed subprocess. Ask through llama-server /v1/chat/completions (thinking disabled) with pigemma.quality_v2. Every item carries a reference answer that must pass and wrong answers that must fail (python -m pigemma.quality_v2 selftest). Not for expert ranking or budget tuning. Exact-cache correctness is checked separately (token-identical output), not here.",
+ "created": "2026-10-05",
+ "items": [
+  {
+   "id": "neg-en-01",
+   "lang": "en",
+   "category": "negation",
+   "prompt": "Which of these numbers is NOT divisible by 3: 51, 87, 91, 117? Answer with the number only.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 91,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "91",
+   "wrong": [
+    "51",
+    "117"
+   ],
+   "notes": "51=3*17, 87=3*29, 117=3*39, 91=7*13"
+  },
+  {
+   "id": "neg-en-02",
+   "lang": "en",
+   "category": "negation",
+   "prompt": "Name one country in South America that does NOT share a land border with Brazil. Answer with the country name only.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "(?i)\\b(chile|ecuador)\\b"
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "(?i)\\b(argentina|peru|colombia|venezuela|bolivia|paraguay|uruguay|guyana|suriname)\\b"
+     }
+    ]
+   },
+   "reference": "Chile",
+   "wrong": [
+    "Peru",
+    "Argentina"
+   ],
+   "notes": "Chile and Ecuador are the only ones"
+  },
+  {
+   "id": "neg-en-03",
+   "lang": "en",
+   "category": "negation",
+   "prompt": "From this list, give every word that does NOT contain the letter 'e': table, chair, window, lamp, shelf, sofa, mirror, bench. Keep the original order and separate the words with commas.",
+   "n_predict": 48,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "(?i)\\bchair\\W+window\\W+lamp\\W+sofa\\W+mirror\\b"
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "(?i)\\b(table|shelf|bench)\\b"
+     }
+    ]
+   },
+   "reference": "chair, window, lamp, sofa, mirror",
+   "wrong": [
+    "chair, window, lamp, sofa",
+    "table, chair, window, lamp, sofa, mirror",
+    "chair, lamp, window, sofa, mirror"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "neg-he-01",
+   "lang": "he",
+   "category": "negation",
+   "prompt": "איזה מהמספרים הבאים אינו מספר ראשוני: 2, 13, 21, 29? ענה במספר בלבד.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 21,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "21",
+   "wrong": [
+    "13",
+    "2"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "neg-he-02",
+   "lang": "he",
+   "category": "negation",
+   "prompt": "כמה מהמספרים 4, 9, 15, 22, 27, 30 אינם זוגיים? ענה במספר בלבד.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 3,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "3",
+   "wrong": [
+    "2",
+    "4"
+   ],
+   "notes": "odd: 9, 15, 27"
+  },
+  {
+   "id": "neg-he-03",
+   "lang": "he",
+   "category": "negation",
+   "prompt": "איזו מהערים הבאות אינה נמצאת בישראל: חיפה, אילת, עמאן, נתניה? ענה בשם העיר בלבד.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "contains",
+      "any": [
+       "עמאן",
+       "רבת עמון"
+      ]
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "חיפה|אילת|נתניה"
+     }
+    ]
+   },
+   "reference": "עמאן",
+   "wrong": [
+    "חיפה",
+    "אילת"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "neg-de-01",
+   "lang": "de",
+   "category": "negation",
+   "prompt": "Welches dieser Metalle ist bei Raumtemperatur NICHT fest: Eisen, Quecksilber, Kupfer, Zink? Antworte mit einem Wort.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "contains",
+      "any": [
+       "Quecksilber"
+      ]
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "(?i)\\b(eisen|kupfer|zink)\\b"
+     }
+    ]
+   },
+   "reference": "Quecksilber",
+   "wrong": [
+    "Zink",
+    "Eisen"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "neg-de-02",
+   "lang": "de",
+   "category": "negation",
+   "prompt": "Wie viele der folgenden Zahlen sind NICHT größer als 10: 3, 12, 10, 7, 15, 11? Antworte nur mit der Zahl.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 3,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "3",
+   "wrong": [
+    "2",
+    "4"
+   ],
+   "notes": "3, 10 and 7 (10 is not greater than 10)"
+  },
+  {
+   "id": "num-en-01",
+   "lang": "en",
+   "category": "numbers",
+   "prompt": "A recipe needs 250 g of flour for 4 servings. How many grams of flour are needed for 10 servings? Answer with the number only.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 625,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "625",
+   "wrong": [
+    "1000",
+    "62.5"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "num-en-02",
+   "lang": "en",
+   "category": "numbers",
+   "prompt": "A shirt costs 40 euros. It is discounted by 25%, and then a 10% coupon is applied to the discounted price. What is the final price in euros? Answer with the number only.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 27,
+    "tolerance": 0.001,
+    "which": "first"
+   },
+   "reference": "27",
+   "wrong": [
+    "26",
+    "30"
+   ],
+   "notes": "40*0.75*0.9; 26 = wrongly adding the percentages"
+  },
+  {
+   "id": "num-en-03",
+   "lang": "en",
+   "category": "numbers",
+   "prompt": "A car travels 180 km in 2 hours and 15 minutes. What is its average speed in km/h? Answer with the number only.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 80,
+    "tolerance": 0.01,
+    "which": "first"
+   },
+   "reference": "80",
+   "wrong": [
+    "78.26",
+    "90"
+   ],
+   "notes": "180/2.25; 78.26 = treating 2h15 as 2.3 h"
+  },
+  {
+   "id": "num-en-04",
+   "lang": "en",
+   "category": "numbers",
+   "prompt": "Today is Wednesday. Which weekday falls exactly 100 days after today? Answer with the name of the day only.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "(?i)\\bfriday\\b"
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "(?i)\\b(monday|tuesday|wednesday|thursday|saturday|sunday)\\b"
+     }
+    ]
+   },
+   "reference": "Friday",
+   "wrong": [
+    "Thursday",
+    "Saturday"
+   ],
+   "notes": "100 mod 7 = 2"
+  },
+  {
+   "id": "num-he-01",
+   "lang": "he",
+   "category": "numbers",
+   "prompt": "במיכל יש 12 ליטר מים. שפכו ממנו שליש, ואחר כך הוסיפו 5 ליטר. כמה ליטר יש עכשיו במיכל? ענה במספר בלבד.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 13,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "13",
+   "wrong": [
+    "9",
+    "17"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "num-he-02",
+   "lang": "he",
+   "category": "numbers",
+   "prompt": "יוסי קרא 24 עמודים ביום הראשון, ובכל יום שאחריו קרא 6 עמודים יותר מאשר ביום הקודם. כמה עמודים קרא בסך הכול בארבעת הימים הראשונים? ענה במספר בלבד.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 132,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "132",
+   "wrong": [
+    "42",
+    "120"
+   ],
+   "notes": "24+30+36+42"
+  },
+  {
+   "id": "num-he-03",
+   "lang": "he",
+   "category": "numbers",
+   "prompt": "השעון מראה 22:45. מה תהיה השעה בעוד 3 שעות ו-50 דקות? ענה בפורמט HH:MM בלבד.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "regex",
+    "pattern": "(?<![\\d:])0?2:35(?![\\d:])"
+   },
+   "reference": "02:35",
+   "wrong": [
+    "26:35",
+    "01:35"
+   ],
+   "notes": "crosses midnight"
+  },
+  {
+   "id": "num-de-01",
+   "lang": "de",
+   "category": "numbers",
+   "prompt": "Ein Zug fährt um 14:52 ab und kommt um 17:09 an. Wie viele Minuten dauert die Fahrt? Antworte nur mit der Zahl.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 137,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "137",
+   "wrong": [
+    "217",
+    "157"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "num-de-02",
+   "lang": "de",
+   "category": "numbers",
+   "prompt": "Lena hat 3 Packungen mit je 18 Stiften. Sie verteilt die Stifte gleichmäßig an 4 Gruppen, jede Gruppe bekommt gleich viele ganze Stifte. Wie viele Stifte bleiben übrig? Antworte nur mit der Zahl.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 2,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "2",
+   "wrong": [
+    "13",
+    "0"
+   ],
+   "notes": "54 = 4*13 + 2"
+  },
+  {
+   "id": "num-de-03",
+   "lang": "de",
+   "category": "numbers",
+   "prompt": "Ein Rechteck hat einen Umfang von 46 cm und ist 15 cm lang. Wie groß ist seine Fläche in Quadratzentimetern? Antworte nur mit der Zahl.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "number",
+    "value": 120,
+    "tolerance": 0.0,
+    "which": "first"
+   },
+   "reference": "120",
+   "wrong": [
+    "690",
+    "345"
+   ],
+   "notes": "width = 46/2 - 15 = 8"
+  },
+  {
+   "id": "ml-en-he-01",
+   "lang": "en",
+   "category": "multilingual",
+   "prompt": "Answer in Hebrew only, with one word: what is the opposite of 'early'?",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "contains",
+      "any": [
+       "מאוחר",
+       "מאוחרת",
+       "באיחור"
+      ]
+     },
+     {
+      "kind": "script",
+      "script": "hebrew",
+      "min_fraction": 0.8
+     }
+    ]
+   },
+   "reference": "מאוחר",
+   "wrong": [
+    "late",
+    "מוקדם"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ml-en-de-01",
+   "lang": "en",
+   "category": "multilingual",
+   "prompt": "Answer in German only, with one word: what is the season after summer called?",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "contains",
+      "any": [
+       "Herbst"
+      ]
+     },
+     {
+      "kind": "script",
+      "script": "latin",
+      "min_fraction": 0.95
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "(?i)\\b(autumn|fall)\\b"
+     }
+    ]
+   },
+   "reference": "Herbst",
+   "wrong": [
+    "Autumn",
+    "Winter"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ml-he-en-01",
+   "lang": "he",
+   "category": "multilingual",
+   "prompt": "ענה באנגלית בלבד, במילה אחת: איך אומרים 'ספרייה' באנגלית?",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "(?i)\\blibrary\\b"
+     },
+     {
+      "kind": "script",
+      "script": "latin",
+      "min_fraction": 0.95
+     }
+    ]
+   },
+   "reference": "Library",
+   "wrong": [
+    "ספרייה",
+    "Bookstore"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ml-he-de-01",
+   "lang": "he",
+   "category": "multilingual",
+   "prompt": "ענה בגרמנית בלבד: איזה מספר בא אחרי שבע? כתוב אותו במילה בגרמנית, בלי ספרות.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "(?i)\\bacht\\b"
+     },
+     {
+      "kind": "script",
+      "script": "latin",
+      "min_fraction": 0.95
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "\\d"
+     }
+    ]
+   },
+   "reference": "Acht",
+   "wrong": [
+    "8",
+    "sieben",
+    "eight"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ml-de-he-01",
+   "lang": "de",
+   "category": "multilingual",
+   "prompt": "Antworte ausschließlich auf Hebräisch und mit einem Wort: Welche Farbe hat frischer Schnee?",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "contains",
+      "any": [
+       "לבן",
+       "לבנה"
+      ]
+     },
+     {
+      "kind": "script",
+      "script": "hebrew",
+      "min_fraction": 0.8
+     }
+    ]
+   },
+   "reference": "לבן",
+   "wrong": [
+    "weiß",
+    "white",
+    "שחור"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ml-de-en-01",
+   "lang": "de",
+   "category": "multilingual",
+   "prompt": "Antworte nur auf Englisch: Wie viele Tage hat ein Schaltjahr? Schreibe die Zahl in Worten, nicht in Ziffern.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "(?i)three[\\s-]+hundred(?:[\\s-]+and)?[\\s-]+sixty[\\s-]*six\\b"
+     },
+     {
+      "kind": "not_regex",
+      "pattern": "\\d"
+     },
+     {
+      "kind": "script",
+      "script": "latin",
+      "min_fraction": 0.95
+     }
+    ]
+   },
+   "reference": "Three hundred and sixty-six",
+   "wrong": [
+    "366",
+    "dreihundertsechsundsechzig",
+    "three hundred sixty-five"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ml-en-mix-01",
+   "lang": "en",
+   "category": "multilingual",
+   "prompt": "Write the word 'water' first in Hebrew and then in German, separated by a single comma, and nothing else.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "(?s)מים.{0,12}?(?i:wasser)"
+     },
+     {
+      "kind": "words",
+      "max": 3
+     }
+    ]
+   },
+   "reference": "מים, Wasser",
+   "wrong": [
+    "Wasser, מים",
+    "water, Wasser",
+    "מים, Water"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ml-he-01",
+   "lang": "he",
+   "category": "multilingual",
+   "prompt": "כתוב את שלושת הצבעים הראשונים של הקשת בענן, מהצבע החיצוני פנימה, בעברית, מופרדים בפסיקים ובלי טקסט נוסף.",
+   "n_predict": 64,
+   "grader": {
+    "kind": "all_of",
+    "checks": [
+     {
+      "kind": "regex",
+      "pattern": "אדו[םמ]\\W+כתו[םמ]\\W+צהוב"
+     },
+     {
+      "kind": "script",
+      "script": "hebrew",
+      "min_fraction": 0.8
+     }
+    ]
+   },
+   "reference": "אדום, כתום, צהוב",
+   "wrong": [
+    "סגול, כחול, ירוק",
+    "אדום, צהוב, כתום",
+    "red, orange, yellow"
+   ],
+   "notes": "primary rainbow: red outermost"
+  },
+  {
+   "id": "ext-en-01",
+   "lang": "en",
+   "category": "extraction",
+   "prompt": "Delivery note: \"DN-7781. Shipped on 3 March 2025 from Kessler Tools, Leipzig, to Oakridge Workshop, Bristol. Items: 12 hammers, 30 screwdriver sets, 5 toolboxes. Carrier: NordFreight. Gross weight: 142.5 kg.\"\n\nReturn a JSON object with exactly these keys: note_id (string), ship_date (YYYY-MM-DD), carrier (string), total_items (integer, the sum of all item quantities), weight_kg (number). Output only the JSON.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "note_id": "DN-7781",
+     "ship_date": "2025-03-03",
+     "carrier": "NordFreight",
+     "total_items": 47,
+     "weight_kg": 142.5
+    },
+    "tolerance": 0.001
+   },
+   "reference": "{\"note_id\": \"DN-7781\", \"ship_date\": \"2025-03-03\", \"carrier\": \"NordFreight\", \"total_items\": 47, \"weight_kg\": 142.5}",
+   "wrong": [
+    "{\"note_id\": \"DN-7781\", \"ship_date\": \"2025-03-03\", \"carrier\": \"NordFreight\", \"total_items\": 3, \"weight_kg\": 142.5}",
+    "{\"note_id\": \"DN-7781\", \"ship_date\": \"2025-05-03\", \"carrier\": \"NordFreight\", \"total_items\": 47, \"weight_kg\": 142.5}",
+    "The shipment contains 47 items."
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ext-en-02",
+   "lang": "en",
+   "category": "extraction",
+   "prompt": "E-mail: \"Hi Sam, quick update on Thursday's workshop: it moves from room B12 to the main hall, starts at 10:30 instead of 9:00, and we now expect 48 participants (up from 35). Lunch is still provided. Best, Priya\"\n\nExtract new_room, new_start_time (HH:MM), participants (integer), lunch_provided (true or false) and sender into a JSON object. Output only the JSON.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "new_room": {
+      "any": [
+       "main hall",
+       "the main hall"
+      ]
+     },
+     "new_start_time": "10:30",
+     "participants": 48,
+     "lunch_provided": true,
+     "sender": "Priya"
+    },
+    "tolerance": 0.001
+   },
+   "reference": "```json\n{\"new_room\": \"main hall\", \"new_start_time\": \"10:30\", \"participants\": 48, \"lunch_provided\": true, \"sender\": \"Priya\"}\n```",
+   "wrong": [
+    "{\"new_room\": \"B12\", \"new_start_time\": \"9:00\", \"participants\": 35, \"lunch_provided\": true, \"sender\": \"Priya\"}",
+    "{\"new_room\": \"main hall\", \"new_start_time\": \"10:30\", \"participants\": 48, \"lunch_provided\": false, \"sender\": \"Sam\"}"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ext-en-03",
+   "lang": "en",
+   "category": "extraction",
+   "prompt": "Chess club results: \"Maya won 5 games and lost 1. Omer won 4, drew 1 and lost 1. Lior won 3 and lost 3. Dana won 2, drew 2 and lost 2.\" A win scores 1 point, a draw 0.5 and a loss 0.\n\nReturn JSON with the keys winner (the player with the most points), winner_points, second_place and second_place_points. Output only the JSON.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "winner": "Maya",
+     "winner_points": 5,
+     "second_place": "Omer",
+     "second_place_points": 4.5
+    },
+    "tolerance": 0.001
+   },
+   "reference": "{\"winner\": \"Maya\", \"winner_points\": 5, \"second_place\": \"Omer\", \"second_place_points\": 4.5}",
+   "wrong": [
+    "{\"winner\": \"Maya\", \"winner_points\": 5, \"second_place\": \"Omer\", \"second_place_points\": 4}",
+    "{\"winner\": \"Omer\", \"winner_points\": 4.5, \"second_place\": \"Maya\", \"second_place_points\": 5}"
+   ],
+   "notes": "Maya 5, Omer 4.5, Lior 3, Dana 3"
+  },
+  {
+   "id": "ext-he-01",
+   "lang": "he",
+   "category": "extraction",
+   "prompt": "הזמנה: \"הזמנה מספר 5521: שלוש חולצות במחיר 45 שקלים כל אחת ומכנסיים במחיר 120 שקלים. משלוח עד הבית בעלות 25 שקלים. שם הלקוחה: רותם אלון. תאריך ההזמנה: 14 באפריל 2025.\"\n\nהחזר אובייקט JSON עם המפתחות order_id, customer, items_total (סכום המוצרים בלי המשלוח), shipping, grand_total ו-date (בפורמט YYYY-MM-DD). החזר JSON בלבד.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "order_id": "5521",
+     "customer": "רותם אלון",
+     "items_total": 255,
+     "shipping": 25,
+     "grand_total": 280,
+     "date": "2025-04-14"
+    },
+    "tolerance": 0.001
+   },
+   "reference": "{\"order_id\": \"5521\", \"customer\": \"רותם אלון\", \"items_total\": 255, \"shipping\": 25, \"grand_total\": 280, \"date\": \"2025-04-14\"}",
+   "wrong": [
+    "{\"order_id\": \"5521\", \"customer\": \"רותם אלון\", \"items_total\": 280, \"shipping\": 25, \"grand_total\": 305, \"date\": \"2025-04-14\"}",
+    "{\"order_id\": \"5521\", \"customer\": \"רותם אלון\", \"items_total\": 255, \"shipping\": 25, \"grand_total\": 280, \"date\": \"2025-14-04\"}"
+   ],
+   "notes": "3*45 + 120 = 255; + 25 = 280"
+  },
+  {
+   "id": "ext-he-02",
+   "lang": "he",
+   "category": "extraction",
+   "prompt": "הודעה: \"חוג הרובוטיקה ייפתח ביום שני, 3 בנובמבר, בשעה 16:30 בחדר 108. המדריך: אורי שמעוני. מספר המקומות מוגבל ל-14 משתתפים, ומחיר החוג לשנה הוא 950 שקלים.\"\n\nחלץ את הנתונים לאובייקט JSON עם המפתחות day, start_time, room, instructor, max_participants ו-yearly_price. החזר JSON בלבד.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "day": {
+      "any": [
+       "שני",
+       "יום שני"
+      ]
+     },
+     "start_time": "16:30",
+     "room": 108,
+     "instructor": "אורי שמעוני",
+     "max_participants": 14,
+     "yearly_price": 950
+    },
+    "tolerance": 0.001
+   },
+   "reference": "{\"day\": \"שני\", \"start_time\": \"16:30\", \"room\": 108, \"instructor\": \"אורי שמעוני\", \"max_participants\": 14, \"yearly_price\": 950}",
+   "wrong": [
+    "{\"day\": \"שני\", \"start_time\": \"16:30\", \"room\": 14, \"instructor\": \"אורי שמעוני\", \"max_participants\": 108, \"yearly_price\": 950}",
+    "{\"day\": \"רביעי\", \"start_time\": \"16:30\", \"room\": 108, \"instructor\": \"אורי שמעוני\", \"max_participants\": 14, \"yearly_price\": 950}"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "ext-he-03",
+   "lang": "he",
+   "category": "extraction",
+   "prompt": "תוצאות: \"בבחירות למועצת התלמידים קיבלה נועה 132 קולות, איתי קיבל 98 קולות ושירה קיבלה 115 קולות. בנוסף נפסלו 7 פתקים.\"\n\nהחזר JSON עם המפתחות winner, winner_votes, valid_votes (סך הקולות הכשרים), invalid_votes ו-total_ballots (כל הפתקים, כולל הפסולים). JSON בלבד.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "winner": "נועה",
+     "winner_votes": 132,
+     "valid_votes": 345,
+     "invalid_votes": 7,
+     "total_ballots": 352
+    },
+    "tolerance": 0.001
+   },
+   "reference": "{\"winner\": \"נועה\", \"winner_votes\": 132, \"valid_votes\": 345, \"invalid_votes\": 7, \"total_ballots\": 352}",
+   "wrong": [
+    "{\"winner\": \"נועה\", \"winner_votes\": 132, \"valid_votes\": 352, \"invalid_votes\": 7, \"total_ballots\": 345}",
+    "{\"winner\": \"שירה\", \"winner_votes\": 115, \"valid_votes\": 345, \"invalid_votes\": 7, \"total_ballots\": 352}"
+   ],
+   "notes": "132+98+115 = 345; +7 = 352"
+  },
+  {
+   "id": "ext-de-01",
+   "lang": "de",
+   "category": "extraction",
+   "prompt": "Rechnung: \"Rechnung Nr. 2025-114 der Tischlerei Brandt vom 9. Mai 2025: 2 Regale zu je 180 Euro, 1 Schreibtisch zu 420 Euro, Montage pauschal 95 Euro. Zahlbar innerhalb von 14 Tagen.\"\n\nGib ein JSON-Objekt mit den Schlüsseln invoice_no, vendor, date (YYYY-MM-DD), total_eur (Gesamtbetrag) und payment_days zurück. Nur das JSON.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "invoice_no": "2025-114",
+     "vendor": {
+      "any": [
+       "Tischlerei Brandt",
+       "Brandt"
+      ]
+     },
+     "date": "2025-05-09",
+     "total_eur": 875,
+     "payment_days": 14
+    },
+    "tolerance": 0.001
+   },
+   "reference": "{\"invoice_no\": \"2025-114\", \"vendor\": \"Tischlerei Brandt\", \"date\": \"2025-05-09\", \"total_eur\": 875, \"payment_days\": 14}",
+   "wrong": [
+    "{\"invoice_no\": \"2025-114\", \"vendor\": \"Tischlerei Brandt\", \"date\": \"2025-05-09\", \"total_eur\": 695, \"payment_days\": 14}",
+    "{\"invoice_no\": \"2025-114\", \"vendor\": \"Tischlerei Brandt\", \"date\": \"2025-09-05\", \"total_eur\": 875, \"payment_days\": 14}"
+   ],
+   "notes": "2*180 + 420 + 95 = 875; 695 forgets the second shelf"
+  },
+  {
+   "id": "ext-de-02",
+   "lang": "de",
+   "category": "extraction",
+   "prompt": "Kursinfo: \"Der Kurs Fotografie für Einsteiger findet an vier Samstagen statt, jeweils von 10:00 bis 13:00 Uhr. Kursleiterin ist Jana Weiß. Die Teilnahme kostet 160 Euro, Vereinsmitglieder zahlen 25 Prozent weniger.\"\n\nErstelle ein JSON-Objekt mit den Schlüsseln sessions (Anzahl der Termine), hours_total (Kursstunden insgesamt), instructor, price_eur und member_price_eur. Nur das JSON.",
+   "n_predict": 160,
+   "grader": {
+    "kind": "json_fields",
+    "fields": {
+     "sessions": 4,
+     "hours_total": 12,
+     "instructor": {
+      "any": [
+       "Jana Weiß",
+       "Frau Jana Weiß"
+      ]
+     },
+     "price_eur": 160,
+     "member_price_eur": 120
+    },
+    "tolerance": 0.001
+   },
+   "reference": "{\"sessions\": 4, \"hours_total\": 12, \"instructor\": \"Jana Weiß\", \"price_eur\": 160, \"member_price_eur\": 120}",
+   "wrong": [
+    "{\"sessions\": 4, \"hours_total\": 3, \"instructor\": \"Jana Weiß\", \"price_eur\": 160, \"member_price_eur\": 120}",
+    "{\"sessions\": 4, \"hours_total\": 12, \"instructor\": \"Jana Weiß\", \"price_eur\": 160, \"member_price_eur\": 135}"
+   ],
+   "notes": "4 * 3 h = 12 h; 160 * 0.75 = 120"
+  },
+  {
+   "id": "code-01",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `second_largest(nums)` that returns the second largest DISTINCT value in a list of integers, or None if there is no such value. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "second_largest",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       [
+        3,
+        1,
+        4,
+        4,
+        5
+       ]
+      ],
+      "expect": 4
+     },
+     {
+      "args": [
+       [
+        7,
+        7
+       ]
+      ],
+      "expect": null
+     },
+     {
+      "args": [
+       [
+        -2,
+        -5,
+        -1
+       ]
+      ],
+      "expect": -2
+     },
+     {
+      "args": [
+       [
+        10
+       ]
+      ],
+      "expect": null
+     },
+     {
+      "args": [
+       [
+        1,
+        2
+       ]
+      ],
+      "expect": 1
+     },
+     {
+      "args": [
+       [
+        5,
+        5,
+        4,
+        4,
+        3
+       ]
+      ],
+      "expect": 4
+     }
+    ]
+   },
+   "reference": "Here is the function:\n\n```python\ndef second_largest(nums):\n    vals = sorted(set(nums), reverse=True)\n    return vals[1] if len(vals) >= 2 else None\n```",
+   "wrong": [
+    "```python\ndef second_largest(nums):\n    return sorted(nums)[-2]\n```",
+    "```python\nimport os\n\ndef second_largest(nums):\n    vals = sorted(set(nums))\n    return vals[-2] if len(vals) > 1 else None\n```"
+   ],
+   "notes": "wrong[1] is correct logic but imports os: the sandbox screen must refuse it"
+  },
+  {
+   "id": "code-02",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `run_length(s)` that compresses a string with run-length encoding, for example 'aaabcc' becomes 'a3b1c2'. Return an empty string for an empty input. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "run_length",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       "aaabcc"
+      ],
+      "expect": "a3b1c2"
+     },
+     {
+      "args": [
+       ""
+      ],
+      "expect": ""
+     },
+     {
+      "args": [
+       "abc"
+      ],
+      "expect": "a1b1c1"
+     },
+     {
+      "args": [
+       "zzzzzzzzzzzz"
+      ],
+      "expect": "z12"
+     },
+     {
+      "args": [
+       "aabbaa"
+      ],
+      "expect": "a2b2a2"
+     }
+    ]
+   },
+   "reference": "```python\ndef run_length(s):\n    if not s:\n        return \"\"\n    out = []\n    prev, count = s[0], 1\n    for ch in s[1:]:\n        if ch == prev:\n            count += 1\n        else:\n            out.append(f\"{prev}{count}\")\n            prev, count = ch, 1\n    out.append(f\"{prev}{count}\")\n    return \"\".join(out)\n```",
+   "wrong": [
+    "```python\nfrom collections import Counter\n\ndef run_length(s):\n    return ''.join(f'{c}{n}' for c, n in Counter(s).items())\n```"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "code-03",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `is_valid_brackets(s)` that returns True if every (, [ and { in the string is closed by the matching bracket in the correct order, ignoring all other characters, and False otherwise. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "is_valid_brackets",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       "([]{})"
+      ],
+      "expect": true
+     },
+     {
+      "args": [
+       "([)]"
+      ],
+      "expect": false
+     },
+     {
+      "args": [
+       "a(b)c"
+      ],
+      "expect": true
+     },
+     {
+      "args": [
+       "(("
+      ],
+      "expect": false
+     },
+     {
+      "args": [
+       ""
+      ],
+      "expect": true
+     },
+     {
+      "args": [
+       "}{"
+      ],
+      "expect": false
+     },
+     {
+      "args": [
+       "{[()()]}"
+      ],
+      "expect": true
+     }
+    ]
+   },
+   "reference": "```python\ndef is_valid_brackets(s):\n    pairs = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\"}\n    stack = []\n    for ch in s:\n        if ch in \"([{\":\n            stack.append(ch)\n        elif ch in pairs:\n            if not stack or stack.pop() != pairs[ch]:\n                return False\n    return not stack\n```",
+   "wrong": [
+    "```python\ndef is_valid_brackets(s):\n    return all(s.count(a) == s.count(b) for a, b in ('()', '[]', '{}'))\n```"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "code-04",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `days_between(d1, d2)` that takes two dates as 'YYYY-MM-DD' strings and returns the absolute number of days between them. The datetime module is allowed. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "days_between",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       "2024-02-28",
+       "2024-03-01"
+      ],
+      "expect": 2
+     },
+     {
+      "args": [
+       "2025-01-01",
+       "2024-01-01"
+      ],
+      "expect": 366
+     },
+     {
+      "args": [
+       "2023-06-15",
+       "2023-06-15"
+      ],
+      "expect": 0
+     },
+     {
+      "args": [
+       "2023-02-28",
+       "2023-03-01"
+      ],
+      "expect": 1
+     }
+    ]
+   },
+   "reference": "```python\nfrom datetime import date\n\n\ndef days_between(d1, d2):\n    a = date.fromisoformat(d1)\n    b = date.fromisoformat(d2)\n    return abs((b - a).days)\n```",
+   "wrong": [
+    "```python\nfrom datetime import date\n\ndef days_between(d1, d2):\n    return (date.fromisoformat(d2) - date.fromisoformat(d1)).days\n```"
+   ],
+   "notes": "2024 is a leap year"
+  },
+  {
+   "id": "code-05",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `word_count_top(text, k)` that lowercases the text, splits it on whitespace, strips the characters .,!?;: from both ends of every word, ignores empty strings, and returns the k most frequent words as a list of (word, count) tuples sorted by count (highest first) and then alphabetically. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "word_count_top",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       "b a b c a b",
+       2
+      ],
+      "expect": [
+       [
+        "b",
+        3
+       ],
+       [
+        "a",
+        2
+       ]
+      ]
+     },
+     {
+      "args": [
+       "The cat. the dog! A cat?",
+       3
+      ],
+      "expect": [
+       [
+        "cat",
+        2
+       ],
+       [
+        "the",
+        2
+       ],
+       [
+        "a",
+        1
+       ]
+      ]
+     },
+     {
+      "args": [
+       "x",
+       5
+      ],
+      "expect": [
+       [
+        "x",
+        1
+       ]
+      ]
+     },
+     {
+      "args": [
+       "! ? hi",
+       2
+      ],
+      "expect": [
+       [
+        "hi",
+        1
+       ]
+      ]
+     }
+    ]
+   },
+   "reference": "```python\nfrom collections import Counter\n\n\ndef word_count_top(text, k):\n    words = [w.strip(\".,!?;:\") for w in text.lower().split()]\n    counts = Counter(w for w in words if w)\n    return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:k]\n```",
+   "wrong": [
+    "```python\nfrom collections import Counter\n\ndef word_count_top(text, k):\n    words = [w.strip('.,!?;:') for w in text.lower().split()]\n    return Counter(w for w in words if w).most_common(k)\n```"
+   ],
+   "notes": "wrong[0] breaks ties by first occurrence instead of alphabetically"
+  },
+  {
+   "id": "code-06",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `flatten(nested)` that flattens arbitrarily nested lists of integers into a single list, keeping the original order. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "flatten",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       [
+        1,
+        [
+         2,
+         [
+          3,
+          4
+         ]
+        ],
+        5
+       ]
+      ],
+      "expect": [
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     },
+     {
+      "args": [
+       []
+      ],
+      "expect": []
+     },
+     {
+      "args": [
+       [
+        [
+         []
+        ]
+       ]
+      ],
+      "expect": []
+     },
+     {
+      "args": [
+       [
+        [
+         1
+        ],
+        [
+         2,
+         [
+          3
+         ]
+        ],
+        []
+       ]
+      ],
+      "expect": [
+       1,
+       2,
+       3
+      ]
+     },
+     {
+      "args": [
+       [
+        0,
+        [
+         0,
+         [
+          0
+         ]
+        ]
+       ]
+      ],
+      "expect": [
+       0,
+       0,
+       0
+      ]
+     }
+    ]
+   },
+   "reference": "```python\ndef flatten(nested):\n    out = []\n    for x in nested:\n        if isinstance(x, list):\n            out.extend(flatten(x))\n        else:\n            out.append(x)\n    return out\n```",
+   "wrong": [
+    "```python\ndef flatten(nested):\n    out = []\n    for x in nested:\n        if isinstance(x, list):\n            out.extend(x)\n        else:\n            out.append(x)\n    return out\n```"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "code-07",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `roman_to_int(s)` that converts a Roman numeral written with I, V, X, L, C, D and M (subtractive notation such as IV and CM allowed) to an integer. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "roman_to_int",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       "III"
+      ],
+      "expect": 3
+     },
+     {
+      "args": [
+       "IV"
+      ],
+      "expect": 4
+     },
+     {
+      "args": [
+       "MCMXCIV"
+      ],
+      "expect": 1994
+     },
+     {
+      "args": [
+       "LVIII"
+      ],
+      "expect": 58
+     },
+     {
+      "args": [
+       "CDXLIV"
+      ],
+      "expect": 444
+     },
+     {
+      "args": [
+       "MMXXV"
+      ],
+      "expect": 2025
+     }
+    ]
+   },
+   "reference": "```python\ndef roman_to_int(s):\n    vals = {\"I\": 1, \"V\": 5, \"X\": 10, \"L\": 50, \"C\": 100, \"D\": 500, \"M\": 1000}\n    total = 0\n    for i, ch in enumerate(s):\n        v = vals[ch]\n        if i + 1 < len(s) and vals[s[i + 1]] > v:\n            total -= v\n        else:\n            total += v\n    return total\n```",
+   "wrong": [
+    "```python\ndef roman_to_int(s):\n    vals = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n    return sum(vals[c] for c in s)\n```"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "code-08",
+   "lang": "en",
+   "category": "code",
+   "prompt": "Write a Python function `moving_average(values, window)` that returns the average of every consecutive window of the given size, each rounded to 2 decimals, as a list. Return an empty list if the window is larger than the list. Use only the Python standard library. Do not read input and do not print anything. Reply with the function in a single Python code block.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "moving_average",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       [
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       2
+      ],
+      "expect": [
+       1.5,
+       2.5,
+       3.5,
+       4.5
+      ]
+     },
+     {
+      "args": [
+       [
+        10,
+        20,
+        30
+       ],
+       3
+      ],
+      "expect": [
+       20.0
+      ]
+     },
+     {
+      "args": [
+       [
+        1,
+        2
+       ],
+       3
+      ],
+      "expect": []
+     },
+     {
+      "args": [
+       [
+        1,
+        2,
+        4
+       ],
+       2
+      ],
+      "expect": [
+       1.5,
+       3.0
+      ]
+     },
+     {
+      "args": [
+       [
+        1,
+        1,
+        2
+       ],
+       3
+      ],
+      "expect": [
+       1.33
+      ]
+     }
+    ]
+   },
+   "reference": "```python\ndef moving_average(values, window):\n    if window <= 0 or window > len(values):\n        return []\n    return [round(sum(values[i:i + window]) / window, 2) for i in range(len(values) - window + 1)]\n```",
+   "wrong": [
+    "```python\ndef moving_average(values, window):\n    return [round(sum(values[i:i + window]) / window, 2) for i in range(len(values) - window)]\n```"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "code-he-01",
+   "lang": "he",
+   "category": "code",
+   "prompt": "כתוב פונקציה בפייתון בשם `digit_sum(n)` שמחזירה את סכום הספרות של מספר שלם. עבור מספר שלילי יש להתעלם מהסימן. השתמש רק בספרייה הסטנדרטית, אל תקרא קלט ואל תדפיס דבר, והחזר את הפונקציה בבלוק קוד פייתון אחד.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "digit_sum",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       1234
+      ],
+      "expect": 10
+     },
+     {
+      "args": [
+       -907
+      ],
+      "expect": 16
+     },
+     {
+      "args": [
+       0
+      ],
+      "expect": 0
+     },
+     {
+      "args": [
+       5
+      ],
+      "expect": 5
+     },
+     {
+      "args": [
+       1000000
+      ],
+      "expect": 1
+     }
+    ]
+   },
+   "reference": "```python\ndef digit_sum(n):\n    return sum(int(c) for c in str(abs(n)))\n```",
+   "wrong": [
+    "```python\ndef digit_sum(n):\n    return sum(int(c) for c in str(n))\n```"
+   ],
+   "notes": "instruction in Hebrew, answer in code"
+  },
+  {
+   "id": "code-de-01",
+   "lang": "de",
+   "category": "code",
+   "prompt": "Schreibe eine Python-Funktion `caesar(text, shift)`, die nur die Buchstaben a-z und A-Z um `shift` Stellen im Alphabet verschiebt (mit Umlauf am Ende des Alphabets, auch für negative Werte) und alle anderen Zeichen unverändert lässt. Nur die Standardbibliothek, keine Eingabe, keine Ausgabe; gib die Funktion in einem einzigen Python-Codeblock zurück.",
+   "n_predict": 384,
+   "grader": {
+    "kind": "python_exec",
+    "entry_point": "caesar",
+    "timeout_s": 10,
+    "tests": [
+     {
+      "args": [
+       "abc",
+       1
+      ],
+      "expect": "bcd"
+     },
+     {
+      "args": [
+       "xyz",
+       3
+      ],
+      "expect": "abc"
+     },
+     {
+      "args": [
+       "Hallo, Welt!",
+       13
+      ],
+      "expect": "Unyyb, Jryg!"
+     },
+     {
+      "args": [
+       "ABC",
+       -1
+      ],
+      "expect": "ZAB"
+     },
+     {
+      "args": [
+       "Zürich 2025",
+       2
+      ],
+      "expect": "Bütkej 2025"
+     }
+    ]
+   },
+   "reference": "```python\ndef caesar(text, shift):\n    out = []\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            out.append(chr((ord(ch) - 97 + shift) % 26 + 97))\n        elif \"A\" <= ch <= \"Z\":\n            out.append(chr((ord(ch) - 65 + shift) % 26 + 65))\n        else:\n            out.append(ch)\n    return \"\".join(out)\n```",
+   "wrong": [
+    "```python\ndef caesar(text, shift):\n    return ''.join(chr(ord(c) + shift) if c.isalpha() else c for c in text)\n```"
+   ],
+   "notes": "instruction in German, answer in code"
+  }
+ ]
+}

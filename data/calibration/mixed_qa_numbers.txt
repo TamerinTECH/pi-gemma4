@@ -1,0 +1,35 @@
+Q: A model file is 14.44 GB and a drive reads 850 MB/s. How long does a full read take?
+A: 14,440 MB / 850 MB/s = 16.99 seconds, about 17 seconds.
+
+Q: If one expert in one layer is 3.345 MB and a token visits 8 experts in each of 30 layers, how many bytes are touched?
+A: 8 x 30 = 240 expert visits; 240 x 3.345 MB = 802.8 MB per token.
+
+Q: With a 75 percent cache hit rate, how much is read from storage per token?
+A: 25 percent of 802.8 MB = 200.7 MB. At 850 MB/s that is 0.236 s, so at most 4.2 tokens per second.
+
+Q: Convert 2.4 GHz to cycles per millisecond.
+A: 2.4 GHz = 2,400,000,000 cycles per second = 2,400,000 cycles per millisecond.
+
+Q: List the Raspberry Pi 5 memory options.
+A: 2 GB, 4 GB, 8 GB and 16 GB. The 16 GB model was introduced in January 2025.
+
+Q: What is 17 percent of 262,144?
+A: 0.17 x 262,144 = 44,564.48.
+
+Q: Translate "the oven is hot" into Hebrew.
+A: התנור חם.
+
+Q: כמה זה שלוש כפול ארבע?
+A: שתים עשרה.
+
+Q: Sort these numbers: 0.28, 1.4, 0.74, 0.45.
+A: 0.28, 0.45, 0.74, 1.4.
+
+Q: Which dates fall on a Monday in October 2026?
+A: October 5, 12, 19 and 26.
+
+Q: A kernel uses 16 KiB pages. How many pages cover a 3.345 MB expert?
+A: 3,345,000 / 16,384 = 204.2, so 205 pages.
+
+Q: Summarise in one sentence why a dense 31B model is slow on a Raspberry Pi.
+A: Every token must read about 17 GB of weights, and the board can move only about 10 GB/s from RAM and under 1 GB/s from storage.

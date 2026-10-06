@@ -1,0 +1,24 @@
+# Line endings: bash scripts, env files and tool sources run on the Pi and in Docker; a CRLF
+# checkout (core.autocrlf=true on Windows) breaks them. Keep them LF everywhere.
+*.sh                text eol=lf
+*.env               text eol=lf
+*.py                text eol=lf
+tools/**/*.c        text eol=lf
+tools/**/*.cpp      text eol=lf
+CMakeLists.txt      text eol=lf
+docker/Dockerfile*  text eol=lf
+
+# Byte-exact content: calibration corpus (sha256 recorded in traces/results; two .cpp files
+# carry CRLF from upstream), captured logs/results, and test fixtures. No conversion at all.
+data/**             -text
+results/**          -text
+tests/fixtures/**   -text
+
+# Binary data
+*.gguf      binary
+*.moetrace  binary
+*.bin       binary
+*.npy       binary
+*.npz       binary
+*.logits    binary
+*.u8        binary

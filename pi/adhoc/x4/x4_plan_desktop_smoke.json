@@ -1,0 +1,57 @@
+{
+ "schema": "x4-plan/1 (x2-plan/1 + model_files, cool_below_c, perf_counters, body_extra, repeated prompt ids)",
+ "model": "/models/unsloth__gemma-4-26B-A4B-it-GGUF/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+ "prompts_file": "/work/pi/adhoc/x4/x4_prompts_smoke.json",
+ "warmup_prompt_id": "warmup",
+ "port": 18190,
+ "gap_s": 1,
+ "prewarm": false,
+ "load_timeout_s": 900,
+ "cool_below_c": null,
+ "cool_max_wait_s": 420,
+ "perf_counters": true,
+ "engines": {
+  "ours": {
+   "what": "desktop x86 Docker build of a7b94df",
+   "args": [
+    "-nr",
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ],
+   "bin": "/work/third_party/llama.cpp/build-linux-x86/bin/llama-server"
+  }
+ },
+ "common_request": {
+  "endpoint": "POST /completion",
+  "temperature": 0,
+  "top_k": 1,
+  "seed": 1,
+  "cache_prompt": false,
+  "stream": true,
+  "mtp": "off (no -md / --spec-type)"
+ },
+ "purpose": "FUNCTIONAL test of x4_compare.py in the desktop Docker image (x86, PIGEMMA_EMULATED=1). Not a measurement.",
+ "blocks": [
+  {
+   "label": "smoke-t4",
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-01"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+{
+ "headline": [
+  "ik_llama.cpp 3d27f5bb builds natively on the Pi 5 (833 s) and loads our exact UD-Q3_K_M GGUF with the weights still memory-mapped (the -nr equivalent is its default).",
+  "Same file, resident, held-out subset, 3 alternated repeats: prefill is 1.6x faster on 33-40-token prompts and 2.86x faster on the 884-token prompt (26.5 vs 9.3 tok/s; time to first token 33 s vs 95 s).",
+  "Decode is 2-3 % slower than ours on short prompts (3.03 vs 3.11 tok/s) and 15 % faster after the 884-token prompt (2.77 vs 2.42 tok/s). No storage reads, no stalls above 1 s, no throttling in either engine.",
+  "Outputs are not token-identical across the two engines (they diverge after 5-20 tokens). Quality parity is not established: both Hebrew held-out answers of ik contained a malformed word."
+ ],
+ "deviations_from_plan": [
+  "Tuning pass 1: two of six blocks never started. Both servers failed to bind port 18090 again inside the 60 s TCP TIME_WAIT of the previous block (45 s gap). The driver now uses one port per block; the two blocks were re-run in pass 2.",
+  "Tuning rule changed after pass 1 and before any held-out request: the first rule (smallest sum of total latency) depends on how long the reply happens to be (ik gave 41 or 59-63 tokens for tun-01 depending on the config). The revised rule S = sum of [TTFT + (n_predict - 1) / client decode rate] removes that dependency. Under either rule the chosen thread count is 4 for both engines.",
+  "Post-hoc tuning block 'ours without -nr' (llama.cpp default repack), added because pass 1 showed a 2.8x prefill gap and -nr is known to slow llama.cpp's kernels. Result: not resident on this board (see side_findings). That one block caused page-cache pressure for about 4 minutes: the test server's own swap use reached 415 MB, MemAvailable stayed above 8.5 GB, all four ContextFriend services stayed active. It was not repeated.",
+  "The longest held-out prompt has 884 tokens; no held-out prompt reaches 1000 tokens.",
+  "Prompts were sent as pre-rendered text to POST /completion, not through the chat endpoint, so that both engines receive identical bytes. ik's /apply-template returned HTTP 500 (it was started without --jinja); the chat endpoint of ik is untested.",
+  "A quality-parity diagnostic (34 non-code qa_heldout_v2 items on both frozen configurations) was started at 23:35. See quality_parity and pi_reachability for whether its results were retrieved."
+ ],
+ "side_findings": [
+  "llama.cpp a7b94df without -nr on this Pi and this file: 6.9 GiB anonymous memory after load (repacked copies), 38 s load with 1.57 GB read, then 1.15 / 1.37 / 2.34 GB read from the microSD during the warm-up / tun-01 / tun-06 requests, decode 2.2-2.4 tok/s, prefill 2.3-7.7 tok/s: slower than -nr on both tuning requests. One block, three requests; whether it settles after more requests was not tested.",
+  "ik's server-reported decode rate counts n tokens over n-1 intervals, which reads 1.6-2.4 % high for 43-64 tokens. The client-side rate (events / time between first and last event) is used for the comparison. For our server the two agree.",
+  "Our server evaluates the last 4 prompt tokens in a separate batch (context-checkpoint logic): about 0.7 s of the 3.8-4.4 s time to first token on short prompts is that second batch. So the 1.6x short-prompt prefill ratio includes server logic, not only kernel speed.",
+  "Thread count: for both engines 3 threads decode as fast as 4 (ours 3.18 vs 3.09, ik 3.13 vs 3.04-3.10 tok/s on tun-01) but prefill 20-22 % slower. Decode on this board does not scale with the fourth core.",
+  "ik with and without --swa-compress, and with 3 or 4 threads, gives different greedy text for tun-01; each configuration is repeatable. The extraction request tun-06 is byte-identical across all seven engine configurations tested."
+ ],
+ "limitations": [
+  "One board, one file (UD-Q3_K_M = IQ3_XXS and IQ4_NL experts, Q8_0 attention and dense FFN, Q6_K head). The ratio may differ for the QAT Q4_0 file.",
+  "4 held-out requests x 3 repeats; variation between repeats is below 2.1 %, but 4 prompts do not describe a workload.",
+  "Resident only. Nothing here says how ik behaves when the model does not fit in RAM; that is X1c on the desktop harness.",
+  "ik's own run-time repack (-rtr) was not run: it turns mmap off and would hold about 12.1 GiB of weights in anonymous memory, leaving MemAvailable near 2.2 GiB, below the 3 GiB safety floor. ik may be faster than measured on a board with more headroom.",
+  "First-use requests only (cache_prompt off, one warm-up request per server start). Warm-session reuse was not measured.",
+  "Energy not measured."
+ ],
+ "handoff": [
+  "X4 (resident bottleneck): prefill is the place where the two engines differ (2.86x at 884 tokens); decode is equal within 3 % on short contexts and does not improve with the fourth thread. ik's llama-bench is installed at ~/pigemma/ik_llama.cpp/build/bin/llama-bench.",
+  "X3 (product track B): if ik is used as the Gemma runtime, first verify answer quality (the 34-item diagnostic or quality_v2) and the chat endpoint with --jinja; until then keep our a7b94df -nr build as the Gemma reference and report ik as a separate runtime row.",
+  "Free space on the Pi's / is 2.077 GB (gate 2.0 GB): about 75 MB of headroom. New binaries must go to tmpfs or the USB stick, or something must be removed first.",
+  "Reusable driver: pi/adhoc/x2/x2_compare.py (plan file with engines and blocks, one port per block, per-block page-cache check and prewarm, guards for memory / services / other llama processes)."
+ ],
+ "pi_reachability": {
+  "last_successful_contact": "2026-10-05 23:35:56 CEST (quality diagnostic running, 8 of 34 items done on our build, 71.6 C, no error)",
+  "event": "an open SSH session to the Pi was reset by the peer between 23:36 and 23:46; from then on PI_HOST did not answer ARP, ping or SSH (retried about every 10-45 s until 00:51 on 2026-10-06, 75 minutes). A ping sweep of LOCAL_SUBNET at 00:21 found no host with the Pi's SSH host key (OTHER_LAN_HOST is a different Raspberry Pi; it was not touched).",
+  "cause": "unknown. The board's Wi-Fi is documented as dropping under load, but a reset followed by a full disappearance could also be a reboot or a hang. The state of the ContextFriend services after 23:35:56 is unknown.",
+  "state_at_last_check": "all four ContextFriend services active at 23:32:55 (end of the held-out evaluation) and at the 23:35:00 pre-block check of the quality run; MemAvailable 15.4 GB; no llama process other than the quality run's own server",
+  "what_was_running": "nohup flock -n ~/pigemma/.bench.lock nice -n 10 python3 ~/pigemma/x2/x2_compare.py --plan x2_plan_quality.json --out results/quality (three blocks: our frozen configuration, ik frozen configuration, ik without --swa-compress; each block starts one llama-server and stops it at the end; the script exits on its own and releases the lock)",
+  "to_do_when_the_pi_is_back": [
+   "check uptime and `systemctl is-active contextfriend-box contextfriend-gpu-tunnel hailort whisper-bench@base`",
+   "check that no llama-server is left (`pgrep -a '^llama-'`) and that ~/pigemma/.bench.lock is free",
+   "copy ~/pigemma/x2/results/quality and ~/pigemma/x2/quality.out to results/comparisons/ik_llama_pi/raw/, then run `python pi/adhoc/x2/x2_grade_quality.py results/comparisons/ik_llama_pi/raw/quality` and `python pi/adhoc/x2/x2_make_result.py results/comparisons/ik_llama_pi`",
+   "remount the USB stick if the Pi rebooted (the mount is not persistent)"
+  ]
+ },
+ "quality_parity_status": "started 2026-10-05 23:35 on the Pi; results NOT retrieved (Pi unreachable from about 23:36); nothing about answer quality may be concluded from this stage beyond the 4 held-out outputs"
+}

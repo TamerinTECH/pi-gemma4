@@ -1,0 +1,4 @@
+load_backend: loaded RPC backend from REPO_ROOT\third_party\llama.cpp-win\ggml-rpc.dll
+load_backend: loaded CPU backend from REPO_ROOT\third_party\llama.cpp-win\ggml-cpu-zen4.dll
+llama_init_from_model: K cache type q8_0 with block size 32 does not divide n_embd_head_k=16
+llama_bench: error: failed to create context with model 'tiny-q4_0.gguf'

@@ -1,0 +1,1 @@
+SOURCE="/dev/nvme0n1p1" FSTYPE="ext4" TARGET="/mnt/nvme" MAJ:MIN="259:1"

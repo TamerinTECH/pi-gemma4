@@ -1,0 +1,12 @@
+avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack
+contextfriend-box.service         loaded active running ContextFriend Box
+contextfriend-gpu-tunnel.service  loaded active running ContextFriend GPU tunnel
+cron.service                      loaded active running Regular background program processing daemon
+dbus.service                      loaded active running D-Bus System Message Bus
+hailort.service                   loaded active running HailoRT service
+NetworkManager.service            loaded active running Network Manager
+ssh.service                       loaded active running OpenBSD Secure Shell server
+systemd-journald.service          loaded active running Journal Service
+systemd-logind.service            loaded active running User Login Management
+systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files
+whisper-bench@base.service        loaded active running Whisper benchmark (base)

@@ -1,0 +1,58 @@
+{
+  "hostname": "pigemma-ci",
+  "kernel": "5.15.167.4-microsoft-standard-WSL2",
+  "page_size": 4096,
+  "cpu_model": "AMD Ryzen 5 8400F 6-Core Processor",
+  "cpu_flags": [
+    "fpu",
+    "sse",
+    "sse2",
+    "ssse3",
+    "sse4_1",
+    "sse4_2",
+    "avx",
+    "f16c",
+    "fma",
+    "bmi2",
+    "avx2",
+    "avx512f",
+    "avx512bw",
+    "avx512vl",
+    "avx512_vnni",
+    "avx512_bf16"
+  ],
+  "nproc": 12,
+  "ram_total_kb": 32589000,
+  "ram_available_kb": 30500000,
+  "swap_total_kb": 8388608,
+  "loadavg1": 0.2,
+  "model_dir": "/work/models",
+  "storage": {
+    "dev": "overlay",
+    "type": "unknown",
+    "rotational": false,
+    "pcie_link_speed": null,
+    "pcie_link_width": null,
+    "read_ahead_kb": null
+  },
+  "free_disk_bytes": 1500000000,
+  "running_services": [],
+  "hat_product": null,
+  "pciex1_gen_cfg": null,
+  "governor": null,
+  "memlock_limit": "unlimited",
+  "tools": {
+    "cmake": "3.28.3",
+    "gcc": "13.3.0",
+    "git": null,
+    "python3": "3.12.3"
+  },
+  "override": null,
+  "collected_at": "2026-10-05T10:00:00Z",
+  "in_container": true,
+  "emulated": false,
+  "notes": [
+    "tests fixture (tests/synth.py FACTS_NAMES). Shape = data_formats facts.json. Values not quoted from docs/design/FACTS.md are illustrative, not measurements.",
+    "x86-64 Linux container (Docker Desktop VM shape: 12 vCPUs, ~31 GB, 4 KiB pages, overlay root, no systemd, no cpufreq) with only 1.5 GB free disk. Expected: every model that would fit gets NO_DISK (exit 3)."
+  ]
+}

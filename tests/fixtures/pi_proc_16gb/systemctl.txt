@@ -1,0 +1,9 @@
+avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack
+cron.service                      loaded active running Regular background program processing daemon
+dbus.service                      loaded active running D-Bus System Message Bus
+friendly-context.service          loaded active running Unrelated service whose name only resembles a protected one
+NetworkManager.service            loaded active running Network Manager
+ssh.service                       loaded active running OpenBSD Secure Shell server
+systemd-journald.service          loaded active running Journal Service
+systemd-logind.service            loaded active running User Login Management
+systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files

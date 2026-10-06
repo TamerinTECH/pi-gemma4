@@ -1,0 +1,13 @@
+0.00.023.545 W llama_context: n_ctx is not divisible by n_seq_max - rounding down to 8192
+0.00.025.265 I cmn          init: llama threadpool init, n_threads = 2
+0.00.028.334 W llama_perplexity: model was trained on only 256 context tokens (2048 specified)
+0.00.028.340 I 
+0.00.028.371 I system_info: n_threads = 2 (n_threads_batch = 2) / 12 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | BMI2 = 1 | AVX512 = 1 | AVX512_VBMI = 1 | AVX512_VNNI = 1 | AVX512_BF16 = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | 
+0.00.028.704 I perplexity: saving all logits to base.kld
+0.00.028.714 I perplexity: tokenizing the input ..
+0.00.029.041 I perplexity: tokenization took 0.322 ms
+0.00.029.069 I perplexity: calculating perplexity over 4 chunks, n_ctx=64, batch_size=2048, n_seq=32
+0.00.031.179 I perplexity: 0.00 seconds per pass - ETA 0.00 minutes
+[1]505.3665,[2]802.5845,[3]958.9822,[4]1165.0598,
+0.00.034.090 I Final estimate: PPL = 1165.0598 +/- 189.16265
+

@@ -1,0 +1,9 @@
+<start_of_turn>user
+Explain in 3 short sentences why running a 26B mixture-of-experts model on a Raspberry Pi is hard, then say 'שלום' in Hebrew.<end_of_turn>
+<start_of_turn>model
+<|channel>thought
+<channel|>A 26B parameter model requires massive amounts of VRAM that far exceed the Raspberry Pi's limited memory capacity. The model's architecture is too computationally intensive for the Pi's low-power processor to handle efficiently. Additionally, the slow data transfer speeds of the Pi's hardware would result in extremely sluggish performance.
+
+שלום [end of text]
+
+

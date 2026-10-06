@@ -1,0 +1,2828 @@
+// =============================================================================
+// pigemma-probe (tools/probe/probe.cpp) - the one custom llama.cpp program of
+// the pi-gemma4 experiment: a cb_eval recorder with three modes.
+//
+//   names      print every graph tensor name seen by the eval callback (sorted,
+//              unique, one per line) to stdout. Used to verify the tensor-name
+//              contract (docs/TRACE_FORMAT.md section 6).
+//   moe-trace  record, per processed token and MoE layer, the K selected
+//              experts (ffn_moe_topk, a strided I32 view of the argsort) and
+//              their renormalised routing weights (ffn_moe_weights_norm), plus
+//              optionally the top-P router probabilities (ffn_moe_probs), into
+//              a .moetrace file (docs/TRACE_FORMAT.md section 3) with the
+//              sidecars <trace>.tokens.bin and <trace>.gen.txt.
+//   act-dump   dump fp16 activations of chosen layers/kinds (default ffn_norm,
+//              ffn_geglu, ffn_out = the inputs/outputs of the dense FFN
+//              matrices) as L<il>.<kind>.npy with a fixed 128-byte header, plus
+//              phase.u8, tokens.bin and meta.json (section 7). Input of H2.
+//
+// Input is one of: -p/-f text (tokenised once, split into fresh-context chunks
+// of --chunk-tokens, BOS inserted at the start of every chunk), --gen-prompts
+// FILE.json (one chunk per prompt), or --replay tokens.bin (teacher-forced
+// replay of an i32 stream, e.g. <trace>.tokens.bin). After each chunk's
+// prefill the probe can generate greedily (--gen N); generated tokens are
+// recorded with phase 1. Every chunk starts from an empty KV cache
+// (llama_memory_clear), so `pos` restarts at 0.
+//
+// On Linux --io-csv F writes one row per ubatch (with -ub 1: per token):
+// token_index,phase,wall_ms,read_bytes_delta,majflt_delta,rss_anon_kb,rss_file_kb
+// from /proc/self/io, /proc/self/stat (field 12) and /proc/self/status. The
+// row boundary is the eval callback on the graph's last node "result_output";
+// if that node is not observed, a residual row is written after llama_process.
+//
+// All standard llama.cpp COMMON arguments work (-m -f -p -t -tb -c -b -ub -nr
+// -lm -ctk -ctv -fa ...); probe flags are removed from argv before
+// common_params_parse(..., LLAMA_EXAMPLE_COMMON). `--help` prints a 3-line
+// banner, the llama.cpp help, then the PIGEMMA section.
+//
+// Exit codes: 0 ok; 2 usage error; 3 load / compute / output-file failure;
+// 4 tensor contract violation (wrong type/shape, missing or extra columns,
+// model without experts in moe-trace); 128+signal (130 SIGINT, 143 SIGTERM)
+// when interrupted - outputs are still closed cleanly. One line
+// "PIGEMMA_SUMMARY {json}" is written to stderr at exit (also on errors) with
+// the TRACE_FORMAT 4.5 keys (mode, exit_code, n_prompt, n_gen, n_records,
+// n_chunks, t_load_ms, t_p_eval_ms, t_eval_ms, tok_s_prompt, tok_s_gen,
+// callback_ms, trace_out, act_out, io_csv) plus n_p_eval, n_eval,
+// t_prefill_wall_ms, t_gen_wall_ms, wall_tok_s_prompt, wall_tok_s_gen (probe
+// wall clock around the decode calls, incl. callback overhead - a separate
+// source from llama_perf), wall_ms, n_ctx, n_threads, interrupted, error,
+// probe_version, llama_build, llama_commit.
+//
+// Mandatory llama settings (applied by the probe, not by the caller):
+//   params.warmup = false   (warm-up routes every token to ALL experts,
+//                            src/llama-graph.cpp:1473, polluting the trace)
+//   params.cb_eval / cb_eval_user_data = the recorder
+//   params.sampling.backend_sampling = false (logits must stay on the host)
+//
+// Build (out-of-tree, tools/CMakeLists.txt; links llama-common + llama like
+// examples/eval-callback). Docker (desktop):
+//   cmake -S /work/tools -B /work/tools/build-linux-x86 -G Ninja
+//         -DLLAMA_DIR=/work/third_party/llama.cpp -DGGML_NATIVE=OFF -DGGML_AVX2=ON
+//         -DGGML_AVX512=ON -DCMAKE_BUILD_TYPE=Release        (one command line)
+//   cmake --build /work/tools/build-linux-x86 --target pigemma-probe
+// Pi: the same with -DGGML_NATIVE=ON (see tools/CMakeLists.txt header).
+//
+// Documented decisions / deviations from the manifest text (also reported as
+// open issues):
+//  D-a --chat uses the model's own chat template by default (GGUF
+//      tokenizer.chat_template rendered through llama.cpp's common_chat
+//      templates, thinking disabled). The manifest's literal
+//      "<start_of_turn>user\n...<end_of_turn>\n<start_of_turn>model\n" is NOT
+//      the Gemma 4 format: the Gemma 4 vocab has no <start_of_turn> token
+//      (verified in the 26B GGUF: <|turn> = 105, <turn|> = 106). It is kept
+//      as --chat-style gemma3; --chat-style gemma4 is the built-in literal
+//      "<|turn>user\n...<turn|>\n<|turn>model\n<|channel>thought\n<channel|>",
+//      also the fallback when the template cannot be rendered.
+//  D-b Raw -p/-f text is tokenised as literal text (parse_special = false)
+//      so corpus code/text containing marker-like strings is not turned into
+//      control tokens; --parse-special restores llama.cpp's default. Chat
+//      wrapping always parses specials (the markers must become tokens).
+//  D-c --tokens T applies to every mode (stop after T recorded tokens,
+//      prefill + generated; it is also the act-dump npy T_MAX, default 512)
+//      and --max-chunks N limits the number of chunks; the 72-token smoke
+//      trace is `--chunk-tokens 64 --gen 8 --tokens 72`.
+//  D-d A chunk longer than n_batch is decoded as consecutive sub-batches of
+//      n_batch tokens (llama_batch_ext capacity is n_batch); the manifest
+//      assumes n_batch >= chunk. Columns still accumulate in token order.
+//  D-e When -c is absent the probe sets n_ctx = max(4096, chunk_tokens +
+//      max generation + 8, rounded up to 256) instead of the model's 262144
+//      training context. An explicit `-c 0` is respected.
+//  D-f Replay never inserts BOS (the replayed stream must stay identical to
+//      the source stream: replay token_index i == source token A+i); use
+//      --replay-chunks <src>.meta.json to cut at the source chunk starts.
+//      --gen is ignored in replay (every replay record is phase 0).
+//  D-g moe_layers = the layers that emitted ffn_moe_topk in the first chunk;
+//      the .moetrace header is therefore written when the first chunk's
+//      records are flushed (allowed by TRACE_FORMAT 3.4), with the 16 KiB
+//      header reserve, and patched at close (n_records written last).
+//  D-h I/O errors on the output files exit 3 (runtime failure); the manifest
+//      lists 3 as "load/compute failure" only.
+// =============================================================================
+
+#include "arg.h"
+#include "build-info.h"
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wunused-function"  // static helpers in llama.cpp's jinja headers
+#endif
+#include "chat.h"
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
+#include "common.h"
+#include "llama.h"
+#include "log.h"
+
+#include "ggml-backend.h"
+#include "ggml.h"
+
+#include <nlohmann/json.hpp>
+
+#include <algorithm>
+#include <atomic>
+#include <cerrno>
+#include <chrono>
+#include <clocale>
+#include <cmath>
+#include <csignal>
+#include <cstdarg>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <filesystem>
+#include <fstream>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <numeric>
+#include <set>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#if !defined(_WIN32)
+#include <unistd.h>
+#endif
+
+namespace fs = std::filesystem;
+using json  = nlohmann::json;
+using ojson = nlohmann::ordered_json;
+
+// -----------------------------------------------------------------------------
+// constants (mirror the machine-readable block of docs/TRACE_FORMAT.md)
+// -----------------------------------------------------------------------------
+static const char *       PROBE_VERSION                 = "1.0.0";
+static const char         MOETRACE_MAGIC[8]             = {'M', 'O', 'E', 'T', 'R', 'C', '0', '1'};
+static constexpr int      MOETRACE_FORMAT_VERSION       = 1;
+static constexpr uint64_t MOETRACE_N_RECORDS_OPEN       = 0xFFFFFFFFFFFFFFFFull;
+static constexpr uint64_t MOETRACE_HEADER_RESERVE_BYTES = 16384;
+static constexpr int      MOETRACE_MAX_EXPERTS          = 256;
+static const char *       MOETRACE_WEIGHTS_TENSOR       = "ffn_moe_weights_norm";
+static const char *       SIDECAR_TOKENS                = ".tokens.bin";
+static const char *       SIDECAR_GEN                   = ".gen.txt";
+static constexpr int      NPY_HEADER_BYTES              = 128;
+static constexpr int      NPY_HEADER_LEN_FIELD          = 118;
+static const char *       ACTS_PHASE_FILE               = "phase.u8";
+static const char *       ACTS_TOKENS_FILE              = "tokens.bin";
+static const char *       PROBE_SUMMARY_PREFIX          = "PIGEMMA_SUMMARY ";
+static const char *       IO_CSV_HEADER = "token_index,phase,wall_ms,read_bytes_delta,majflt_delta,rss_anon_kb,rss_file_kb";
+static const char *       DEFAULT_NAMES_PROMPT = "The quick brown fox jumps over the lazy dog.";
+
+enum probe_exit : int {
+    PROBE_EXIT_OK       = 0,
+    PROBE_EXIT_USAGE    = 2,
+    PROBE_EXIT_RUNTIME  = 3,
+    PROBE_EXIT_CONTRACT = 4,
+};
+
+enum class probe_mode { none, names, moe_trace, act_dump };
+enum class input_kind { text, gen_prompts, replay };
+
+// -----------------------------------------------------------------------------
+// signal handling: first SIGINT/SIGTERM -> finish the current llama_process,
+// flush, close normally; second -> patch n_records (async-signal-safe pwrite)
+// and _exit(128+sig).
+// -----------------------------------------------------------------------------
+static volatile std::sig_atomic_t g_stop_signal          = 0;
+static volatile std::sig_atomic_t g_signal_count         = 0;
+static volatile std::sig_atomic_t g_trace_fd             = -1;
+static volatile std::sig_atomic_t g_trace_header_written = 0;
+static std::atomic<uint64_t>      g_committed_records{ 0 };
+
+extern "C" void probe_signal_handler(int sig) {
+    if (g_signal_count == 0) {
+        g_signal_count = 1;
+        g_stop_signal  = sig;
+#if !defined(_WIN32)
+        static const char msg[] =
+            "\npigemma-probe: signal received - finishing the current llama_process call, then closing the outputs "
+            "(send it again to abort immediately)\n";
+        const ssize_t r = write(2, msg, sizeof(msg) - 1);
+        (void) r;
+#endif
+        return;
+    }
+#if !defined(_WIN32)
+    if constexpr (std::atomic<uint64_t>::is_always_lock_free) {
+        if (g_trace_fd >= 0 && g_trace_header_written) {
+            const uint64_t n = g_committed_records.load();
+            uint8_t        b[8];
+            for (int i = 0; i < 8; ++i) {
+                b[i] = (uint8_t) ((n >> (8 * i)) & 0xFFu);
+            }
+            const ssize_t r = pwrite(g_trace_fd, b, sizeof(b), 16);
+            (void) r;
+        }
+    }
+    _exit(128 + sig);
+#else
+    std::_Exit(128 + sig);
+#endif
+}
+
+static void install_signal_handlers() {
+#if defined(_WIN32)
+    std::signal(SIGINT, probe_signal_handler);
+    std::signal(SIGTERM, probe_signal_handler);
+#else
+    struct sigaction sa;
+    std::memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = probe_signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;  // do not break model-file reads with EINTR
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+#endif
+}
+
+// -----------------------------------------------------------------------------
+// small utilities
+// -----------------------------------------------------------------------------
+#if defined(__GNUC__)
+#    define PROBE_PRINTF(a, b) __attribute__((format(printf, a, b)))
+#else
+#    define PROBE_PRINTF(a, b)
+#endif
+
+// probe messages go to stderr; the llama.cpp async logger is drained first so
+// that lines do not interleave
+static void plog(const char * level, const char * fmt, ...) PROBE_PRINTF(2, 3);
+
+static void plog(const char * level, const char * fmt, ...) {
+    common_log_flush(common_log_main());
+    std::fprintf(stderr, "pigemma-probe: %s", level);
+    va_list ap;
+    va_start(ap, fmt);
+    std::vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    std::fputc('\n', stderr);
+    std::fflush(stderr);
+}
+
+#define PINFO(...) plog("", __VA_ARGS__)
+#define PWARN(...) plog("WARNING: ", __VA_ARGS__)
+#define PERR(...)  plog("ERROR: ", __VA_ARGS__)
+
+static std::string strf(const char * fmt, ...) PROBE_PRINTF(1, 2);
+
+static std::string strf(const char * fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    va_list ap2;
+    va_copy(ap2, ap);
+    const int n = std::vsnprintf(nullptr, 0, fmt, ap);
+    va_end(ap);
+    std::string out;
+    if (n > 0) {
+        out.resize((size_t) n + 1);
+        std::vsnprintf(&out[0], out.size(), fmt, ap2);
+        out.resize((size_t) n);
+    }
+    va_end(ap2);
+    return out;
+}
+
+static double now_ms() {
+    using namespace std::chrono;
+    return duration<double, std::milli>(steady_clock::now().time_since_epoch()).count();
+}
+
+static std::string iso_utc_now() {
+    const std::time_t t = std::time(nullptr);
+    std::tm           tm{};
+#if defined(_WIN32)
+    gmtime_s(&tm, &t);
+#else
+    gmtime_r(&t, &tm);
+#endif
+    char buf[32];
+    std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", &tm);
+    return buf;
+}
+
+static bool host_is_little_endian() {
+    const uint16_t x = 1;
+    uint8_t        b = 0;
+    std::memcpy(&b, &x, 1);
+    return b == 1;
+}
+
+static void put_u16(uint8_t * p, uint16_t v) {
+    p[0] = (uint8_t) (v & 0xFFu);
+    p[1] = (uint8_t) ((v >> 8) & 0xFFu);
+}
+
+static void put_u32(uint8_t * p, uint32_t v) {
+    for (int i = 0; i < 4; ++i) {
+        p[i] = (uint8_t) ((v >> (8 * i)) & 0xFFu);
+    }
+}
+
+static void put_u64(uint8_t * p, uint64_t v) {
+    for (int i = 0; i < 8; ++i) {
+        p[i] = (uint8_t) ((v >> (8 * i)) & 0xFFu);
+    }
+}
+
+static uint64_t round_up8(uint64_t v) {
+    return (v + 7u) & ~uint64_t(7);
+}
+
+static double round3(double v) {
+    return std::round(v * 1000.0) / 1000.0;
+}
+
+static ojson num_or_null(double v) {
+    if (!std::isfinite(v)) {
+        return ojson(nullptr);
+    }
+    return ojson(round3(v));
+}
+
+static ojson str_or_null(const std::string & s) {
+    return s.empty() ? ojson(nullptr) : ojson(s);
+}
+
+static std::string dump_json(const ojson & j, int indent = -1) {
+    return j.dump(indent, ' ', false, ojson::error_handler_t::replace);
+}
+
+static bool parse_i64(const std::string & s, int64_t lo, int64_t hi, int64_t & out) {
+    if (s.empty()) {
+        return false;
+    }
+    errno             = 0;
+    char *          end = nullptr;
+    const long long v   = std::strtoll(s.c_str(), &end, 10);
+    if (errno != 0 || end == s.c_str() || *end != '\0') {
+        return false;
+    }
+    if (v < lo || v > hi) {
+        return false;
+    }
+    out = (int64_t) v;
+    return true;
+}
+
+static std::string trim(const std::string & s) {
+    size_t a = 0;
+    size_t b = s.size();
+    while (a < b && (s[a] == ' ' || s[a] == '\t' || s[a] == '\r' || s[a] == '\n')) {
+        ++a;
+    }
+    while (b > a && (s[b - 1] == ' ' || s[b - 1] == '\t' || s[b - 1] == '\r' || s[b - 1] == '\n')) {
+        --b;
+    }
+    return s.substr(a, b - a);
+}
+
+static std::vector<std::string> split_csv(const std::string & s) {
+    std::vector<std::string> out;
+    size_t                   start = 0;
+    while (start <= s.size()) {
+        size_t comma = s.find(',', start);
+        if (comma == std::string::npos) {
+            comma = s.size();
+        }
+        const std::string item = trim(s.substr(start, comma - start));
+        if (!item.empty()) {
+            out.push_back(item);
+        }
+        start = comma + 1;
+    }
+    return out;
+}
+
+static std::string path_stem(const std::string & p) {
+    if (p.empty()) {
+        return "";
+    }
+    return fs::path(p).stem().string();
+}
+
+static bool read_file_bytes(const std::string & path, std::string & out, std::string & err) {
+    std::ifstream f(path, std::ios::binary);
+    if (!f) {
+        err = "cannot open '" + path + "'";
+        return false;
+    }
+    out.assign(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());
+    if (f.bad()) {
+        err = "error reading '" + path + "'";
+        return false;
+    }
+    return true;
+}
+
+static void strip_utf8_bom(std::string & s) {
+    if (s.size() >= 3 && (unsigned char) s[0] == 0xEF && (unsigned char) s[1] == 0xBB && (unsigned char) s[2] == 0xBF) {
+        s.erase(0, 3);
+    }
+}
+
+static bool make_parent_dirs(const std::string & path, std::string & err) {
+    const fs::path parent = fs::path(path).parent_path();
+    if (parent.empty()) {
+        return true;
+    }
+    std::error_code ec;
+    fs::create_directories(parent, ec);
+    if (ec) {
+        err = "cannot create directory '" + parent.string() + "': " + ec.message();
+        return false;
+    }
+    return true;
+}
+
+static std::string escape_for_log(const std::string & s, size_t max_len) {
+    std::string out;
+    for (size_t i = 0; i < s.size() && out.size() < max_len; ++i) {
+        const char c = s[i];
+        if (c == '\n') {
+            out += "\\n";
+        } else if (c == '\r') {
+            out += "\\r";
+        } else if (c == '\t') {
+            out += "\\t";
+        } else {
+            out += c;
+        }
+    }
+    if (out.size() >= max_len) {
+        out += "...";
+    }
+    return out;
+}
+
+// -----------------------------------------------------------------------------
+// probe options (pre-scanned out of argv before common_params_parse)
+// -----------------------------------------------------------------------------
+struct probe_opts {
+    std::string              mode;
+    std::string              trace_out;
+    int64_t                  gen              = 0;
+    bool                     gen_set          = false;
+    int64_t                  probs_top        = 0;
+    int64_t                  chunk_tokens     = 1024;
+    int64_t                  max_chunks       = 0;
+    int64_t                  tokens           = -1;  // -1 = unset
+    bool                     chat             = false;
+    std::string              chat_style       = "template";
+    bool                     chat_think       = false;
+    bool                     parse_special    = false;
+    std::string              gen_prompts;
+    std::string              replay;
+    bool                     replay_range_set = false;
+    bool                     replay_a_set     = false;
+    bool                     replay_b_set     = false;
+    int64_t                  replay_a         = 0;
+    int64_t                  replay_b         = 0;
+    std::string              replay_chunks;
+    std::string              io_csv;
+    std::vector<int>         layers;
+    bool                     layers_set = false;
+    std::vector<std::string> kinds;
+    bool                     kinds_set = false;
+    std::string              act_out;
+    std::string              corpus_id;
+    bool                     help    = false;
+    bool                     version = false;
+};
+
+struct opt_def {
+    const char * name;
+    bool         has_value;
+};
+
+static const opt_def k_probe_opts[] = {
+    { "--mode",          true  },
+    { "--trace-out",     true  },
+    { "--gen",           true  },
+    { "--probs-top",     true  },
+    { "--chunk-tokens",  true  },
+    { "--max-chunks",    true  },
+    { "--tokens",        true  },
+    { "--chat",          false },
+    { "--chat-style",    true  },
+    { "--chat-think",    false },
+    { "--parse-special", false },
+    { "--gen-prompts",   true  },
+    { "--replay",        true  },
+    { "--replay-range",  true  },
+    { "--replay-chunks", true  },
+    { "--io-csv",        true  },
+    { "--layers",        true  },
+    { "--kinds",         true  },
+    { "--act-out",       true  },
+    { "--corpus-id",     true  },
+};
+
+static bool valid_kind_name(const std::string & k) {
+    if (k.empty() || k.size() > 48) {
+        return false;
+    }
+    for (char c : k) {
+        const bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
+        if (!ok) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool apply_probe_opt(probe_opts & o, const std::string & name, const std::string & val, std::string & err) {
+    int64_t v = 0;
+    if (name == "--mode") {
+        if (val != "names" && val != "moe-trace" && val != "act-dump") {
+            err = "--mode must be names, moe-trace or act-dump (got '" + val + "')";
+            return false;
+        }
+        o.mode = val;
+    } else if (name == "--trace-out") {
+        o.trace_out = val;
+    } else if (name == "--gen") {
+        if (!parse_i64(val, 0, 1000000, v)) {
+            err = "--gen expects an integer 0..1000000";
+            return false;
+        }
+        o.gen     = v;
+        o.gen_set = true;
+    } else if (name == "--probs-top") {
+        if (!parse_i64(val, 0, MOETRACE_MAX_EXPERTS, v)) {
+            err = "--probs-top expects an integer 0..256";
+            return false;
+        }
+        o.probs_top = v;
+    } else if (name == "--chunk-tokens") {
+        if (!parse_i64(val, 2, 1 << 24, v)) {
+            err = "--chunk-tokens expects an integer >= 2";
+            return false;
+        }
+        o.chunk_tokens = v;
+    } else if (name == "--max-chunks") {
+        if (!parse_i64(val, 0, std::numeric_limits<int32_t>::max(), v)) {
+            err = "--max-chunks expects an integer >= 0";
+            return false;
+        }
+        o.max_chunks = v;
+    } else if (name == "--tokens") {
+        if (!parse_i64(val, 1, (int64_t) 1 << 32, v)) {
+            err = "--tokens expects an integer >= 1";
+            return false;
+        }
+        o.tokens = v;
+    } else if (name == "--chat") {
+        o.chat = true;
+    } else if (name == "--chat-style") {
+        if (val != "template" && val != "gemma4" && val != "gemma3") {
+            err = "--chat-style must be template, gemma4 or gemma3";
+            return false;
+        }
+        o.chat_style = val;
+    } else if (name == "--chat-think") {
+        o.chat_think = true;
+    } else if (name == "--parse-special") {
+        o.parse_special = true;
+    } else if (name == "--gen-prompts") {
+        o.gen_prompts = val;
+    } else if (name == "--replay") {
+        o.replay = val;
+    } else if (name == "--replay-range") {
+        const size_t colon = val.find(':');
+        if (colon == std::string::npos || val.find(':', colon + 1) != std::string::npos) {
+            err = "--replay-range expects A:B (Python slice; A or B may be empty)";
+            return false;
+        }
+        const std::string a = trim(val.substr(0, colon));
+        const std::string b = trim(val.substr(colon + 1));
+        o.replay_a_set      = !a.empty();
+        o.replay_b_set      = !b.empty();
+        if (o.replay_a_set && !parse_i64(a, -((int64_t) 1 << 40), (int64_t) 1 << 40, o.replay_a)) {
+            err = "--replay-range: bad start '" + a + "'";
+            return false;
+        }
+        if (o.replay_b_set && !parse_i64(b, -((int64_t) 1 << 40), (int64_t) 1 << 40, o.replay_b)) {
+            err = "--replay-range: bad end '" + b + "'";
+            return false;
+        }
+        o.replay_range_set = true;
+    } else if (name == "--replay-chunks") {
+        o.replay_chunks = val;
+    } else if (name == "--io-csv") {
+        o.io_csv = val;
+    } else if (name == "--layers") {
+        o.layers.clear();
+        for (const std::string & item : split_csv(val)) {
+            if (!parse_i64(item, 0, 100000, v)) {
+                err = "--layers expects a comma list of layer indices (got '" + item + "')";
+                return false;
+            }
+            o.layers.push_back((int) v);
+        }
+        if (o.layers.empty()) {
+            err = "--layers is empty";
+            return false;
+        }
+        std::sort(o.layers.begin(), o.layers.end());
+        o.layers.erase(std::unique(o.layers.begin(), o.layers.end()), o.layers.end());
+        o.layers_set = true;
+    } else if (name == "--kinds") {
+        o.kinds.clear();
+        for (const std::string & item : split_csv(val)) {
+            if (!valid_kind_name(item)) {
+                err = "--kinds: invalid tensor kind '" + item + "' (letters, digits and '_' only)";
+                return false;
+            }
+            if (std::find(o.kinds.begin(), o.kinds.end(), item) == o.kinds.end()) {
+                o.kinds.push_back(item);
+            }
+        }
+        if (o.kinds.empty()) {
+            err = "--kinds is empty";
+            return false;
+        }
+        o.kinds_set = true;
+    } else if (name == "--act-out") {
+        o.act_out = val;
+    } else if (name == "--corpus-id") {
+        o.corpus_id = val;
+    } else {
+        err = "internal: unhandled option " + name;
+        return false;
+    }
+    return true;
+}
+
+// Removes the probe's own flags from argv. Everything else (including argv[0])
+// is passed to common_params_parse. --opt=value is accepted for probe flags.
+static bool prescan_args(int argc, char ** argv, probe_opts & o, std::vector<char *> & rest, std::string & err) {
+    bool ok = true;
+    rest.clear();
+    rest.push_back(argv[0]);
+    for (int i = 1; i < argc; ++i) {
+        const std::string a = argv[i];
+        if (a == "-h" || a == "--help" || a == "--usage") {
+            o.help = true;
+            rest.push_back(argv[i]);
+            continue;
+        }
+        if (a == "--version") {
+            o.version = true;
+            rest.push_back(argv[i]);
+            continue;
+        }
+        std::string name = a;
+        std::string inline_val;
+        bool        has_inline = false;
+        if (a.rfind("--", 0) == 0) {
+            const size_t eq = a.find('=');
+            if (eq != std::string::npos) {
+                name       = a.substr(0, eq);
+                inline_val = a.substr(eq + 1);
+                has_inline = true;
+            }
+        }
+        const opt_def * def = nullptr;
+        for (const opt_def & d : k_probe_opts) {
+            if (name == d.name) {
+                def = &d;
+                break;
+            }
+        }
+        if (def == nullptr) {
+            rest.push_back(argv[i]);
+            continue;
+        }
+        std::string val;
+        if (def->has_value) {
+            if (has_inline) {
+                val = inline_val;
+            } else if (i + 1 < argc) {
+                val = argv[++i];
+            } else {
+                if (ok) {
+                    err = std::string(def->name) + " expects a value";
+                }
+                ok = false;
+                continue;
+            }
+        } else if (has_inline) {
+            if (ok) {
+                err = std::string(def->name) + " does not take a value";
+            }
+            ok = false;
+            continue;
+        }
+        std::string e;
+        if (!apply_probe_opt(o, def->name, val, e)) {
+            if (ok) {
+                err = e;
+            }
+            ok = false;
+        }
+    }
+    return ok;
+}
+
+static const char * k_probe_help =
+    "\n\n----- PIGEMMA probe options (pigemma-probe) -----\n\n"
+    "--mode names|moe-trace|act-dump  (required) what the eval-callback recorder captures:\n"
+    "                                 names     = every graph tensor name, sorted + unique, to stdout\n"
+    "                                 moe-trace = .moetrace routing trace (ffn_moe_topk ids + ffn_moe_weights_norm)\n"
+    "                                 act-dump  = fp16 activations L<il>.<kind>.npy of chosen layers/kinds\n"
+    "--trace-out FILE                 moe-trace output (.moetrace); sidecars FILE.tokens.bin, FILE.gen.txt\n"
+    "--gen N                          greedy tokens generated after each chunk (default 0; with --gen-prompts the\n"
+    "                                 default is each item's max_tokens). EOG stops generation and is not recorded\n"
+    "--probs-top P                    also store the P most probable experts (ffn_moe_probs) per layer (default 0)\n"
+    "--chunk-tokens N                 split the tokenised -p/-f text (or a replay) into fresh-context chunks of at\n"
+    "                                 most N tokens; BOS is inserted at the start of every text chunk (default 1024)\n"
+    "--max-chunks N                   process at most N chunks (default 0 = all)\n"
+    "--tokens T                       stop after T recorded tokens (prefill + generated). act-dump: also the npy\n"
+    "                                 header T_MAX (default 512); other modes: default unlimited\n"
+    "--chat                           wrap each prompt as one user turn + generation prompt\n"
+    "--chat-style S                   template (default: the GGUF tokenizer.chat_template, thinking off) |\n"
+    "                                 gemma4 (literal <|turn>user..<turn|>..<|turn>model..) |\n"
+    "                                 gemma3 (literal <start_of_turn>user..<end_of_turn>..<start_of_turn>model)\n"
+    "--chat-think                     enable the thinking channel when rendering the chat template\n"
+    "--parse-special                  parse special-token text in raw -p/-f input (default: literal text)\n"
+    "--gen-prompts FILE.json          prompts list (strings, or objects with \"prompt\" [, \"max_tokens\", \"id\"]);\n"
+    "                                 each prompt is its own chunk (data/prompts/gen_prompts.json)\n"
+    "--replay FILE                    teacher-forced replay of a raw i32 LE token stream (X.moetrace.tokens.bin);\n"
+    "                                 ignores -p/-f and --gen; every record is phase 0; no BOS is inserted\n"
+    "--replay-range A:B               replay tokens[A:B] (Python slice semantics, empty = start/end)\n"
+    "--replay-chunks FILE.json        object with a \"chunks\" array (n_prompt, n_gen) of the source stream: also cut\n"
+    "                                 the replay at those chunk boundaries (e.g. <trace>.meta.json)\n"
+    "--io-csv FILE                    Linux only: one row per ubatch: token_index,phase,wall_ms,read_bytes_delta,\n"
+    "                                 majflt_delta,rss_anon_kb,rss_file_kb (from /proc/self/{io,stat,status})\n"
+    "--layers L1,L2,...               act-dump layers (default 5,20,35,50)\n"
+    "--kinds K1,K2,...                act-dump tensor kinds (default ffn_norm,ffn_geglu,ffn_out)\n"
+    "--act-out DIR                    act-dump output directory (L<il>.<kind>.npy, phase.u8, tokens.bin, meta.json)\n"
+    "--corpus-id S                    corpus id for the trace header (default: -f basename without extension,\n"
+    "                                 'prompt' for -p, the prompts-file stem, or 'replay')\n"
+    "\n"
+    "The probe always sets warmup=false (warm-up routes every token to all experts). Formats: docs/TRACE_FORMAT.md.\n"
+    "Without -c the context is max(4096, chunk + gen + 8) tokens, not the model's training context.\n"
+    "Exit codes: 0 ok, 2 usage, 3 load/compute/output failure, 4 tensor contract violation,\n"
+    "128+signal when interrupted (outputs are closed cleanly). A one-line 'PIGEMMA_SUMMARY {json}' goes to stderr.\n"
+    "Example (26B smoke trace, 64 prompt + 8 generated tokens):\n"
+    "  pigemma-probe --mode moe-trace -m 26b.gguf -f text.txt -nr -t 6 -c 4096 --chunk-tokens 64 --gen 8 \\\n"
+    "                --tokens 72 --trace-out traces/26b/smoke.moetrace\n";
+
+static void print_probe_usage_tail(int /*argc*/, char ** /*argv*/) {
+    std::fputs(k_probe_help, stdout);
+    std::fflush(stdout);
+}
+
+static void print_probe_banner(FILE * out) {
+    std::fprintf(out,
+                 "pigemma-probe %s (llama.cpp build %d, commit %s) - cb_eval recorder: names | moe-trace | act-dump\n",
+                 PROBE_VERSION, llama_build_number(), llama_commit());
+    std::fprintf(out,
+                 "usage: pigemma-probe --mode MODE -m MODEL.gguf (-p TEXT | -f FILE | --gen-prompts F | --replay F) "
+                 "[options]\n");
+    std::fprintf(out, "the llama.cpp options are listed first, the PIGEMMA probe options at the end\n\n");
+    std::fflush(out);
+}
+
+// -----------------------------------------------------------------------------
+// /proc sampling for --io-csv (Linux)
+// -----------------------------------------------------------------------------
+struct proc_sample {
+    int64_t read_bytes  = -1;
+    int64_t majflt      = -1;
+    int64_t rss_anon_kb = -1;
+    int64_t rss_file_kb = -1;
+};
+
+static proc_sample read_proc_sample() {
+    proc_sample s;
+#if defined(__linux__)
+    char line[512];
+    if (FILE * f = std::fopen("/proc/self/io", "r")) {
+        while (std::fgets(line, sizeof(line), f)) {
+            if (std::strncmp(line, "read_bytes:", 11) == 0) {
+                s.read_bytes = std::strtoll(line + 11, nullptr, 10);
+            }
+        }
+        std::fclose(f);
+    }
+    if (FILE * f = std::fopen("/proc/self/stat", "r")) {
+        char         buf[4096];
+        const size_t n = std::fread(buf, 1, sizeof(buf) - 1, f);
+        std::fclose(f);
+        buf[n]          = '\0';
+        const char * rp = std::strrchr(buf, ')');  // comm may contain spaces/parens
+        if (rp != nullptr) {
+            // the token after ')' is field 3 (state); majflt is field 12
+            const char * p     = rp + 1;
+            int          field = 2;
+            while (*p != '\0') {
+                while (*p == ' ') {
+                    ++p;
+                }
+                if (*p == '\0') {
+                    break;
+                }
+                ++field;
+                if (field == 12) {
+                    s.majflt = std::strtoll(p, nullptr, 10);
+                    break;
+                }
+                while (*p != '\0' && *p != ' ') {
+                    ++p;
+                }
+            }
+        }
+    }
+    if (FILE * f = std::fopen("/proc/self/status", "r")) {
+        while (std::fgets(line, sizeof(line), f)) {
+            if (std::strncmp(line, "RssAnon:", 8) == 0) {
+                s.rss_anon_kb = std::strtoll(line + 8, nullptr, 10);
+            } else if (std::strncmp(line, "RssFile:", 8) == 0) {
+                s.rss_file_kb = std::strtoll(line + 8, nullptr, 10);
+            }
+        }
+        std::fclose(f);
+    }
+#endif
+    return s;
+}
+
+// -----------------------------------------------------------------------------
+// recorder state shared with the eval callback
+// -----------------------------------------------------------------------------
+struct layer_acc {
+    std::vector<uint8_t> ids;  // n_topk * K expert ids (ffn_moe_topk order)
+    std::vector<float>   w;    // n_w * K weights (ffn_moe_weights_norm)
+    std::vector<uint8_t> pid;  // n_p * P prob ids (descending)
+    std::vector<float>   pp;   // n_p * P probs
+    int64_t              n_topk = 0;
+    int64_t              n_w    = 0;
+    int64_t              n_p    = 0;
+
+    void clear() {
+        ids.clear();
+        w.clear();
+        pid.clear();
+        pp.clear();
+        n_topk = n_w = n_p = 0;
+    }
+};
+
+struct act_target {
+    int         il       = -1;
+    int         kind_idx = -1;
+    std::string kind;
+    std::string path;
+    FILE *      f          = nullptr;
+    int64_t     ne0        = -1;  // seen
+    int64_t     expect_ne0 = -1;  // -1 = no expectation
+    int64_t     rows       = 0;   // rows written to the file
+    int64_t     cols_call  = 0;   // columns received during the current decode call
+    int64_t     nonfinite  = 0;   // f16 values that overflowed to +-inf or were NaN
+};
+
+struct probe_state {
+    probe_mode mode      = probe_mode::none;
+    int        n_layer   = 0;
+    int        n_expert  = 0;  // E
+    int        n_used    = 0;  // K
+    int        probs_top = 0;  // P
+    int64_t    t_max     = 0;  // act-dump npy header rows at open
+
+    // names
+    std::set<std::string> names;
+
+    // moe-trace
+    std::vector<layer_acc> acc;
+
+    // act-dump
+    std::vector<std::string>      kinds;
+    std::vector<std::vector<int>> act_index;  // [kind][layer] -> target index or -1
+    std::vector<act_target>       targets;
+    std::vector<ggml_fp16_t>      f16buf;
+    std::vector<float>            rowbuf;
+
+    // io.csv
+    FILE *  io            = nullptr;
+    bool    io_started    = false;
+    double  io_prev_ms    = 0.0;
+    int64_t io_prev_read  = -1;
+    int64_t io_prev_majfl = -1;
+    int64_t io_base       = 0;  // token_index of the first token of the current decode call
+    int64_t io_done       = 0;  // tokens covered by rows in the current decode call
+    int64_t io_submitted  = 0;  // tokens submitted so far in the current decode call
+    int     ubatch_T      = 0;  // columns seen in the current ubatch
+    int     n_ubatch      = 1;
+    uint8_t phase         = 0;
+    int64_t io_rows       = 0;
+
+    // misc
+    std::vector<uint8_t> scratch;
+    std::vector<float>   pvals;
+    std::vector<int>     pidx;
+    double               cb_ms      = 0.0;
+    int                  fatal_code = 0;
+    std::string          fatal_msg;
+
+    void fail(int code, const std::string & msg) {
+        if (fatal_code == 0) {
+            fatal_code = code;
+            fatal_msg  = msg;
+        }
+    }
+
+    int kind_index(std::string_view base) const {
+        for (size_t i = 0; i < kinds.size(); ++i) {
+            if (base == kinds[i]) {
+                return (int) i;
+            }
+        }
+        return -1;
+    }
+
+    void reset_call() {
+        for (auto & a : acc) {
+            a.clear();
+        }
+        for (auto & tg : targets) {
+            tg.cols_call = 0;
+        }
+        ubatch_T = 0;
+    }
+};
+
+// "<base>-<il>" -> base, il (il must be a plain non-negative decimal)
+static bool split_layer_name(const char * name, std::string_view & base, int & il) {
+    const char * dash = std::strrchr(name, '-');
+    if (dash == nullptr || dash == name || dash[1] == '\0') {
+        return false;
+    }
+    long v = 0;
+    for (const char * p = dash + 1; *p != '\0'; ++p) {
+        if (*p < '0' || *p > '9') {
+            return false;
+        }
+        v = v * 10 + (*p - '0');
+        if (v > 1000000) {
+            return false;
+        }
+    }
+    base = std::string_view(name, (size_t) (dash - name));
+    il   = (int) v;
+    return true;
+}
+
+static std::string tensor_desc(const ggml_tensor * t) {
+    return strf("'%s' %s ne=[%lld,%lld,%lld,%lld] nb=[%zu,%zu,%zu,%zu]", t->name, ggml_type_name(t->type),
+                (long long) t->ne[0], (long long) t->ne[1], (long long) t->ne[2], (long long) t->ne[3], t->nb[0],
+                t->nb[1], t->nb[2], t->nb[3]);
+}
+
+static const uint8_t * tensor_bytes(probe_state & st, const ggml_tensor * t) {
+    if (t->buffer == nullptr || ggml_backend_buffer_is_host(t->buffer)) {
+        return (const uint8_t *) t->data;
+    }
+    const size_t n = ggml_nbytes(t);
+    st.scratch.resize(n);
+    ggml_backend_tensor_get(t, st.scratch.data(), 0, n);
+    return st.scratch.data();
+}
+
+static std::string npy_header(int64_t rows, int64_t ne0) {
+    const std::string dict = "{'descr': '<f2', 'fortran_order': False, 'shape': (" + std::to_string(rows) + ", " +
+                             std::to_string(ne0) + "), }";
+    static const char magic[8] = { '\x93', 'N', 'U', 'M', 'P', 'Y', '\x01', '\x00' };
+    std::string       h(magic, 8);
+    h.push_back((char) (NPY_HEADER_LEN_FIELD & 0xFF));
+    h.push_back((char) ((NPY_HEADER_LEN_FIELD >> 8) & 0xFF));
+    h += dict;
+    while (h.size() < (size_t) NPY_HEADER_BYTES - 1) {
+        h.push_back(' ');
+    }
+    h.push_back('\n');
+    return h;
+}
+
+static void io_start(probe_state & st) {
+    const proc_sample s = read_proc_sample();
+    st.io_prev_ms       = now_ms();
+    st.io_prev_read     = s.read_bytes;
+    st.io_prev_majfl    = s.majflt;
+    st.io_started       = true;
+}
+
+static void io_emit(probe_state & st, int64_t n_tok) {
+    if (st.io == nullptr || n_tok <= 0) {
+        return;
+    }
+    const double      t = now_ms();
+    const proc_sample s = read_proc_sample();
+    st.io_done += n_tok;
+    const int64_t tok_idx = st.io_base + st.io_done - 1;
+    const int64_t dread   = (s.read_bytes >= 0 && st.io_prev_read >= 0) ? s.read_bytes - st.io_prev_read : 0;
+    const int64_t dmaj    = (s.majflt >= 0 && st.io_prev_majfl >= 0) ? s.majflt - st.io_prev_majfl : 0;
+    if (std::fprintf(st.io, "%lld,%u,%.3f,%lld,%lld,%lld,%lld\n", (long long) tok_idx, (unsigned) st.phase,
+                     t - st.io_prev_ms, (long long) dread, (long long) dmaj, (long long) s.rss_anon_kb,
+                     (long long) s.rss_file_kb) < 0) {
+        st.fail(PROBE_EXIT_RUNTIME, "cannot write the --io-csv file");
+    }
+    st.io_prev_ms    = t;
+    st.io_prev_read  = s.read_bytes;
+    st.io_prev_majfl = s.majflt;
+    st.io_rows++;
+}
+
+static bool probe_wants(probe_state & st, const ggml_tensor * t) {
+    if (st.fatal_code != 0) {
+        return false;
+    }
+    if (st.mode == probe_mode::names) {
+        st.names.emplace(t->name);
+        return false;
+    }
+    if (st.io != nullptr && std::strcmp(t->name, "result_output") == 0) {
+        return true;
+    }
+    std::string_view base;
+    int              il = -1;
+    if (!split_layer_name(t->name, base, il) || il >= st.n_layer) {
+        return false;
+    }
+    if (st.mode == probe_mode::moe_trace) {
+        return base == "ffn_moe_topk" || base == MOETRACE_WEIGHTS_TENSOR ||
+               (st.probs_top > 0 && base == "ffn_moe_probs");
+    }
+    if (st.mode == probe_mode::act_dump) {
+        const int k = st.kind_index(base);
+        return k >= 0 && st.act_index[(size_t) k][(size_t) il] >= 0;
+    }
+    return false;
+}
+
+static void collect_topk(probe_state & st, const ggml_tensor * t, int il, const uint8_t * d) {
+    const int K = st.n_used;
+    if (t->type != GGML_TYPE_I32 || t->ne[0] != K || t->ne[2] != 1 || t->ne[3] != 1 || t->nb[0] != 4) {
+        st.fail(PROBE_EXIT_CONTRACT, strf("tensor contract: expected ffn_moe_topk I32 ne=[K=%d,T,1,1] nb[0]=4, got %s",
+                                          K, tensor_desc(t).c_str()));
+        return;
+    }
+    const int64_t T = t->ne[1];
+    layer_acc &   a = st.acc[(size_t) il];
+    for (int64_t c = 0; c < T; ++c) {
+        for (int k = 0; k < K; ++k) {
+            int32_t v = 0;
+            std::memcpy(&v, d + (size_t) k * t->nb[0] + (size_t) c * t->nb[1], 4);
+            if (v < 0 || v >= st.n_expert) {
+                st.fail(PROBE_EXIT_CONTRACT, strf("tensor contract: %s holds expert id %d outside [0,%d)",
+                                                  tensor_desc(t).c_str(), (int) v, st.n_expert));
+                return;
+            }
+            a.ids.push_back((uint8_t) v);
+        }
+    }
+    a.n_topk += T;
+    st.ubatch_T = (int) T;
+}
+
+static void collect_weights(probe_state & st, const ggml_tensor * t, int il, const uint8_t * d) {
+    const int K    = st.n_used;
+    int64_t   T    = 0;
+    size_t    sk   = 0;
+    size_t    stok = 0;
+    bool      ok   = t->type == GGML_TYPE_F32 && t->nb[0] == 4 && t->ne[3] == 1;
+    if (ok && t->ne[0] == K && t->ne[2] == 1) {  // [K, T] at a7b94df (TRACE_FORMAT D1)
+        T    = t->ne[1];
+        sk   = t->nb[0];
+        stok = t->nb[1];
+    } else if (ok && t->ne[0] == 1 && t->ne[1] == K) {  // [1, K, T] (manifest wording)
+        T    = t->ne[2];
+        sk   = t->nb[1];
+        stok = t->nb[2];
+    } else {
+        ok = false;
+    }
+    if (!ok) {
+        st.fail(PROBE_EXIT_CONTRACT,
+                strf("tensor contract: expected ffn_moe_weights_norm F32 ne=[K=%d,T] or [1,K,T] with nb[0]=4, got %s", K,
+                     tensor_desc(t).c_str()));
+        return;
+    }
+    layer_acc & a = st.acc[(size_t) il];
+    for (int64_t c = 0; c < T; ++c) {
+        for (int k = 0; k < K; ++k) {
+            float v = 0.0f;
+            std::memcpy(&v, d + (size_t) k * sk + (size_t) c * stok, 4);
+            a.w.push_back(v);
+        }
+    }
+    a.n_w += T;
+    st.ubatch_T = (int) T;
+}
+
+static void collect_probs(probe_state & st, const ggml_tensor * t, int il, const uint8_t * d) {
+    const int E = st.n_expert;
+    const int P = st.probs_top;
+    if (t->type != GGML_TYPE_F32 || t->ne[0] != E || t->ne[2] != 1 || t->ne[3] != 1 || t->nb[0] != 4) {
+        st.fail(PROBE_EXIT_CONTRACT, strf("tensor contract: expected ffn_moe_probs F32 ne=[E=%d,T,1,1] nb[0]=4, got %s",
+                                          E, tensor_desc(t).c_str()));
+        return;
+    }
+    const int64_t T = t->ne[1];
+    layer_acc &   a = st.acc[(size_t) il];
+    st.pvals.resize((size_t) E);
+    st.pidx.resize((size_t) E);
+    const std::vector<float> & pv  = st.pvals;
+    auto                       key = [&pv](int i) {
+        const float v = pv[(size_t) i];
+        return std::isnan(v) ? -std::numeric_limits<float>::infinity() : v;
+    };
+    for (int64_t c = 0; c < T; ++c) {
+        for (int e = 0; e < E; ++e) {
+            std::memcpy(&st.pvals[(size_t) e], d + (size_t) e * t->nb[0] + (size_t) c * t->nb[1], 4);
+        }
+        std::iota(st.pidx.begin(), st.pidx.end(), 0);
+        std::partial_sort(st.pidx.begin(), st.pidx.begin() + P, st.pidx.end(), [&key](int x, int y) {
+            const float kx = key(x);
+            const float ky = key(y);
+            return kx > ky || (kx == ky && x < y);  // descending, ties to the lower id
+        });
+        for (int p = 0; p < P; ++p) {
+            a.pid.push_back((uint8_t) st.pidx[(size_t) p]);
+            a.pp.push_back(st.pvals[(size_t) st.pidx[(size_t) p]]);
+        }
+    }
+    a.n_p += T;
+    st.ubatch_T = (int) T;
+}
+
+static void collect_act(probe_state & st, const ggml_tensor * t, int il, std::string_view base, const uint8_t * d) {
+    const int k = st.kind_index(base);
+    if (k < 0) {
+        return;
+    }
+    const int ti = st.act_index[(size_t) k][(size_t) il];
+    if (ti < 0) {
+        return;
+    }
+    act_target & tg = st.targets[(size_t) ti];
+    if (t->type != GGML_TYPE_F32 || t->nb[0] != 4 || t->ne[0] <= 0 || t->ne[2] != 1 || t->ne[3] != 1) {
+        st.fail(PROBE_EXIT_CONTRACT, strf("tensor contract: expected activation F32 ne=[ne0,T,1,1] nb[0]=4, got %s",
+                                          tensor_desc(t).c_str()));
+        return;
+    }
+    const int64_t ne0 = t->ne[0];
+    if (tg.expect_ne0 > 0 && ne0 != tg.expect_ne0) {
+        st.fail(PROBE_EXIT_CONTRACT,
+                strf("tensor contract: %s has ne0=%lld, expected %lld for kind '%s'", tensor_desc(t).c_str(),
+                     (long long) ne0, (long long) tg.expect_ne0, tg.kind.c_str()));
+        return;
+    }
+    if (tg.ne0 < 0) {
+        tg.f = std::fopen(tg.path.c_str(), "wb");
+        if (tg.f == nullptr) {
+            st.fail(PROBE_EXIT_RUNTIME, "cannot create '" + tg.path + "': " + std::strerror(errno));
+            return;
+        }
+        const std::string h = npy_header(st.t_max, ne0);
+        if (std::fwrite(h.data(), 1, h.size(), tg.f) != h.size()) {
+            st.fail(PROBE_EXIT_RUNTIME, "cannot write '" + tg.path + "'");
+            return;
+        }
+        tg.ne0 = ne0;
+    } else if (tg.ne0 != ne0) {
+        st.fail(PROBE_EXIT_CONTRACT, strf("tensor contract: %s changed ne0 from %lld to %lld", tensor_desc(t).c_str(),
+                                          (long long) tg.ne0, (long long) ne0));
+        return;
+    }
+    const int64_t T = t->ne[1];
+    st.f16buf.resize((size_t) ne0);
+    for (int64_t c = 0; c < T; ++c) {
+        const uint8_t * src = d + (size_t) c * t->nb[1];
+        const float *   row = nullptr;
+        if (((uintptr_t) src % alignof(float)) == 0) {
+            row = (const float *) src;
+        } else {
+            st.rowbuf.resize((size_t) ne0);
+            std::memcpy(st.rowbuf.data(), src, (size_t) ne0 * sizeof(float));
+            row = st.rowbuf.data();
+        }
+        ggml_fp32_to_fp16_row(row, st.f16buf.data(), ne0);
+        for (int64_t i = 0; i < ne0; ++i) {
+            if ((st.f16buf[(size_t) i] & 0x7C00u) == 0x7C00u) {
+                tg.nonfinite++;
+            }
+        }
+        if (std::fwrite(st.f16buf.data(), sizeof(ggml_fp16_t), (size_t) ne0, tg.f) != (size_t) ne0) {
+            st.fail(PROBE_EXIT_RUNTIME, "cannot write '" + tg.path + "' (disk full?)");
+            return;
+        }
+    }
+    tg.rows += T;
+    tg.cols_call += T;
+    st.ubatch_T = (int) T;
+}
+
+static void probe_collect(probe_state & st, ggml_tensor * t) {
+    if (st.io != nullptr && std::strcmp(t->name, "result_output") == 0) {
+        const int64_t left = st.io_submitted - st.io_done;
+        const int64_t n =
+            st.ubatch_T > 0 ? std::min<int64_t>(st.ubatch_T, left) : std::min<int64_t>(st.n_ubatch, left);
+        io_emit(st, n);
+        st.ubatch_T = 0;
+        return;
+    }
+    std::string_view base;
+    int              il = -1;
+    if (!split_layer_name(t->name, base, il) || il >= st.n_layer) {
+        return;
+    }
+    const uint8_t * d = tensor_bytes(st, t);
+    if (d == nullptr) {
+        st.fail(PROBE_EXIT_RUNTIME, "tensor " + tensor_desc(t) + " has no data");
+        return;
+    }
+    if (st.mode == probe_mode::moe_trace) {
+        if (base == "ffn_moe_topk") {
+            collect_topk(st, t, il, d);
+        } else if (base == MOETRACE_WEIGHTS_TENSOR) {
+            collect_weights(st, t, il, d);
+        } else if (base == "ffn_moe_probs") {
+            collect_probs(st, t, il, d);
+        }
+    } else if (st.mode == probe_mode::act_dump) {
+        collect_act(st, t, il, base, d);
+    }
+}
+
+// the ggml_backend_sched eval callback: ask=true -> "do you want this node?",
+// ask=false -> data of a node we asked for (returning false stops the graph)
+static bool probe_cb(ggml_tensor * t, bool ask, void * user_data) {
+    auto *       st = static_cast<probe_state *>(user_data);
+    const double t0 = now_ms();
+    bool         r  = true;
+    if (ask) {
+        r = probe_wants(*st, t);
+    } else {
+        probe_collect(*st, t);
+        r = st->fatal_code == 0;
+    }
+    st->cb_ms += now_ms() - t0;
+    return r;
+}
+
+// -----------------------------------------------------------------------------
+// .moetrace writer (TRACE_FORMAT section 3.5)
+// -----------------------------------------------------------------------------
+struct trace_writer {
+    std::string path;
+    std::string tok_path;
+    FILE *      f              = nullptr;
+    FILE *      ftok           = nullptr;
+    uint64_t    H              = 0;
+    uint32_t    R              = 0;
+    uint64_t    n              = 0;
+    bool        header_written = false;
+
+    bool open(const std::string & p, std::string & err) {
+        path     = p;
+        tok_path = p + SIDECAR_TOKENS;
+        if (!make_parent_dirs(p, err)) {
+            return false;
+        }
+        f = std::fopen(path.c_str(), "wb");
+        if (f == nullptr) {
+            err = "cannot create '" + path + "': " + std::strerror(errno);
+            return false;
+        }
+        ftok = std::fopen(tok_path.c_str(), "wb");
+        if (ftok == nullptr) {
+            err = "cannot create '" + tok_path + "': " + std::strerror(errno);
+            return false;
+        }
+#if !defined(_WIN32)
+        g_trace_fd = fileno(f);
+#endif
+        return true;
+    }
+
+    static bool write_fixed(FILE * out, uint64_t h, uint32_t r, uint64_t nrec) {
+        uint8_t fixed[32];
+        std::memset(fixed, 0, sizeof(fixed));
+        std::memcpy(fixed, MOETRACE_MAGIC, 8);
+        put_u32(fixed + 8, (uint32_t) h);
+        put_u32(fixed + 12, r);
+        put_u64(fixed + 16, nrec);
+        put_u64(fixed + 24, 0);
+        return std::fwrite(fixed, 1, sizeof(fixed), out) == sizeof(fixed);
+    }
+
+    static bool write_json_padded(FILE * out, const std::string & js, uint64_t h) {
+        if (std::fwrite(js.data(), 1, js.size(), out) != js.size()) {
+            return false;
+        }
+        const std::string pad((size_t) (h - js.size()), ' ');
+        return pad.empty() || std::fwrite(pad.data(), 1, pad.size(), out) == pad.size();
+    }
+
+    bool write_header(const std::string & js, uint32_t record_size, std::string & err) {
+        R = record_size;
+        H = round_up8(js.size() + MOETRACE_HEADER_RESERVE_BYTES);
+        if (H > 0x7FFFFFFFull) {
+            err = "trace header too large";
+            return false;
+        }
+        if (!write_fixed(f, H, R, MOETRACE_N_RECORDS_OPEN) || !write_json_padded(f, js, H) || std::fflush(f) != 0) {
+            err = "cannot write the trace header to '" + path + "'";
+            return false;
+        }
+        header_written         = true;
+        g_trace_header_written = 1;
+        return true;
+    }
+
+    bool append(const std::vector<uint8_t> & rec, int32_t token_id) {
+        if (std::fwrite(rec.data(), 1, rec.size(), f) != rec.size()) {
+            return false;
+        }
+        uint8_t tb[4];
+        put_u32(tb, (uint32_t) token_id);
+        if (std::fwrite(tb, 1, 4, ftok) != 4) {
+            return false;
+        }
+        ++n;
+        return true;
+    }
+
+    bool flush() {
+        if (std::fflush(f) != 0 || std::fflush(ftok) != 0) {
+            return false;
+        }
+        g_committed_records.store(n);
+        return true;
+    }
+
+    // final header in place (or a full rewrite if it outgrew the reserve), n_records LAST
+    bool close(const std::string & js, std::string & err) {
+        g_trace_fd = -1;
+        bool ok    = flush();
+        if (ok && js.size() <= H) {
+            ok = std::fseek(f, 32, SEEK_SET) == 0 && write_json_padded(f, js, H) && std::fflush(f) == 0;
+            uint8_t nb[8];
+            put_u64(nb, n);
+            ok = ok && std::fseek(f, 16, SEEK_SET) == 0 && std::fwrite(nb, 1, 8, f) == 8 && std::fflush(f) == 0;
+            ok = (std::fclose(f) == 0) && ok;
+            f  = nullptr;
+            if (!ok) {
+                err = "cannot finalise '" + path + "'";
+            }
+        } else if (ok) {
+            ok = rewrite(js, err);
+        } else {
+            err = "cannot flush '" + path + "'";
+        }
+        if (ftok != nullptr) {
+            ok   = (std::fclose(ftok) == 0) && ok;
+            ftok = nullptr;
+        }
+        return ok;
+    }
+
+    bool rewrite(const std::string & js, std::string & err) {
+        std::fclose(f);
+        f                     = nullptr;
+        const uint64_t    H2  = round_up8(js.size() + MOETRACE_HEADER_RESERVE_BYTES);
+        const std::string tmp = path + ".tmp";
+        FILE *            in  = std::fopen(path.c_str(), "rb");
+        FILE *            out = std::fopen(tmp.c_str(), "wb");
+        bool              ok  = in != nullptr && out != nullptr && H2 <= 0x7FFFFFFFull;
+        ok                    = ok && write_fixed(out, H2, R, MOETRACE_N_RECORDS_OPEN) && write_json_padded(out, js, H2);
+        ok                    = ok && std::fseek(in, (long) (32 + H), SEEK_SET) == 0;
+        uint64_t          left = n * (uint64_t) R;
+        std::vector<char> buf(1 << 20);
+        while (ok && left > 0) {
+            const size_t want = (size_t) std::min<uint64_t>(left, buf.size());
+            ok = std::fread(buf.data(), 1, want, in) == want && std::fwrite(buf.data(), 1, want, out) == want;
+            left -= want;
+        }
+        uint8_t nb[8];
+        put_u64(nb, n);
+        ok = ok && std::fflush(out) == 0 && std::fseek(out, 16, SEEK_SET) == 0 && std::fwrite(nb, 1, 8, out) == 8;
+        if (in != nullptr) {
+            std::fclose(in);
+        }
+        if (out != nullptr) {
+            ok = (std::fclose(out) == 0) && ok;
+        }
+        if (ok) {
+            std::error_code ec;
+            fs::rename(tmp, path, ec);
+            if (ec) {
+                fs::remove(path, ec);
+                fs::rename(tmp, path, ec);
+            }
+            ok = !ec;
+        }
+        if (!ok) {
+            err = "cannot rewrite '" + path + "' with the grown header";
+        } else {
+            H = H2;
+        }
+        return ok;
+    }
+
+    // nothing was recorded: remove the empty outputs
+    void abandon() {
+        g_trace_fd = -1;
+        if (f != nullptr) {
+            std::fclose(f);
+            f = nullptr;
+        }
+        if (ftok != nullptr) {
+            std::fclose(ftok);
+            ftok = nullptr;
+        }
+        if (!path.empty()) {
+            std::error_code ec;
+            fs::remove(path, ec);
+            fs::remove(tok_path, ec);
+        }
+    }
+};
+
+// -----------------------------------------------------------------------------
+// inputs
+// -----------------------------------------------------------------------------
+struct gen_prompt_item {
+    std::string prompt;
+    int64_t     max_tokens = -1;
+    std::string id;
+};
+
+static bool load_gen_prompts(const std::string & path, std::vector<gen_prompt_item> & out, std::string & err) {
+    std::string text;
+    if (!read_file_bytes(path, text, err)) {
+        return false;
+    }
+    strip_utf8_bom(text);
+    json j;
+    try {
+        j = json::parse(text);
+    } catch (const std::exception & e) {
+        err = "--gen-prompts: '" + path + "' is not valid JSON: " + e.what();
+        return false;
+    }
+    const json * arr = &j;
+    if (j.is_object() && j.contains("prompts")) {
+        arr = &j["prompts"];
+    }
+    if (!arr->is_array()) {
+        err = "--gen-prompts: expected a JSON array (or an object with a 'prompts' array)";
+        return false;
+    }
+    for (size_t i = 0; i < arr->size(); ++i) {
+        const json &    it = (*arr)[i];
+        gen_prompt_item g;
+        if (it.is_string()) {
+            g.prompt = it.get<std::string>();
+        } else if (it.is_object() && it.contains("prompt") && it["prompt"].is_string()) {
+            g.prompt = it["prompt"].get<std::string>();
+            if (it.contains("max_tokens") && it["max_tokens"].is_number_integer()) {
+                g.max_tokens = it["max_tokens"].get<int64_t>();
+            }
+            if (it.contains("id") && it["id"].is_string()) {
+                g.id = it["id"].get<std::string>();
+            }
+        } else {
+            err = strf("--gen-prompts: item %zu is neither a string nor an object with a string 'prompt'", i);
+            return false;
+        }
+        if (g.prompt.empty()) {
+            err = strf("--gen-prompts: item %zu has an empty prompt", i);
+            return false;
+        }
+        out.push_back(g);
+    }
+    if (out.empty()) {
+        err = "--gen-prompts: no prompts in '" + path + "'";
+        return false;
+    }
+    return true;
+}
+
+static bool load_replay_tokens(const std::string & path, std::vector<llama_token> & out, std::string & err) {
+    std::string raw;
+    if (!read_file_bytes(path, raw, err)) {
+        return false;
+    }
+    if (raw.size() % 4 != 0) {
+        err = strf("--replay: '%s' has %zu bytes, not a multiple of 4 (raw i32 LE stream expected)", path.c_str(),
+                   raw.size());
+        return false;
+    }
+    out.resize(raw.size() / 4);
+    for (size_t i = 0; i < out.size(); ++i) {
+        const auto *   p = (const unsigned char *) raw.data() + 4 * i;
+        const uint32_t v = (uint32_t) p[0] | ((uint32_t) p[1] << 8) | ((uint32_t) p[2] << 16) | ((uint32_t) p[3] << 24);
+        out[i]           = (llama_token) (int32_t) v;
+    }
+    if (out.empty()) {
+        err = "--replay: '" + path + "' is empty";
+        return false;
+    }
+    return true;
+}
+
+// cumulative chunk ends (n_prompt + n_gen) of the source stream
+static bool load_replay_chunks(const std::string & path, std::vector<int64_t> & ends, std::string & err) {
+    std::string text;
+    if (!read_file_bytes(path, text, err)) {
+        return false;
+    }
+    strip_utf8_bom(text);
+    json j;
+    try {
+        j = json::parse(text);
+    } catch (const std::exception & e) {
+        err = "--replay-chunks: '" + path + "' is not valid JSON: " + e.what();
+        return false;
+    }
+    const json * arr = nullptr;
+    if (j.is_array()) {
+        arr = &j;
+    } else if (j.is_object() && j.contains("chunks") && j["chunks"].is_array()) {
+        arr = &j["chunks"];
+    }
+    if (arr == nullptr) {
+        err = "--replay-chunks: expected an object with a 'chunks' array";
+        return false;
+    }
+    int64_t cum = 0;
+    for (size_t i = 0; i < arr->size(); ++i) {
+        const json & c = (*arr)[i];
+        if (!c.is_object() || !c.contains("n_prompt") || !c["n_prompt"].is_number_integer()) {
+            err = strf("--replay-chunks: chunk %zu lacks an integer n_prompt", i);
+            return false;
+        }
+        const int64_t np = c["n_prompt"].get<int64_t>();
+        const int64_t ng = (c.contains("n_gen") && c["n_gen"].is_number_integer()) ? c["n_gen"].get<int64_t>() : 0;
+        if (np < 0 || ng < 0) {
+            err = strf("--replay-chunks: chunk %zu has negative counts", i);
+            return false;
+        }
+        cum += np + ng;
+        ends.push_back(cum);
+    }
+    return true;
+}
+
+static int64_t py_index(int64_t v, int64_t n) {
+    if (v < 0) {
+        v += n;
+    }
+    return std::max<int64_t>(0, std::min<int64_t>(v, n));
+}
+
+struct chunk_in {
+    std::vector<llama_token> tokens;
+    int64_t                  n_gen_max = 0;
+    std::string              source;
+    int                      prompt_index = -1;
+    std::string              prompt_id;
+};
+
+struct chunk_out {
+    int64_t     chunk_id = 0;
+    std::string source;
+    int64_t     n_prompt     = 0;
+    int64_t     n_gen        = 0;
+    int         prompt_index = -1;
+    std::string prompt_id;
+};
+
+static ojson chunks_json(const std::vector<chunk_out> & chunks) {
+    ojson arr = ojson::array();
+    for (const chunk_out & c : chunks) {
+        ojson o;
+        o["chunk_id"] = c.chunk_id;
+        o["source"]   = c.source;
+        o["n_prompt"] = c.n_prompt;
+        o["n_gen"]    = c.n_gen;
+        if (c.prompt_index >= 0) {
+            o["prompt_index"] = c.prompt_index;
+        }
+        if (!c.prompt_id.empty()) {
+            o["prompt_id"] = c.prompt_id;
+        }
+        arr.push_back(o);
+    }
+    return arr;
+}
+
+// chat wrapping (decision D-a)
+struct chat_wrapper {
+    std::string               style = "template";
+    bool                      think = false;
+    common_chat_templates_ptr tmpls;
+    std::vector<std::string>  notes;
+
+    void init(const llama_model * model, const std::string & tmpl_text) {
+        if (style != "template") {
+            return;
+        }
+        if (tmpl_text.empty()) {
+            notes.push_back("GGUF has no tokenizer.chat_template; --chat used the literal gemma4 format");
+            style = "gemma4";
+            return;
+        }
+        try {
+            tmpls = common_chat_templates_init(model, "");
+        } catch (const std::exception & e) {
+            notes.push_back(std::string("chat template init failed (") + e.what() +
+                            "); used the literal gemma4 format");
+            style = "gemma4";
+            return;
+        }
+        if (!tmpls) {
+            notes.push_back("chat template init returned null; used the literal gemma4 format");
+            style = "gemma4";
+        }
+    }
+
+    std::string wrap(const std::string & user) {
+        if (style == "template") {
+            try {
+                common_chat_templates_inputs in;
+                common_chat_msg              msg;
+                msg.role    = "user";
+                msg.content = user;
+                in.messages.push_back(msg);
+                in.add_generation_prompt   = true;
+                in.use_jinja               = true;
+                in.enable_thinking         = think;
+                const common_chat_params p = common_chat_templates_apply(tmpls.get(), in);
+                if (!p.prompt.empty()) {
+                    return p.prompt;
+                }
+                notes.push_back("chat template rendered an empty prompt; used the literal gemma4 format");
+            } catch (const std::exception & e) {
+                notes.push_back(std::string("chat template rendering failed (") + e.what() +
+                                "); used the literal gemma4 format");
+            }
+            style = "gemma4";
+        }
+        if (style == "gemma3") {
+            return "<start_of_turn>user\n" + user + "<end_of_turn>\n<start_of_turn>model\n";
+        }
+        std::string s = "<|turn>user\n" + user + "<turn|>\n<|turn>model\n";
+        if (!think) {
+            s += "<|channel>thought\n<channel|>";
+        }
+        return s;
+    }
+};
+
+static std::string meta_str(const llama_model * m, const std::string & key) {
+    std::vector<char> buf(256);
+    int32_t           n = llama_model_meta_val_str(m, key.c_str(), buf.data(), buf.size());
+    if (n < 0) {
+        return "";
+    }
+    if ((size_t) n >= buf.size()) {
+        buf.resize((size_t) n + 1);
+        n = llama_model_meta_val_str(m, key.c_str(), buf.data(), buf.size());
+        if (n < 0) {
+            return "";
+        }
+    }
+    return std::string(buf.data(), std::min<size_t>((size_t) n, buf.size() - 1));
+}
+
+static int64_t meta_int(const llama_model * m, const std::string & key, int64_t dflt) {
+    const std::string s = trim(meta_str(m, key));
+    int64_t           v = 0;
+    if (parse_i64(s, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), v)) {
+        return v;
+    }
+    return dflt;
+}
+
+// -----------------------------------------------------------------------------
+// run bookkeeping for the summary line
+// -----------------------------------------------------------------------------
+struct run_info {
+    probe_opts               opt;
+    std::vector<std::string> argv_all;
+    std::string              mode_name;
+    int64_t                  n_prompt  = 0;
+    int64_t                  n_gen     = 0;
+    int64_t                  n_records = 0;
+    int64_t                  n_chunks  = 0;
+    bool                     have_perf = false;
+    llama_perf_context_data  perf{};
+    double                   cb_ms      = 0.0;
+    double                   wall_start = 0.0;
+    double                   t_prefill_wall_ms = 0.0;  // wall time inside prefill decode calls (incl. callback)
+    double                   t_gen_wall_ms     = 0.0;  // wall time inside generation decode calls (incl. callback)
+    std::string              trace_out;
+    std::string              act_out;
+    std::string              io_csv;
+    std::string              error;
+    int                      interrupted = 0;
+    int64_t                  n_ctx       = 0;
+    int                      n_threads   = 0;
+};
+
+static void print_summary(const run_info & ri, int exit_code) {
+    ojson s;
+    s["mode"]          = str_or_null(ri.mode_name);
+    s["exit_code"]     = exit_code;
+    s["n_prompt"]      = ri.n_prompt;
+    s["n_gen"]         = ri.n_gen;
+    s["n_records"]     = ri.n_records;
+    s["n_chunks"]      = ri.n_chunks;
+    const double tl    = ri.have_perf ? ri.perf.t_load_ms : 0.0;
+    const double tp    = ri.have_perf ? ri.perf.t_p_eval_ms : 0.0;
+    const double te    = ri.have_perf ? ri.perf.t_eval_ms : 0.0;
+    s["t_load_ms"]     = round3(tl);
+    s["t_p_eval_ms"]   = round3(tp);
+    s["t_eval_ms"]     = round3(te);
+    s["tok_s_prompt"]  = (ri.have_perf && tp > 0.0 && ri.perf.n_p_eval > 0) ?
+                             num_or_null(1000.0 * ri.perf.n_p_eval / tp) :
+                             ojson(nullptr);
+    s["tok_s_gen"]     = (ri.have_perf && te > 0.0 && ri.perf.n_eval > 0) ? num_or_null(1000.0 * ri.perf.n_eval / te) :
+                                                                                ojson(nullptr);
+    s["callback_ms"]   = round3(ri.cb_ms);
+    // probe-side wall clock around the decode calls (separate source from llama_perf above)
+    s["t_prefill_wall_ms"] = round3(ri.t_prefill_wall_ms);
+    s["t_gen_wall_ms"]     = round3(ri.t_gen_wall_ms);
+    s["wall_tok_s_prompt"] = (ri.n_prompt > 0 && ri.t_prefill_wall_ms > 0.0) ?
+                                 num_or_null(1000.0 * (double) ri.n_prompt / ri.t_prefill_wall_ms) :
+                                 ojson(nullptr);
+    s["wall_tok_s_gen"]    = (ri.n_gen > 0 && ri.t_gen_wall_ms > 0.0) ?
+                                 num_or_null(1000.0 * (double) ri.n_gen / ri.t_gen_wall_ms) :
+                                 ojson(nullptr);
+    s["trace_out"]     = str_or_null(ri.trace_out);
+    s["act_out"]       = str_or_null(ri.act_out);
+    s["io_csv"]        = str_or_null(ri.io_csv);
+    // llama_perf_context reports max(1, n); report 0 when nothing was timed
+    s["n_p_eval"]      = (ri.have_perf && tp > 0.0) ? ri.perf.n_p_eval : 0;
+    s["n_eval"]        = (ri.have_perf && te > 0.0) ? ri.perf.n_eval : 0;
+    s["wall_ms"]       = round3(now_ms() - ri.wall_start);
+    s["n_ctx"]         = ri.n_ctx;
+    s["n_threads"]     = ri.n_threads;
+    s["interrupted"]   = ri.interrupted != 0;
+    s["error"]         = str_or_null(ri.error);
+    s["probe_version"] = PROBE_VERSION;
+    s["llama_build"]   = llama_build_number();
+    s["llama_commit"]  = llama_commit();
+    const std::string line = std::string(PROBE_SUMMARY_PREFIX) + dump_json(s) + "\n";
+    common_log_flush(common_log_main());
+    std::fflush(stdout);
+    std::fwrite(line.data(), 1, line.size(), stderr);
+    std::fflush(stderr);
+}
+
+// -----------------------------------------------------------------------------
+// decode helper: one token list (a chunk prefill or one generated token) in
+// sub-batches of n_batch; positions continue from the KV memory
+// -----------------------------------------------------------------------------
+static int decode_tokens(llama_context * ctx, probe_state & st, const std::vector<llama_token> & toks, int n_batch,
+                         int64_t io_base, bool & io_warned) {
+    common_batch batch = common_batch_get_one(ctx, toks);
+    st.io_base         = io_base;
+    st.io_done         = 0;
+    st.io_submitted    = 0;
+    st.ubatch_T        = 0;
+    if (st.io != nullptr && !st.io_started) {
+        io_start(st);  // the first row counts from the first llama_process after load
+    }
+    for (int32_t off = 0; off < batch.size(); off += n_batch) {
+        const int32_t n = std::min<int32_t>(n_batch, batch.size() - off);
+        st.io_submitted += n;
+        const int32_t rc = llama_process(ctx, LLAMA_PROCESS_TYPE_DECODE, batch.get_sub_batch(off, n));
+        if (st.fatal_code != 0) {
+            return 0;  // the caller reports the callback's error
+        }
+        if (rc != 0) {
+            return rc;
+        }
+        // llama.cpp adds compute time to its perf counters only inside synchronize(), which
+        // normally happens when logits are read; a replay never reads logits, so sync here
+        // (one call per llama_process, negligible next to the callback's per-split syncs)
+        llama_synchronize(ctx);
+        if (st.io != nullptr && st.io_done < st.io_submitted) {
+            if (!io_warned) {
+                PWARN("io.csv: 'result_output' was not observed for every ubatch; residual rows cover the rest");
+                io_warned = true;
+            }
+            io_emit(st, st.io_submitted - st.io_done);
+        }
+    }
+    return 0;
+}
+
+// -----------------------------------------------------------------------------
+// the run after argument parsing: open outputs, load, record, close
+// -----------------------------------------------------------------------------
+static int run_loaded(run_info & ri, common_params & params, probe_state & st, probe_mode mode, input_kind input,
+                      const std::vector<gen_prompt_item> & gen_items, const std::vector<llama_token> & replay_tokens,
+                      const std::vector<int64_t> & replay_ends) {
+    probe_opts &             o = ri.opt;
+    std::vector<std::string> notes;
+
+    // ---- outputs that can be opened before the (slow) model load ----------
+    trace_writer tw;
+    std::string  err;
+    if (mode == probe_mode::moe_trace) {
+        if (!tw.open(o.trace_out, err)) {
+            ri.error = err;
+            PERR("%s", err.c_str());
+            tw.abandon();
+            return PROBE_EXIT_RUNTIME;
+        }
+        ri.trace_out = o.trace_out;
+    }
+    if (mode == probe_mode::act_dump) {
+        std::error_code ec;
+        fs::create_directories(o.act_out, ec);
+        if (ec) {
+            ri.error = "cannot create --act-out '" + o.act_out + "': " + ec.message();
+            PERR("%s", ri.error.c_str());
+            return PROBE_EXIT_RUNTIME;
+        }
+        ri.act_out = o.act_out;
+    }
+    if (!o.io_csv.empty()) {
+        if (!make_parent_dirs(o.io_csv, err)) {
+            ri.error = err;
+            PERR("%s", err.c_str());
+            tw.abandon();
+            return PROBE_EXIT_RUNTIME;
+        }
+        st.io = std::fopen(o.io_csv.c_str(), "wb");
+        if (st.io == nullptr || std::fprintf(st.io, "%s\n", IO_CSV_HEADER) < 0) {
+            ri.error = "cannot create --io-csv '" + o.io_csv + "'";
+            PERR("%s", ri.error.c_str());
+            if (st.io != nullptr) {
+                std::fclose(st.io);
+                st.io = nullptr;
+            }
+            tw.abandon();
+            return PROBE_EXIT_RUNTIME;
+        }
+        ri.io_csv = o.io_csv;
+    }
+
+    // ---- load -------------------------------------------------------------
+    const std::string created_at = iso_utc_now();
+    std::error_code   ec_size;
+    const auto        gguf_size_u = fs::file_size(params.model.path, ec_size);
+    const int64_t     gguf_size   = ec_size ? 0 : (int64_t) gguf_size_u;
+    if (ec_size) {
+        notes.push_back("could not stat the GGUF for gguf_size_bytes");
+    }
+    PINFO("loading %s (mode %s; warm-up disabled)", params.model.path.c_str(), o.mode.c_str());
+
+    // installed before the (possibly many-minute) load: a first Ctrl-C then stops right after
+    // the load with exit 128+sig and no partial outputs; a second one exits immediately
+    install_signal_handlers();
+    auto            init  = common_init_from_params(params);
+    llama_model *   model = init ? init->model() : nullptr;
+    llama_context * ctx   = init ? init->context() : nullptr;
+    if (model == nullptr || ctx == nullptr) {
+        ri.error = "failed to load the model or to create the context";
+        PERR("%s", ri.error.c_str());
+        tw.abandon();
+        ri.trace_out.clear();
+        if (st.io != nullptr) {
+            std::fclose(st.io);
+            st.io = nullptr;
+        }
+        return PROBE_EXIT_RUNTIME;
+    }
+    const llama_vocab * vocab       = llama_model_get_vocab(model);
+    const int           n_vocab     = llama_vocab_n_tokens(vocab);
+    const int           n_layer     = llama_model_n_layer(model);
+    const int64_t       n_embd      = llama_model_n_embd(model);
+    const int64_t       n_ctx       = (int64_t) llama_n_ctx(ctx);
+    const int           n_batch     = (int) llama_n_batch(ctx);
+    const int           n_ubatch    = (int) llama_n_ubatch(ctx);
+    const int           n_threads   = llama_n_threads(ctx);
+    const int           n_threads_b = llama_n_threads_batch(ctx);
+    const std::string   arch        = meta_str(model, "general.architecture");
+    const std::string   model_name  = meta_str(model, "general.name");
+    const int64_t       n_expert    = meta_int(model, arch + ".expert_count", 0);
+    const int64_t       n_used      = meta_int(model, arch + ".expert_used_count", 0);
+    const int64_t       n_ff        = meta_int(model, arch + ".feed_forward_length", -1);
+    ri.n_ctx                        = n_ctx;
+    ri.n_threads                    = n_threads;
+    PINFO(
+        "model: arch=%s name='%s' n_layer=%d n_embd=%lld n_expert=%lld n_expert_used=%lld n_vocab=%d | n_ctx=%lld "
+        "n_batch=%d n_ubatch=%d threads=%d/%d",
+        arch.c_str(), model_name.c_str(), n_layer, (long long) n_embd, (long long) n_expert, (long long) n_used, n_vocab,
+        (long long) n_ctx, n_batch, n_ubatch, n_threads, n_threads_b);
+
+    FILE * act_tok   = nullptr;
+    FILE * act_phase = nullptr;
+    auto   close_early = [&](int code, const std::string & msg) {
+        ri.error = msg;
+        PERR("%s", msg.c_str());
+        tw.abandon();
+        ri.trace_out.clear();  // the empty outputs were removed
+        if (st.io != nullptr) {
+            std::fclose(st.io);
+            st.io = nullptr;
+        }
+        if (act_tok != nullptr) {
+            std::fclose(act_tok);
+            act_tok = nullptr;
+        }
+        if (act_phase != nullptr) {
+            std::fclose(act_phase);
+            act_phase = nullptr;
+        }
+        ri.perf      = llama_perf_context(ctx);
+        ri.have_perf = true;
+        init.reset();
+        return code;
+    };
+
+    if (g_stop_signal != 0) {
+        ri.interrupted = (int) g_stop_signal;
+        return close_early(128 + (int) g_stop_signal, strf("interrupted by signal %d during the model load", (int) g_stop_signal));
+    }
+
+    st.mode     = mode;
+    st.n_layer  = n_layer;
+    st.n_ubatch = std::max(1, n_ubatch);
+    if (mode == probe_mode::moe_trace) {
+        if (n_expert <= 0 || n_used <= 0) {
+            return close_early(PROBE_EXIT_CONTRACT,
+                               strf("moe-trace needs an MoE model: '%s.expert_count'=%lld, '%s.expert_used_count'=%lld "
+                                    "(a dense model has no ffn_moe_topk tensors)",
+                                    arch.c_str(), (long long) n_expert, arch.c_str(), (long long) n_used));
+        }
+        if (n_expert > MOETRACE_MAX_EXPERTS || n_used > n_expert) {
+            return close_early(PROBE_EXIT_CONTRACT,
+                               strf("moe-trace: n_expert=%lld / n_expert_used=%lld outside the .moetrace limits "
+                                    "(1 <= K <= E <= 256)",
+                                    (long long) n_expert, (long long) n_used));
+        }
+        if (o.probs_top > n_expert) {
+            return close_early(PROBE_EXIT_USAGE, strf("--probs-top %lld exceeds n_expert %lld", (long long) o.probs_top,
+                                                      (long long) n_expert));
+        }
+        st.n_expert  = (int) n_expert;
+        st.n_used    = (int) n_used;
+        st.probs_top = (int) o.probs_top;
+        st.acc.assign((size_t) n_layer, layer_acc{});
+    }
+    if (mode == probe_mode::act_dump) {
+        for (int il : o.layers) {
+            if (il >= n_layer) {
+                return close_early(PROBE_EXIT_USAGE, strf("--layers: layer %d >= n_layer %d", il, n_layer));
+            }
+        }
+        // kinds whose rows are n_embd wide (the residual-stream width)
+        static const char * embd_kinds[] = { "ffn_norm", "ffn_out",          "ffn_norm_1",     "ffn_norm_2",
+                                             "attn_out", "ffn_mlp",          "ffn_moe",        "ffn_moe_combined",
+                                             "l_out",    "attn_post_norm",   "ffn_post_norm" };
+        st.kinds = o.kinds;
+        st.t_max = o.tokens;
+        st.act_index.assign(st.kinds.size(), std::vector<int>((size_t) n_layer, -1));
+        for (size_t k = 0; k < st.kinds.size(); ++k) {
+            for (int il : o.layers) {
+                act_target tg;
+                tg.il       = il;
+                tg.kind_idx = (int) k;
+                tg.kind     = st.kinds[k];
+                tg.path     = (fs::path(o.act_out) / ("L" + std::to_string(il) + "." + tg.kind + ".npy")).string();
+                for (const char * ek : embd_kinds) {
+                    if (tg.kind == ek) {
+                        tg.expect_ne0 = n_embd;
+                    }
+                }
+                if (tg.kind == "ffn_geglu" && n_ff > 0) {
+                    tg.expect_ne0 = n_ff;
+                }
+                st.act_index[k][(size_t) il] = (int) st.targets.size();
+                st.targets.push_back(tg);
+            }
+        }
+        act_tok   = std::fopen((fs::path(o.act_out) / ACTS_TOKENS_FILE).string().c_str(), "wb");
+        act_phase = std::fopen((fs::path(o.act_out) / ACTS_PHASE_FILE).string().c_str(), "wb");
+        if (act_tok == nullptr || act_phase == nullptr) {
+            return close_early(PROBE_EXIT_RUNTIME, "cannot create tokens.bin / phase.u8 in --act-out");
+        }
+    }
+
+    // ---- build the chunk list ---------------------------------------------
+    const llama_token bos     = llama_vocab_bos(vocab);
+    const bool        add_bos = llama_vocab_get_add_bos(vocab) && bos != LLAMA_TOKEN_NULL;
+    chat_wrapper      chat;
+    chat.style = o.chat_style;
+    chat.think = o.chat_think;
+    if (o.chat) {
+        chat.init(model, meta_str(model, "tokenizer.chat_template"));
+    }
+    auto tokenize = [&](const std::string & text, bool special) {
+        std::vector<llama_token> t = common_tokenize(ctx, text, add_bos, special);
+        if (add_bos && t.size() >= 2 && t[0] == bos && t[1] == bos) {
+            t.erase(t.begin());  // template text that already carried a BOS
+        }
+        return t;
+    };
+
+    std::string corpus_id = o.corpus_id;
+    if (corpus_id.empty()) {
+        if (input == input_kind::replay) {
+            corpus_id = "replay";
+        } else if (input == input_kind::gen_prompts) {
+            corpus_id = path_stem(o.gen_prompts);
+        } else if (!params.prompt_file.empty()) {
+            corpus_id = path_stem(params.prompt_file);
+        } else {
+            corpus_id = "prompt";
+        }
+    }
+
+    std::vector<chunk_in> chunks;
+    int64_t               replay_a = 0;
+    int64_t               replay_b = 0;
+    if (input == input_kind::replay) {
+        const int64_t n = (int64_t) replay_tokens.size();
+        replay_a        = o.replay_a_set ? py_index(o.replay_a, n) : 0;
+        replay_b        = o.replay_b_set ? py_index(o.replay_b, n) : n;
+        if (replay_b < replay_a) {
+            replay_b = replay_a;
+        }
+        if (replay_b == replay_a) {
+            return close_early(PROBE_EXIT_USAGE,
+                               strf("--replay-range selects no tokens (the stream has %lld)", (long long) n));
+        }
+        for (int64_t i = replay_a; i < replay_b; ++i) {
+            const llama_token tk = replay_tokens[(size_t) i];
+            if (tk < 0 || tk >= n_vocab) {
+                return close_early(PROBE_EXIT_USAGE, strf("--replay: token %d at index %lld is outside the vocabulary "
+                                                          "(n_vocab %d) - wrong model for this stream?",
+                                                          (int) tk, (long long) i, n_vocab));
+            }
+        }
+        std::set<int64_t> cuts;
+        for (int64_t p = replay_a; p < replay_b; p += o.chunk_tokens) {
+            cuts.insert(p);
+        }
+        for (int64_t e : replay_ends) {
+            if (e > replay_a && e < replay_b) {
+                cuts.insert(e);
+            }
+        }
+        cuts.insert(replay_b);
+        int64_t prev = replay_a;
+        for (int64_t c : cuts) {
+            if (c <= prev) {
+                continue;
+            }
+            chunk_in ch;
+            ch.tokens.assign(replay_tokens.begin() + (std::ptrdiff_t) prev, replay_tokens.begin() + (std::ptrdiff_t) c);
+            ch.source = corpus_id;
+            chunks.push_back(std::move(ch));
+            prev = c;
+        }
+        if (o.gen > 0) {
+            notes.push_back("--gen ignored in replay (teacher-forced, phase 0 only)");
+            PWARN("--gen is ignored with --replay (every replay record is phase 0)");
+        }
+        PINFO("replay: tokens [%lld, %lld) of %lld -> %zu chunk(s)", (long long) replay_a, (long long) replay_b,
+              (long long) n, chunks.size());
+    } else if (input == input_kind::gen_prompts) {
+        const std::string src = path_stem(o.gen_prompts);
+        for (size_t i = 0; i < gen_items.size(); ++i) {
+            const gen_prompt_item & g    = gen_items[i];
+            const std::string       text = o.chat ? chat.wrap(g.prompt) : g.prompt;
+            if (o.chat && i == 0) {
+                PINFO("chat-wrapped prompt 0 (%s): \"%s\"", chat.style.c_str(), escape_for_log(text, 300).c_str());
+            }
+            chunk_in ch;
+            ch.tokens       = tokenize(text, o.chat || o.parse_special);
+            ch.n_gen_max    = o.gen_set ? o.gen : std::max<int64_t>(0, g.max_tokens);
+            ch.source       = src;
+            ch.prompt_index = (int) i;
+            ch.prompt_id    = g.id;
+            if (ch.tokens.empty()) {
+                return close_early(PROBE_EXIT_USAGE, strf("--gen-prompts: prompt %zu tokenises to 0 tokens", i));
+            }
+            chunks.push_back(std::move(ch));
+        }
+        PINFO("gen-prompts: %zu prompt(s) from %s", chunks.size(), o.gen_prompts.c_str());
+    } else {
+        std::string text    = params.prompt;
+        bool        special = o.parse_special;
+        if (o.chat) {
+            text    = chat.wrap(text);
+            special = true;
+            PINFO("chat-wrapped prompt (%s): \"%s\"", chat.style.c_str(), escape_for_log(text, 300).c_str());
+        }
+        const std::vector<llama_token> all = tokenize(text, special);
+        if (all.empty()) {
+            return close_early(PROBE_EXIT_USAGE, "the prompt tokenises to 0 tokens");
+        }
+        size_t pos = 0;
+        while (pos < all.size()) {
+            chunk_in ch;
+            if (add_bos && all[pos] != bos) {
+                ch.tokens.push_back(bos);
+            }
+            const size_t take = std::min<size_t>((size_t) o.chunk_tokens - ch.tokens.size(), all.size() - pos);
+            ch.tokens.insert(ch.tokens.end(), all.begin() + (std::ptrdiff_t) pos,
+                             all.begin() + (std::ptrdiff_t) (pos + take));
+            pos += take;
+            ch.n_gen_max = o.gen;
+            ch.source    = corpus_id;
+            chunks.push_back(std::move(ch));
+        }
+        PINFO("prompt: %zu tokens -> %zu chunk(s) of <= %lld tokens", all.size(), chunks.size(),
+              (long long) o.chunk_tokens);
+    }
+    for (const std::string & nt : chat.notes) {
+        notes.push_back(nt);
+        PWARN("%s", nt.c_str());
+    }
+    for (size_t i = 0; i < chunks.size(); ++i) {
+        if ((int64_t) chunks[i].tokens.size() > n_ctx) {
+            return close_early(PROBE_EXIT_USAGE,
+                               strf("chunk %zu has %zu tokens > n_ctx %lld: raise -c or lower --chunk-tokens", i,
+                                    chunks[i].tokens.size(), (long long) n_ctx));
+        }
+    }
+
+    // ---- trace header builder --------------------------------------------
+    std::vector<int>       moe_layers;
+    std::vector<chunk_out> chunks_out;
+    auto                   build_header = [&]() {
+        ojson h;
+        h["format_version"]  = MOETRACE_FORMAT_VERSION;
+        h["model_name"]      = model_name;
+        h["gguf_path"]       = params.model.path;
+        h["gguf_size_bytes"] = gguf_size;
+        h["llama_build"]     = llama_build_number();
+        h["llama_commit"]    = llama_commit();
+        h["arch"]            = arch;
+        h["n_layer"]         = n_layer;
+        h["n_expert"]        = st.n_expert;
+        h["n_expert_used"]   = st.n_used;
+        h["moe_layers"]      = moe_layers;
+        h["n_embd"]          = n_embd;
+        h["probs_top"]       = st.probs_top;
+        h["weights_tensor"]  = MOETRACE_WEIGHTS_TENSOR;
+        h["corpus_id"]       = corpus_id;
+        h["created_at"]      = created_at;
+        h["n_ctx"]           = n_ctx;
+        h["n_batch"]         = n_batch;
+        h["n_ubatch"]        = n_ubatch;
+        h["n_threads"]       = n_threads;
+        h["flags"]           = ri.argv_all;
+        h["chunks"]          = chunks_json(chunks_out);
+        // optional keys (TRACE_FORMAT 3.4) + probe extras (readers ignore unknown keys)
+        h["chat"]            = o.chat;
+        h["gen_max"]         = o.gen;
+        if (input == input_kind::replay) {
+            ojson rp;
+            rp["tokens_file"] = o.replay;
+            rp["range"]       = ojson::array({ replay_a, replay_b });
+            h["replay"]       = rp;
+        }
+        if (!notes.empty()) {
+            h["notes"] = notes;
+        }
+        h["probe_version"]   = PROBE_VERSION;
+        h["n_threads_batch"] = n_threads_b;
+        h["input"]           = input == input_kind::replay      ? "replay" :
+                               input == input_kind::gen_prompts ? "gen-prompts" :
+                                                                  "text";
+        if (o.chat) {
+            h["chat_style"] = chat.style;
+        }
+        return dump_json(h);
+    };
+
+    // ---- gen.txt (opened on the first chunk that requests generation) ----
+    FILE *      gen_file = nullptr;
+    std::string gen_path;
+    if (mode == probe_mode::moe_trace) {
+        gen_path = o.trace_out + SIDECAR_GEN;
+    } else if (mode == probe_mode::act_dump) {
+        gen_path = (fs::path(o.act_out) / "gen.txt").string();
+    }
+
+    // ---- per-call verification + commit -----------------------------------
+    std::vector<uint8_t> rec;
+    uint64_t             stream_pos = 0;  // committed records / rows / tokens
+    int                  code       = PROBE_EXIT_OK;
+    bool                 io_warned  = false;
+    const int            K          = st.n_used;
+    const int            P          = st.probs_top;
+
+    auto commit_call = [&](const std::vector<llama_token> & toks, int64_t pos0, uint8_t phase,
+                           int64_t chunk_index) -> bool {
+        const int64_t n = (int64_t) toks.size();
+        if (mode == probe_mode::moe_trace) {
+            if (moe_layers.empty()) {
+                for (int il = 0; il < n_layer; ++il) {
+                    if (st.acc[(size_t) il].n_topk > 0) {
+                        moe_layers.push_back(il);
+                    }
+                }
+                if (moe_layers.empty()) {
+                    st.fail(PROBE_EXIT_CONTRACT,
+                            "no ffn_moe_topk-<il> tensor was observed in the first chunk "
+                            "(not an MoE graph, or the tensor names changed)");
+                    return false;
+                }
+            }
+            std::vector<bool> is_moe((size_t) n_layer, false);
+            for (int il : moe_layers) {
+                is_moe[(size_t) il] = true;
+            }
+            for (int il = 0; il < n_layer; ++il) {
+                const layer_acc & a = st.acc[(size_t) il];
+                if (is_moe[(size_t) il]) {
+                    if (a.n_topk != n || a.n_w != n || (P > 0 && a.n_p != n)) {
+                        const int64_t got = a.n_topk != n ? a.n_topk : (a.n_w != n ? a.n_w : a.n_p);
+                        const char *  nm  = a.n_topk != n ? "ffn_moe_topk" :
+                                                            (a.n_w != n ? MOETRACE_WEIGHTS_TENSOR : "ffn_moe_probs");
+                        st.fail(PROBE_EXIT_CONTRACT, strf("layer %d got %lld columns, expected %lld (%s)", il,
+                                                          (long long) got, (long long) n, nm));
+                        return false;
+                    }
+                } else if (a.n_topk != 0 || a.n_w != 0 || a.n_p != 0) {
+                    st.fail(PROBE_EXIT_CONTRACT,
+                            strf("layer %d emitted MoE routing tensors but is not in moe_layers (first chunk)", il));
+                    return false;
+                }
+            }
+            const int L = (int) moe_layers.size();
+            if (!tw.header_written) {
+                const uint64_t rs = 16u + 3u * (uint64_t) L * (uint64_t) K + 3u * (uint64_t) L * (uint64_t) P;
+                if (rs > 0xFFFFFFFFull) {
+                    st.fail(PROBE_EXIT_CONTRACT, "record_size overflows u32");
+                    return false;
+                }
+                rec.assign((size_t) rs, 0);
+                std::string e;
+                if (!tw.write_header(build_header(), (uint32_t) rs, e)) {
+                    st.fail(PROBE_EXIT_RUNTIME, e);
+                    return false;
+                }
+            }
+            for (int64_t col = 0; col < n; ++col) {
+                std::fill(rec.begin(), rec.end(), 0);
+                put_u32(&rec[0], (uint32_t) (stream_pos + (uint64_t) col));
+                put_u32(&rec[4], (uint32_t) (pos0 + col));
+                put_u32(&rec[8], (uint32_t) toks[(size_t) col]);
+                rec[12] = phase;
+                rec[13] = (uint8_t) (chunk_index & 0xFF);
+                for (int j = 0; j < L; ++j) {
+                    const layer_acc & a    = st.acc[(size_t) moe_layers[(size_t) j]];
+                    uint8_t *         slot = &rec[16 + (size_t) 3 * K * j];
+                    for (int k = 0; k < K; ++k) {
+                        slot[k] = a.ids[(size_t) (col * K + k)];
+                        put_u16(slot + K + 2 * k, ggml_fp32_to_fp16(a.w[(size_t) (col * K + k)]));
+                    }
+                    for (int p = 0; p < P; ++p) {
+                        uint8_t * q = &rec[16 + (size_t) 3 * L * K + (size_t) 3 * (P * j + p)];
+                        q[0]        = a.pid[(size_t) (col * P + p)];
+                        put_u16(q + 1, ggml_fp32_to_fp16(a.pp[(size_t) (col * P + p)]));
+                    }
+                }
+                if (!tw.append(rec, toks[(size_t) col])) {
+                    st.fail(PROBE_EXIT_RUNTIME, "cannot write records to '" + tw.path + "' (disk full?)");
+                    return false;
+                }
+            }
+            if (!tw.flush()) {
+                st.fail(PROBE_EXIT_RUNTIME, "cannot flush '" + tw.path + "'");
+                return false;
+            }
+        } else if (mode == probe_mode::act_dump) {
+            for (const act_target & tg : st.targets) {
+                if (tg.cols_call != n) {
+                    st.fail(PROBE_EXIT_CONTRACT, strf("layer %d got %lld columns, expected %lld (%s)", tg.il,
+                                                      (long long) tg.cols_call, (long long) n, tg.kind.c_str()));
+                    return false;
+                }
+            }
+            for (int64_t col = 0; col < n; ++col) {
+                uint8_t tb[4];
+                put_u32(tb, (uint32_t) toks[(size_t) col]);
+                if (std::fwrite(tb, 1, 4, act_tok) != 4 || std::fputc(phase, act_phase) == EOF) {
+                    st.fail(PROBE_EXIT_RUNTIME, "cannot write tokens.bin / phase.u8");
+                    return false;
+                }
+            }
+            for (act_target & tg : st.targets) {
+                if (tg.f != nullptr && std::fflush(tg.f) != 0) {
+                    st.fail(PROBE_EXIT_RUNTIME, "cannot flush '" + tg.path + "'");
+                    return false;
+                }
+            }
+            if (std::fflush(act_tok) != 0 || std::fflush(act_phase) != 0) {
+                st.fail(PROBE_EXIT_RUNTIME, "cannot flush tokens.bin / phase.u8");
+                return false;
+            }
+        }
+        stream_pos += (uint64_t) n;
+        if (mode != probe_mode::names) {
+            ri.n_records = (int64_t) stream_pos;
+        }
+        return true;
+    };
+
+    // ---- main loop ---------------------------------------------------------
+    const int64_t            limit = o.tokens > 0 ? o.tokens : -1;
+    llama_memory_t           mem   = llama_get_memory(ctx);
+    std::vector<llama_token> one(1);
+    bool                     gen_clip_noted = false;
+    for (size_t ci = 0; ci < chunks.size() && code == PROBE_EXIT_OK; ++ci) {
+        if (g_stop_signal != 0) {
+            break;
+        }
+        if (o.max_chunks > 0 && (int64_t) ci >= o.max_chunks) {
+            break;
+        }
+        if (limit >= 0 && (int64_t) stream_pos >= limit) {
+            break;
+        }
+        const chunk_in &         cin  = chunks[ci];
+        std::vector<llama_token> toks = cin.tokens;
+        if (limit >= 0 && (int64_t) (stream_pos + toks.size()) > limit) {
+            toks.resize((size_t) (limit - (int64_t) stream_pos));
+        }
+        if (toks.empty()) {
+            break;
+        }
+
+        // fresh context per chunk
+        llama_memory_clear(mem, true);
+        st.reset_call();
+        st.phase         = 0;
+        const double tp0 = now_ms();
+        int          rc  = decode_tokens(ctx, st, toks, n_batch, (int64_t) stream_pos, io_warned);
+        ri.t_prefill_wall_ms += now_ms() - tp0;
+        if (st.fatal_code == 0 && rc != 0) {
+            st.fail(PROBE_EXIT_RUNTIME,
+                    strf("llama_process failed (rc=%d) on chunk %zu (prefill of %zu tokens)", (int) rc, ci, toks.size()));
+        }
+        if (st.fatal_code == 0) {
+            commit_call(toks, 0, 0, (int64_t) ci);
+        }
+        if (st.fatal_code != 0) {
+            code = st.fatal_code;
+            break;
+        }
+        chunk_out co;
+        co.chunk_id     = (int64_t) ci;
+        co.source       = cin.source;
+        co.n_prompt     = (int64_t) toks.size();
+        co.prompt_index = cin.prompt_index;
+        co.prompt_id    = cin.prompt_id;
+        chunks_out.push_back(co);
+        ri.n_prompt += (int64_t) toks.size();
+        ri.n_chunks      = (int64_t) chunks_out.size();
+        const double tp1 = now_ms();
+
+        // greedy generation
+        int64_t budget = cin.n_gen_max;
+        if (budget > 0 && mode != probe_mode::names && !gen_path.empty()) {
+            if (gen_file == nullptr) {
+                gen_file = std::fopen(gen_path.c_str(), "wb");
+                if (gen_file == nullptr) {
+                    st.fail(PROBE_EXIT_RUNTIME, "cannot create '" + gen_path + "'");
+                    code = st.fatal_code;
+                    break;
+                }
+            }
+            const std::string sep = strf("\n--- chunk %zu ---\n", ci);
+            std::fwrite(sep.data(), 1, sep.size(), gen_file);
+        }
+        if (budget > n_ctx - (int64_t) toks.size()) {
+            budget = std::max<int64_t>(0, n_ctx - (int64_t) toks.size());
+            if (!gen_clip_noted) {
+                notes.push_back(strf("generation clipped to n_ctx (%lld) - raise -c to generate --gen tokens per chunk",
+                                     (long long) n_ctx));
+                PWARN("%s", notes.back().c_str());
+                gen_clip_noted = true;
+            }
+        }
+        if (limit >= 0) {
+            budget = std::min<int64_t>(budget, limit - (int64_t) stream_pos);
+        }
+        int64_t pos     = (int64_t) toks.size();
+        int64_t n_gen_c = 0;
+        for (int64_t g = 0; g < budget; ++g) {
+            if (g_stop_signal != 0) {
+                break;
+            }
+            const float * lg = llama_get_logits_ith(ctx, -1);
+            if (lg == nullptr) {
+                st.fail(PROBE_EXIT_RUNTIME,
+                        strf("no logits available after position %lld of chunk %zu", (long long) pos, ci));
+                break;
+            }
+            llama_token best = 0;
+            float       bv   = lg[0];
+            for (llama_token v = 1; v < n_vocab; ++v) {
+                if (lg[v] > bv) {
+                    bv   = lg[v];
+                    best = v;
+                }
+            }
+            if (llama_vocab_is_eog(vocab, best)) {
+                break;
+            }
+            one[0] = best;
+            st.reset_call();
+            st.phase        = 1;
+            const double tg0 = now_ms();
+            rc              = decode_tokens(ctx, st, one, n_batch, (int64_t) stream_pos, io_warned);
+            ri.t_gen_wall_ms += now_ms() - tg0;
+            if (st.fatal_code == 0 && rc != 0) {
+                st.fail(PROBE_EXIT_RUNTIME, strf("llama_process failed (rc=%d) while generating token %lld of chunk %zu",
+                                                 (int) rc, (long long) g, ci));
+            }
+            if (st.fatal_code == 0) {
+                commit_call(one, pos, 1, (int64_t) ci);
+            }
+            if (st.fatal_code != 0) {
+                break;
+            }
+            chunks_out.back().n_gen++;
+            ri.n_gen++;
+            n_gen_c++;
+            pos++;
+            if (gen_file != nullptr) {
+                const std::string piece = common_token_to_piece(ctx, best, true);
+                std::fwrite(piece.data(), 1, piece.size(), gen_file);
+            }
+        }
+        if (gen_file != nullptr) {
+            std::fflush(gen_file);
+        }
+        if (st.fatal_code != 0) {
+            code = st.fatal_code;
+            break;
+        }
+        const double tp2 = now_ms();
+        PINFO(
+            "chunk %zu/%zu (%s): prefill %zu tok %.0f ms (%.2f tok/s) | gen %lld tok %.0f ms (%.2f tok/s) | recorded "
+            "%llu",
+            ci + 1, chunks.size(), cin.source.c_str(), toks.size(), tp1 - tp0,
+            (tp1 > tp0) ? 1000.0 * (double) toks.size() / (tp1 - tp0) : 0.0, (long long) n_gen_c, tp2 - tp1,
+            (tp2 > tp1 && n_gen_c > 0) ? 1000.0 * (double) n_gen_c / (tp2 - tp1) : 0.0, (unsigned long long) stream_pos);
+    }
+    if (code == PROBE_EXIT_OK && st.fatal_code != 0) {
+        code = st.fatal_code;
+    }
+    if (st.fatal_code != 0) {
+        ri.error = st.fatal_msg;
+        PERR("%s", st.fatal_msg.c_str());
+    }
+    if (g_stop_signal != 0) {
+        ri.interrupted = (int) g_stop_signal;
+        notes.push_back(strf("interrupted by signal %d", (int) g_stop_signal));
+        if (code == PROBE_EXIT_OK) {
+            code = 128 + (int) g_stop_signal;
+        }
+    }
+    if (code != PROBE_EXIT_OK && !ri.error.empty()) {
+        notes.push_back("incomplete: " + ri.error);
+    }
+
+    // ---- perf (before the context is freed) --------------------------------
+    ri.perf      = llama_perf_context(ctx);
+    ri.have_perf = true;
+    ri.cb_ms     = st.cb_ms;
+
+    // ---- close outputs -----------------------------------------------------
+    const bool wrote_gen = gen_file != nullptr;
+    if (gen_file != nullptr) {
+        std::fclose(gen_file);
+        gen_file = nullptr;
+    }
+    if (st.io != nullptr) {
+        if (std::fclose(st.io) != 0 && code == PROBE_EXIT_OK) {
+            code     = PROBE_EXIT_RUNTIME;
+            ri.error = "cannot close --io-csv";
+        }
+        st.io = nullptr;
+    }
+    if (mode == probe_mode::moe_trace) {
+        if (tw.header_written) {
+            std::string e;
+            if (!tw.close(build_header(), e)) {
+                PERR("%s", e.c_str());
+                if (code == PROBE_EXIT_OK) {
+                    code     = PROBE_EXIT_RUNTIME;
+                    ri.error = e;
+                }
+            } else {
+                PINFO("trace: %s (%llu records x %u B, %zu chunks, %zu MoE layers)", tw.path.c_str(),
+                      (unsigned long long) tw.n, (unsigned) tw.R, chunks_out.size(), moe_layers.size());
+            }
+        } else {
+            PWARN("no records were recorded; removing the empty trace outputs");
+            tw.abandon();
+            ri.trace_out.clear();
+        }
+    }
+    if (mode == probe_mode::act_dump) {
+        const int64_t T             = (int64_t) stream_pos;
+        bool          ok            = true;
+        ojson         kinds_j       = ojson::object();
+        ojson         nonfinite_j   = ojson::object();
+        bool          any_nonfinite = false;
+        for (act_target & tg : st.targets) {
+            if (tg.f != nullptr) {
+                const std::string h = npy_header(T, tg.ne0);
+                ok   = std::fseek(tg.f, 0, SEEK_SET) == 0 && std::fwrite(h.data(), 1, h.size(), tg.f) == h.size() && ok;
+                ok   = (std::fclose(tg.f) == 0) && ok;
+                tg.f = nullptr;
+                std::error_code ec;
+                fs::resize_file(tg.path, (uintmax_t) (NPY_HEADER_BYTES + T * tg.ne0 * 2), ec);
+                ok = !ec && ok;
+            }
+            // kinds: {name: ne0} as ints only (readers do int(v)); a kind never seen and without
+            // an expected width (only possible after an error) is left out
+            const int64_t ne0 = tg.ne0 > 0 ? tg.ne0 : tg.expect_ne0;
+            if (ne0 > 0 && !kinds_j.contains(tg.kind)) {
+                kinds_j[tg.kind] = ne0;
+            }
+            if (tg.nonfinite > 0) {
+                nonfinite_j["L" + std::to_string(tg.il) + "." + tg.kind] = tg.nonfinite;
+                any_nonfinite                                           = true;
+            }
+        }
+        if (act_tok != nullptr) {
+            ok      = (std::fclose(act_tok) == 0) && ok;
+            act_tok = nullptr;
+        }
+        if (act_phase != nullptr) {
+            ok        = (std::fclose(act_phase) == 0) && ok;
+            act_phase = nullptr;
+        }
+        {
+            // tokens.bin / phase.u8 never hold more than T entries (written at commit), resize is a safeguard
+            std::error_code ec;
+            fs::resize_file(fs::path(o.act_out) / ACTS_TOKENS_FILE, (uintmax_t) (4 * T), ec);
+            ok = !ec && ok;
+            fs::resize_file(fs::path(o.act_out) / ACTS_PHASE_FILE, (uintmax_t) T, ec);
+            ok = !ec && ok;
+        }
+        ojson m;
+        m["model"]           = fs::path(params.model.path).filename().string();
+        m["model_name"]      = model_name;
+        m["gguf_path"]       = params.model.path;
+        m["gguf_size_bytes"] = gguf_size;
+        m["layers"]          = o.layers;
+        m["kinds"]           = kinds_j;
+        m["n_tokens"]        = T;
+        m["dtype"]           = "<f2";
+        m["phase_file"]      = ACTS_PHASE_FILE;
+        m["tokens_file"]     = ACTS_TOKENS_FILE;
+        m["gen_file"]        = wrote_gen ? ojson("gen.txt") : ojson(nullptr);
+        m["chunks"]          = chunks_json(chunks_out);
+        m["corpus_id"]       = corpus_id;
+        m["llama_build"]     = llama_build_number();
+        m["llama_commit"]    = llama_commit();
+        m["arch"]            = arch;
+        m["n_layer"]         = n_layer;
+        m["n_embd"]          = n_embd;
+        m["n_ctx"]           = n_ctx;
+        m["n_batch"]         = n_batch;
+        m["n_ubatch"]        = n_ubatch;
+        m["n_threads"]       = n_threads;
+        m["t_max"]           = st.t_max;
+        m["created_at"]      = created_at;
+        m["flags"]           = ri.argv_all;
+        m["complete"]        = code == PROBE_EXIT_OK;
+        m["error"]           = str_or_null(ri.error);
+        if (any_nonfinite) {
+            m["f16_nonfinite"] = nonfinite_j;
+        }
+        if (o.chat) {
+            m["chat_style"] = chat.style;
+        }
+        if (!notes.empty()) {
+            m["notes"] = notes;
+        }
+        m["probe_version"]          = PROBE_VERSION;
+        const std::string meta_path = (fs::path(o.act_out) / "meta.json").string();
+        std::ofstream     mf(meta_path, std::ios::binary | std::ios::trunc);
+        mf << dump_json(m, 2) << "\n";
+        mf.close();
+        ok = !mf.fail() && ok;
+        if (!ok && code == PROBE_EXIT_OK) {
+            code     = PROBE_EXIT_RUNTIME;
+            ri.error = "cannot finalise the act-dump directory '" + o.act_out + "'";
+            PERR("%s", ri.error.c_str());
+        }
+        ri.n_records = T;
+        PINFO("act-dump: %s (%lld tokens, %zu files)", o.act_out.c_str(), (long long) T, st.targets.size());
+    }
+    if (mode == probe_mode::names) {
+        common_log_flush(common_log_main());
+        for (const std::string & nm : st.names) {
+            std::fputs(nm.c_str(), stdout);
+            std::fputc('\n', stdout);
+        }
+        std::fflush(stdout);
+        PINFO("names: %zu unique tensor names", st.names.size());
+    }
+
+    init.reset();  // free context + model while `st` (the callback target) is still alive
+    return code;
+}
+
+static int run(run_info & ri, int largc, char ** largv) {
+    probe_opts & o = ri.opt;
+    common_init();
+
+    common_params params;
+    if (!common_params_parse(largc, largv, params, LLAMA_EXAMPLE_COMMON, print_probe_usage_tail)) {
+        ri.error = "invalid llama.cpp arguments (see the message above; --help lists them)";
+        PERR("%s", ri.error.c_str());
+        return PROBE_EXIT_USAGE;
+    }
+
+    auto usage = [&](const std::string & msg) {
+        ri.error = msg;
+        PERR("%s", msg.c_str());
+        return (int) PROBE_EXIT_USAGE;
+    };
+
+    // ---- mode + outputs ----------------------------------------------------
+    probe_mode mode = probe_mode::none;
+    if (o.mode == "names") {
+        mode = probe_mode::names;
+    } else if (o.mode == "moe-trace") {
+        mode = probe_mode::moe_trace;
+    } else if (o.mode == "act-dump") {
+        mode = probe_mode::act_dump;
+    } else {
+        return usage("--mode is required (names | moe-trace | act-dump); see --help");
+    }
+    if (params.model.path.empty()) {
+        return usage("-m MODEL.gguf is required");
+    }
+    if (mode == probe_mode::moe_trace && o.trace_out.empty()) {
+        return usage("moe-trace needs --trace-out FILE.moetrace");
+    }
+    if (mode == probe_mode::act_dump && o.act_out.empty()) {
+        return usage("act-dump needs --act-out DIR");
+    }
+    if (mode != probe_mode::moe_trace && !o.trace_out.empty()) {
+        PWARN("--trace-out is only used by moe-trace; ignored");
+    }
+    if (mode != probe_mode::moe_trace && o.probs_top > 0) {
+        return usage("--probs-top only applies to moe-trace");
+    }
+    if (mode != probe_mode::act_dump && (o.layers_set || o.kinds_set || !o.act_out.empty())) {
+        PWARN("--layers/--kinds/--act-out are only used by act-dump; ignored");
+    }
+    if (!o.io_csv.empty()) {
+#if !defined(__linux__)
+        return usage("--io-csv is Linux only (/proc/self/io)");
+#else
+        if (mode == probe_mode::names) {
+            return usage("--io-csv needs moe-trace or act-dump (names mode does not track ubatch sizes)");
+        }
+#endif
+    }
+    if (mode == probe_mode::act_dump) {
+        if (!o.layers_set) {
+            o.layers = { 5, 20, 35, 50 };
+        }
+        if (!o.kinds_set) {
+            o.kinds = { "ffn_norm", "ffn_geglu", "ffn_out" };
+        }
+        if (o.tokens < 0) {
+            o.tokens = 512;
+        }
+    }
+
+    // ---- input -------------------------------------------------------------
+    input_kind                   input      = input_kind::text;
+    const bool                   has_prompt = !params.prompt.empty() || !params.prompt_file.empty();
+    std::vector<gen_prompt_item> gen_items;
+    std::vector<llama_token>     replay_tokens;
+    std::vector<int64_t>         replay_ends;
+    std::string                  err;
+    if (!o.replay.empty()) {
+        input = input_kind::replay;
+        if (!o.gen_prompts.empty()) {
+            return usage("--replay and --gen-prompts are mutually exclusive");
+        }
+        if (has_prompt) {
+            PWARN("-p/-f are ignored with --replay");
+        }
+        if (o.chat) {
+            PWARN("--chat is ignored with --replay");
+            o.chat = false;
+        }
+        if (!load_replay_tokens(o.replay, replay_tokens, err)) {
+            return usage(err);
+        }
+        if (!o.replay_chunks.empty() && !load_replay_chunks(o.replay_chunks, replay_ends, err)) {
+            return usage(err);
+        }
+    } else {
+        if (o.replay_range_set || !o.replay_chunks.empty()) {
+            return usage("--replay-range / --replay-chunks need --replay");
+        }
+        if (!o.gen_prompts.empty()) {
+            input = input_kind::gen_prompts;
+            if (has_prompt) {
+                return usage("use either -p/-f or --gen-prompts, not both");
+            }
+            if (!load_gen_prompts(o.gen_prompts, gen_items, err)) {
+                return usage(err);
+            }
+        } else if (!has_prompt) {
+            if (mode == probe_mode::names) {
+                params.prompt = DEFAULT_NAMES_PROMPT;
+                PINFO("names mode without -p/-f: using the built-in prompt \"%s\"", DEFAULT_NAMES_PROMPT);
+            } else {
+                return usage("no input: give -p TEXT, -f FILE, --gen-prompts FILE or --replay FILE");
+            }
+        }
+    }
+
+    // ---- context size default (decision D-e) ------------------------------
+    int64_t gen_need = o.gen;
+    for (const gen_prompt_item & g : gen_items) {
+        gen_need = std::max<int64_t>(gen_need, o.gen_set ? o.gen : g.max_tokens);
+    }
+    if (input == input_kind::replay) {
+        gen_need = 0;
+    }
+    const bool explicit_ctx_zero = (uint32_t) params.fit_params_min_ctx == UINT32_MAX;
+    if (params.n_ctx == 0 && !explicit_ctx_zero) {
+        const int64_t base = (input == input_kind::gen_prompts ? 512 : o.chunk_tokens) + gen_need + 8;
+        int64_t       want = std::max<int64_t>(4096, ((base + 255) / 256) * 256);
+        want               = std::min<int64_t>(want, std::numeric_limits<int32_t>::max());
+        params.n_ctx       = (int32_t) want;
+        PINFO("-c not given: using n_ctx = %lld (chunk %lld + gen %lld)", (long long) want, (long long) o.chunk_tokens,
+              (long long) gen_need);
+    }
+
+    // ---- mandatory llama settings -------------------------------------------
+    probe_state st;
+    params.cb_eval                   = probe_cb;
+    params.cb_eval_user_data         = &st;
+    params.warmup                    = false;
+    params.sampling.backend_sampling = false;
+
+    llama_backend_init();
+    llama_numa_init(params.numa);
+    const int code = run_loaded(ri, params, st, mode, input, gen_items, replay_tokens, replay_ends);
+    llama_backend_free();
+    return code;
+}
+
+int main(int argc, char ** argv) {
+    std::setlocale(LC_NUMERIC, "C");
+    run_info ri;
+    ri.wall_start = now_ms();
+    for (int i = 0; i < argc; ++i) {
+        ri.argv_all.emplace_back(argv[i]);
+    }
+    if (!host_is_little_endian()) {
+        ri.error = "big-endian hosts are not supported (all pigemma formats are little-endian)";
+        std::fprintf(stderr, "pigemma-probe: ERROR: %s\n", ri.error.c_str());
+        print_summary(ri, PROBE_EXIT_RUNTIME);
+        return PROBE_EXIT_RUNTIME;
+    }
+
+    std::vector<char *> largv;
+    std::string         err;
+    const bool          ok = prescan_args(argc, argv, ri.opt, largv, err);
+    ri.mode_name           = ri.opt.mode;
+    if (ri.opt.help) {
+        print_probe_banner(stdout);  // llama.cpp then prints its usage + our tail and exits 0
+    } else if (ri.opt.version) {
+        std::printf("pigemma-probe %s\n", PROBE_VERSION);
+        std::fflush(stdout);
+    } else if (!ok) {
+        ri.error = err;
+        std::fprintf(stderr, "pigemma-probe: ERROR: %s (see --help)\n", err.c_str());
+        print_summary(ri, PROBE_EXIT_USAGE);
+        return PROBE_EXIT_USAGE;
+    }
+
+    const int code = run(ri, (int) largv.size(), largv.data());
+    print_summary(ri, code);
+    return code;
+}

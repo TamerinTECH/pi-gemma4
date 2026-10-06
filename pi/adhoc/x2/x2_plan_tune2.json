@@ -1,0 +1,113 @@
+{
+ "schema": "x2-plan/1",
+ "model": "~/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+ "prompts_file": "~/pigemma/x2/x2_prompts.json",
+ "warmup_prompt_id": "warmup",
+ "port": 18090,
+ "gap_s": 45,
+ "prewarm": true,
+ "load_timeout_s": 900,
+ "engines": {
+  "ours": {
+   "what": "ggml-org/llama.cpp a7b94df (our pinned build, native on the Pi 08:51)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-nr",
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  },
+  "ik": {
+   "what": "ikawrakow/ik_llama.cpp 3d27f5bb (native on the Pi, X2)",
+   "bin": "~/pigemma/ik_llama.cpp/build/bin/llama-server",
+   "args": [
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  },
+  "ours-repack": {
+   "what": "ggml-org/llama.cpp a7b94df, SAME binary as 'ours' but WITHOUT -nr (llama.cpp's default weight repacking: eligible tensors are copied into anonymous CPU_REPACK memory; different memory layout, resident-only reference)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  }
+ },
+ "common_request": {
+  "endpoint": "POST /completion",
+  "temperature": 0,
+  "top_k": 1,
+  "seed": 1,
+  "cache_prompt": false,
+  "stream": true,
+  "mtp": "off (no -md / --spec-type)",
+  "ik": "no -rtr, no -ser, no -prexp, no -khad"
+ },
+ "purpose": "TUNING pass 2 (2 tuning requests only), declared 2026-10-05 23:05 after pass 1 and before any held-out request. (a) Re-runs the two pass-1 blocks that never started (both servers failed to re-bind port 18090 inside the 60 s TIME_WAIT; the driver now uses one port per block). (b) POST-HOC ADDITION to the grid: 'ours-repack' = our a7b94df binary without -nr. Reason: pass 1 showed a 2.8x prefill gap, and -nr is known to slow llama.cpp's kernels (E0, x86: prefill 0.66x), so comparing ik only against our -nr build could overstate ik. ik's analogous option -rtr is NOT run: it disables mmap and would hold ~12.1 GiB of weights in anonymous memory, leaving MemAvailable ~2.2 GiB < the 3 GiB safety floor on this board. (c) REVISED RULE (the pass-1 rule 'smallest sum of total latency' is confounded by reply length: ik produced 41 vs 59-63 tokens for tun-01 depending on the config): per engine choose the config with the smallest S = sum over the 2 tuning requests of [TTFT + (n_predict - 1) / client decode rate], i.e. the projected time to prefill and to generate the full bound; ties within 2 % go to -t 4, then (ik) to --swa-compress.",
+ "blocks": [
+  {
+   "label": "tune2-ik-t4",
+   "engine": "ik",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "tune2-ours-t3",
+   "engine": "ours",
+   "config": "t3",
+   "args": [
+    "-t",
+    "3"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "tune2-oursrepack-t4",
+   "engine": "ours-repack",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  }
+ ]
+}

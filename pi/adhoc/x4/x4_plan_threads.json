@@ -1,0 +1,164 @@
+{
+ "schema": "x4-plan/1 (x2-plan/1 + model_files, cool_below_c, perf_counters, body_extra, repeated prompt ids)",
+ "model": "~/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+ "prompts_file": "~/pigemma/x4/x4_prompts.json",
+ "warmup_prompt_id": "warmup",
+ "port": 18190,
+ "gap_s": 45,
+ "prewarm": true,
+ "load_timeout_s": 900,
+ "cool_below_c": 62,
+ "cool_max_wait_s": 420,
+ "perf_counters": true,
+ "engines": {
+  "ours": {
+   "what": "ggml-org/llama.cpp a7b94df, native Pi build, weights memory-mapped (-nr)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-nr",
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  },
+  "ours-repack": {
+   "what": "same binary WITHOUT -nr: llama.cpp default repack (eligible tensors are copied into anonymous CPU_REPACK memory)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  }
+ },
+ "common_request": {
+  "endpoint": "POST /completion",
+  "temperature": 0,
+  "top_k": 1,
+  "seed": 1,
+  "cache_prompt": false,
+  "stream": true,
+  "mtp": "off (no -md / --spec-type)"
+ },
+ "purpose": "Thread scaling 1/2/3/4 for prefill and decode, resident (no memory pressure), our a7b94df -nr build, the two X2 tuning requests (30-token chat, 687-token extraction), two interleaved passes (4,1,3,2 then 2,3,1,4). -tb is left at its default (= -t).",
+ "blocks": [
+  {
+   "label": "thr-t4-r1",
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "thr-t1-r1",
+   "engine": "ours",
+   "config": "t1",
+   "args": [
+    "-t",
+    "1"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "thr-t3-r1",
+   "engine": "ours",
+   "config": "t3",
+   "args": [
+    "-t",
+    "3"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "thr-t2-r1",
+   "engine": "ours",
+   "config": "t2",
+   "args": [
+    "-t",
+    "2"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "thr-t2-r2",
+   "engine": "ours",
+   "config": "t2",
+   "args": [
+    "-t",
+    "2"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "thr-t3-r2",
+   "engine": "ours",
+   "config": "t3",
+   "args": [
+    "-t",
+    "3"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "thr-t1-r2",
+   "engine": "ours",
+   "config": "t1",
+   "args": [
+    "-t",
+    "1"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "thr-t4-r2",
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  }
+ ]
+}

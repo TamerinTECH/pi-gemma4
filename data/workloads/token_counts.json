@@ -1,0 +1,1000 @@
+{
+ "format": "pigemma-workload-tokens/2",
+ "kind": {
+  "prompt_tokens_empty_replies": "measured",
+  "thought_block_tokens": "measured",
+  "first_prompt_tokens": "measured",
+  "prompt_tokens_upper / reusable_prefix_upper / new_prefill_upper": "projected upper bound (every earlier reply at max_tokens; reuse as in expected_reuse_note) - not a measurement"
+ },
+ "tool": {
+  "binary": "third_party/llama.cpp-win/llama-tokenize.exe",
+  "llama_commit": "a7b94df",
+  "flags": "-m MODEL -f FILE --ids --no-escape --log-disable (BOS added, specials parsed)",
+  "model": "models/google__gemma-4-26B-A4B-it-qat-q4_0-gguf/gemma-4-26B_q4_0-it.gguf",
+  "load": "vocab_only (no weights, no inference)"
+ },
+ "rendering": "pigemma.workloads.render_gemma4 (thinking disabled, bos=False; the tool adds BOS)",
+ "bos_tokens": 1,
+ "thought_block_tokens": 4,
+ "length_class_rule": "short < 80 <= medium < 500 <= long (first-request prompt tokens)",
+ "files_sha256": {
+  "calibration": "91f0a0016c71781dc6dad3737f1a1c70708cd6deb2aac89234c85e212a1c623a",
+  "tuning": "e999533a300c6caf6b23d636101668e345995ae54ab9725e0c54b80d39b21f99",
+  "heldout": "8f55067d91d488be62332ab89ab510c1e3c6e07a8c6242bc54939c331ea6967e"
+ },
+ "by_set": {
+  "calibration": {
+   "n_requests": 32,
+   "first_prompt_tokens_total": 4435,
+   "new_prefill_tokens_per_pass_upper": 5279,
+   "generation_budget_tokens": 2320,
+   "length_classes": {
+    "long": 5,
+    "medium": 3,
+    "short": 16
+   }
+  },
+  "tuning": {
+   "n_requests": 11,
+   "first_prompt_tokens_total": 1577,
+   "new_prefill_tokens_per_pass_upper": 1850,
+   "generation_budget_tokens": 704,
+   "length_classes": {
+    "long": 2,
+    "short": 6
+   }
+  },
+  "heldout": {
+   "n_requests": 26,
+   "first_prompt_tokens_total": 3664,
+   "new_prefill_tokens_per_pass_upper": 4289,
+   "generation_budget_tokens": 1488,
+   "length_classes": {
+    "long": 4,
+    "medium": 2,
+    "short": 13
+   }
+  }
+ },
+ "conversations": {
+  "cal-01": {
+   "prompt_tokens_empty_replies": [
+    33
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    33
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    33
+   ],
+   "first_prompt_tokens": 33,
+   "length_class": "short"
+  },
+  "cal-02": {
+   "prompt_tokens_empty_replies": [
+    35
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    35
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    35
+   ],
+   "first_prompt_tokens": 35,
+   "length_class": "short"
+  },
+  "cal-03": {
+   "prompt_tokens_empty_replies": [
+    35
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    35
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    35
+   ],
+   "first_prompt_tokens": 35,
+   "length_class": "short"
+  },
+  "cal-04": {
+   "prompt_tokens_empty_replies": [
+    74
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    74
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    74
+   ],
+   "first_prompt_tokens": 74,
+   "length_class": "short"
+  },
+  "cal-05": {
+   "prompt_tokens_empty_replies": [
+    33
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    33
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    33
+   ],
+   "first_prompt_tokens": 33,
+   "length_class": "short"
+  },
+  "cal-06": {
+   "prompt_tokens_empty_replies": [
+    53
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    53
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    53
+   ],
+   "first_prompt_tokens": 53,
+   "length_class": "short"
+  },
+  "cal-07": {
+   "prompt_tokens_empty_replies": [
+    47
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    47
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    47
+   ],
+   "first_prompt_tokens": 47,
+   "length_class": "short"
+  },
+  "cal-08": {
+   "prompt_tokens_empty_replies": [
+    103
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    103
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    103
+   ],
+   "first_prompt_tokens": 103,
+   "length_class": "medium"
+  },
+  "cal-09": {
+   "prompt_tokens_empty_replies": [
+    70
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    70
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    70
+   ],
+   "first_prompt_tokens": 70,
+   "length_class": "short"
+  },
+  "cal-10": {
+   "prompt_tokens_empty_replies": [
+    63
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    63
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    63
+   ],
+   "first_prompt_tokens": 63,
+   "length_class": "short"
+  },
+  "cal-11": {
+   "prompt_tokens_empty_replies": [
+    59
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    59
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    59
+   ],
+   "first_prompt_tokens": 59,
+   "length_class": "short"
+  },
+  "cal-12": {
+   "prompt_tokens_empty_replies": [
+    52
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    52
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    52
+   ],
+   "first_prompt_tokens": 52,
+   "length_class": "short"
+  },
+  "cal-13": {
+   "prompt_tokens_empty_replies": [
+    114
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    114
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    114
+   ],
+   "first_prompt_tokens": 114,
+   "length_class": "medium"
+  },
+  "cal-14": {
+   "prompt_tokens_empty_replies": [
+    145
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    145
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    145
+   ],
+   "first_prompt_tokens": 145,
+   "length_class": "medium"
+  },
+  "cal-15": {
+   "prompt_tokens_empty_replies": [
+    804
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    804
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    804
+   ],
+   "first_prompt_tokens": 804,
+   "length_class": "long"
+  },
+  "cal-16": {
+   "prompt_tokens_empty_replies": [
+    737
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    737
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    737
+   ],
+   "first_prompt_tokens": 737,
+   "length_class": "long"
+  },
+  "cal-17": {
+   "prompt_tokens_empty_replies": [
+    554
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    554
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    554
+   ],
+   "first_prompt_tokens": 554,
+   "length_class": "long"
+  },
+  "cal-18": {
+   "prompt_tokens_empty_replies": [
+    668
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    668
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    668
+   ],
+   "first_prompt_tokens": 668,
+   "length_class": "long"
+  },
+  "cal-19": {
+   "prompt_tokens_empty_replies": [
+    27,
+    64,
+    92
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    27,
+    128,
+    220
+   ],
+   "reusable_prefix_upper": [
+    0,
+    23,
+    124
+   ],
+   "new_prefill_upper": [
+    27,
+    105,
+    96
+   ],
+   "first_prompt_tokens": 27,
+   "length_class": "short"
+  },
+  "cal-20": {
+   "prompt_tokens_empty_replies": [
+    38,
+    70,
+    97
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    38,
+    134,
+    225
+   ],
+   "reusable_prefix_upper": [
+    0,
+    34,
+    130
+   ],
+   "new_prefill_upper": [
+    38,
+    100,
+    95
+   ],
+   "first_prompt_tokens": 38,
+   "length_class": "short"
+  },
+  "cal-21": {
+   "prompt_tokens_empty_replies": [
+    30,
+    69,
+    99
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    30,
+    133,
+    227
+   ],
+   "reusable_prefix_upper": [
+    0,
+    26,
+    129
+   ],
+   "new_prefill_upper": [
+    30,
+    107,
+    98
+   ],
+   "first_prompt_tokens": 30,
+   "length_class": "short"
+  },
+  "cal-22": {
+   "prompt_tokens_empty_replies": [
+    564,
+    592
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    564,
+    672
+   ],
+   "reusable_prefix_upper": [
+    0,
+    560
+   ],
+   "new_prefill_upper": [
+    564,
+    112
+   ],
+   "first_prompt_tokens": 564,
+   "length_class": "long"
+  },
+  "cal-23": {
+   "prompt_tokens_empty_replies": [
+    46,
+    77
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    46,
+    173
+   ],
+   "reusable_prefix_upper": [
+    0,
+    42
+   ],
+   "new_prefill_upper": [
+    46,
+    131
+   ],
+   "first_prompt_tokens": 46,
+   "length_class": "short"
+  },
+  "cal-24": {
+   "prompt_tokens_empty_replies": [
+    51
+   ],
+   "set": "calibration",
+   "prompt_tokens_upper": [
+    51
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    51
+   ],
+   "first_prompt_tokens": 51,
+   "length_class": "short"
+  },
+  "tun-01": {
+   "prompt_tokens_empty_replies": [
+    30
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    30
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    30
+   ],
+   "first_prompt_tokens": 30,
+   "length_class": "short"
+  },
+  "tun-02": {
+   "prompt_tokens_empty_replies": [
+    39
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    39
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    39
+   ],
+   "first_prompt_tokens": 39,
+   "length_class": "short"
+  },
+  "tun-03": {
+   "prompt_tokens_empty_replies": [
+    30
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    30
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    30
+   ],
+   "first_prompt_tokens": 30,
+   "length_class": "short"
+  },
+  "tun-04": {
+   "prompt_tokens_empty_replies": [
+    47
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    47
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    47
+   ],
+   "first_prompt_tokens": 47,
+   "length_class": "short"
+  },
+  "tun-05": {
+   "prompt_tokens_empty_replies": [
+    57
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    57
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    57
+   ],
+   "first_prompt_tokens": 57,
+   "length_class": "short"
+  },
+  "tun-06": {
+   "prompt_tokens_empty_replies": [
+    687
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    687
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    687
+   ],
+   "first_prompt_tokens": 687,
+   "length_class": "long"
+  },
+  "tun-07": {
+   "prompt_tokens_empty_replies": [
+    28,
+    65,
+    98
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    28,
+    113,
+    194
+   ],
+   "reusable_prefix_upper": [
+    0,
+    24,
+    109
+   ],
+   "new_prefill_upper": [
+    28,
+    89,
+    85
+   ],
+   "first_prompt_tokens": 28,
+   "length_class": "short"
+  },
+  "tun-08": {
+   "prompt_tokens_empty_replies": [
+    659,
+    690
+   ],
+   "set": "tuning",
+   "prompt_tokens_upper": [
+    659,
+    754
+   ],
+   "reusable_prefix_upper": [
+    0,
+    655
+   ],
+   "new_prefill_upper": [
+    659,
+    99
+   ],
+   "first_prompt_tokens": 659,
+   "length_class": "long"
+  },
+  "ho-01": {
+   "prompt_tokens_empty_replies": [
+    33
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    33
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    33
+   ],
+   "first_prompt_tokens": 33,
+   "length_class": "short"
+  },
+  "ho-02": {
+   "prompt_tokens_empty_replies": [
+    32
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    32
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    32
+   ],
+   "first_prompt_tokens": 32,
+   "length_class": "short"
+  },
+  "ho-03": {
+   "prompt_tokens_empty_replies": [
+    40
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    40
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    40
+   ],
+   "first_prompt_tokens": 40,
+   "length_class": "short"
+  },
+  "ho-04": {
+   "prompt_tokens_empty_replies": [
+    33
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    33
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    33
+   ],
+   "first_prompt_tokens": 33,
+   "length_class": "short"
+  },
+  "ho-05": {
+   "prompt_tokens_empty_replies": [
+    36
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    36
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    36
+   ],
+   "first_prompt_tokens": 36,
+   "length_class": "short"
+  },
+  "ho-06": {
+   "prompt_tokens_empty_replies": [
+    28
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    28
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    28
+   ],
+   "first_prompt_tokens": 28,
+   "length_class": "short"
+  },
+  "ho-07": {
+   "prompt_tokens_empty_replies": [
+    49
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    49
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    49
+   ],
+   "first_prompt_tokens": 49,
+   "length_class": "short"
+  },
+  "ho-08": {
+   "prompt_tokens_empty_replies": [
+    91
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    91
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    91
+   ],
+   "first_prompt_tokens": 91,
+   "length_class": "medium"
+  },
+  "ho-09": {
+   "prompt_tokens_empty_replies": [
+    63
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    63
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    63
+   ],
+   "first_prompt_tokens": 63,
+   "length_class": "short"
+  },
+  "ho-10": {
+   "prompt_tokens_empty_replies": [
+    52
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    52
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    52
+   ],
+   "first_prompt_tokens": 52,
+   "length_class": "short"
+  },
+  "ho-11": {
+   "prompt_tokens_empty_replies": [
+    98
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    98
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    98
+   ],
+   "first_prompt_tokens": 98,
+   "length_class": "medium"
+  },
+  "ho-12": {
+   "prompt_tokens_empty_replies": [
+    744
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    744
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    744
+   ],
+   "first_prompt_tokens": 744,
+   "length_class": "long"
+  },
+  "ho-13": {
+   "prompt_tokens_empty_replies": [
+    884
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    884
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    884
+   ],
+   "first_prompt_tokens": 884,
+   "length_class": "long"
+  },
+  "ho-14": {
+   "prompt_tokens_empty_replies": [
+    642
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    642
+   ],
+   "reusable_prefix_upper": [
+    0
+   ],
+   "new_prefill_upper": [
+    642
+   ],
+   "first_prompt_tokens": 642,
+   "length_class": "long"
+  },
+  "ho-15": {
+   "prompt_tokens_empty_replies": [
+    30,
+    77,
+    110
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    30,
+    125,
+    206
+   ],
+   "reusable_prefix_upper": [
+    0,
+    26,
+    121
+   ],
+   "new_prefill_upper": [
+    30,
+    99,
+    85
+   ],
+   "first_prompt_tokens": 30,
+   "length_class": "short"
+  },
+  "ho-16": {
+   "prompt_tokens_empty_replies": [
+    32,
+    74,
+    101
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    32,
+    122,
+    197
+   ],
+   "reusable_prefix_upper": [
+    0,
+    28,
+    118
+   ],
+   "new_prefill_upper": [
+    32,
+    94,
+    79
+   ],
+   "first_prompt_tokens": 32,
+   "length_class": "short"
+  },
+  "ho-17": {
+   "prompt_tokens_empty_replies": [
+    702,
+    733
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    702,
+    789
+   ],
+   "reusable_prefix_upper": [
+    0,
+    698
+   ],
+   "new_prefill_upper": [
+    702,
+    91
+   ],
+   "first_prompt_tokens": 702,
+   "length_class": "long"
+  },
+  "ho-18": {
+   "prompt_tokens_empty_replies": [
+    37,
+    69
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    37,
+    125
+   ],
+   "reusable_prefix_upper": [
+    0,
+    33
+   ],
+   "new_prefill_upper": [
+    37,
+    92
+   ],
+   "first_prompt_tokens": 37,
+   "length_class": "short"
+  },
+  "ho-19": {
+   "prompt_tokens_empty_replies": [
+    38,
+    71
+   ],
+   "set": "heldout",
+   "prompt_tokens_upper": [
+    38,
+    119
+   ],
+   "reusable_prefix_upper": [
+    0,
+    34
+   ],
+   "new_prefill_upper": [
+    38,
+    85
+   ],
+   "first_prompt_tokens": 38,
+   "length_class": "short"
+  }
+ }
+}

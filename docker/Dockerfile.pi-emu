@@ -1,0 +1,9 @@
+# Emulated Raspberry Pi 5 userland: Debian 13 (trixie) arm64, same OS release as Raspberry Pi OS (trixie).
+# Runs under qemu-user via Docker Desktop binfmt. Functional testing only: speed is NOT representative.
+FROM --platform=linux/arm64 debian:trixie
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential cmake ninja-build git ca-certificates curl \
+      python3 python3-numpy fio procps util-linux kmod time file \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

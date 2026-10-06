@@ -1,0 +1,424 @@
+#include "debug.h"
+
+#include "common.h"
+#include "log.h"
+
+#include <cmath>
+#include <regex>
+#include <string>
+#include <vector>
+
+struct common_debug_cb_user_data::impl {
+    std::vector<uint8_t>    data;
+    std::vector<std::regex> tensor_filters;
+    bool                    abort_on_nan{false};
+};
+
+common_debug_cb_user_data::common_debug_cb_user_data() : pimpl(std::make_unique<impl>()) {}
+common_debug_cb_user_data::~common_debug_cb_user_data() = default;
+
+common_debug_cb_user_data::common_debug_cb_user_data(common_params & params, const std::vector<std::string> & filter_patterns, bool abort_on_nan)
+    : pimpl(std::make_unique<impl>())
+{
+    for (const auto & pattern : filter_patterns) {
+        try {
+            std::string anchored_pattern = "^" + pattern;
+            pimpl->tensor_filters.emplace_back(anchored_pattern, std::regex::optimize);
+        } catch (const std::regex_error & e) {
+            throw std::runtime_error("Invalid regex pattern '" + pattern + "': " + e.what());
+        }
+    }
+    pimpl->abort_on_nan = abort_on_nan;
+
+    params.cb_eval           = common_debug_cb_eval;
+    params.cb_eval_user_data = this;
+}
+
+static std::string common_ggml_ne_string(const ggml_tensor * t) {
+
+#include "arg.h"
+#include "common.h"
+#include "debug.h"
+#include "log.h"
+#include "llama.h"
+
+#include <clocale>
+#include <string>
+#include <vector>
+
+static bool run(llama_context * ctx, const common_params & params) {
+    const llama_model * model = llama_get_model(ctx);
+    const llama_vocab * vocab = llama_model_get_vocab(model);
+
+    const bool add_bos = llama_vocab_get_add_bos(vocab);
+
+    std::vector<llama_token> tokens = common_tokenize(ctx, params.prompt, add_bos, true);
+
+    if (tokens.empty()) {
+        LOG_ERR("%s : there are not input tokens to process - (try to provide a prompt with '-p')\n", __func__);
+        return false;
+    }
+
+    LOG_INF("number of input tokens = %zu\n", tokens.size());
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        LOG_INF("  %d\n", tokens[i]);
+    }
+
+    common_batch batch = common_batch_get_one(ctx, tokens);
+    if (llama_process(ctx, LLAMA_PROCESS_TYPE_DECODE, batch.get())) {
+        LOG_ERR("%s : failed to eval\n", __func__);
+        return false;
+    }
+
+    return true;
+}
+
+int main(int argc, char ** argv) {
+    std::setlocale(LC_NUMERIC, "C");
+
+    common_debug_cb_user_data cb_data;
+
+    common_params params;
+
+    common_init();
+
+    if (!common_params_parse(argc, argv, params, LLAMA_EXAMPLE_COMMON)) {
+
+Kleine Computer im Klassenzimmer
+
+Seit einigen Jahren experimentieren viele Schulen in Bayern mit kleinen Einplatinencomputern wie dem Raspberry Pi. Die Geräte kosten nur einen Bruchteil eines Laptops, verbrauchen wenig Strom und lassen sich an jeden Bildschirm anschließen. Im Informatikunterricht lernen die Schülerinnen und Schüler damit nicht nur das Programmieren, sondern auch, wie ein Computer überhaupt aufgebaut ist: Prozessor, Arbeitsspeicher, Speicherkarte und Netzwerk sind offen sichtbar und keine geschlossene Blackbox.
+
+Eine neue Frage stellt sich mit den großen Sprachmodellen. Kann ein solcher Kleincomputer ein Sprachmodell selbst ausführen, ohne dass die Daten der Schule in eine Cloud geschickt werden? Für den Datenschutz wäre das ein großer Vorteil. Elternbriefe, Notizen aus dem Unterricht oder Gesprächsprotokolle würden das Gebäude nie verlassen. Die Schwierigkeit liegt in der Größe der Modelle. Ein Modell mit dreißig Milliarden Parametern benötigt selbst in stark komprimierter Form mehr als zehn Gigabyte Speicher, und bei jedem erzeugten Wort müssen große Teile dieser Daten durch den Prozessor fließen.
+
+Ein Mixture-of-Experts-Modell ist hier im Vorteil. Es besteht aus vielen kleinen Teilnetzen, den sogenannten Experten, von denen für jedes Wort nur wenige aktiviert werden. Dadurch muss der Rechner pro Wort deutlich weniger Daten bewegen. Ob sich das in der Praxis auszahlt, hängt davon ab, wie oft dieselben Experten hintereinander gebraucht werden. Wechselt das Gespräch plötzlich das Thema, etwa von Mathematik zu Geschichte, werden andere Experten benötigt, und diese müssen erst aus dem langsameren Speicher geladen werden.
+
+The bakery opened before the street did. At a quarter past four, Mara unlocked the back door, switched on the ovens, and stood for a moment in the dark listening to them tick as they warmed. The dough from the night before had risen under its damp cloths, slow and patient, the way the old baker who trained her had insisted it should. Fast dough tastes of nothing, he used to say. Give it the night.
+
+By five the first trays were in. The smell of crust reached the front room and then, through the gap under the door, the pavement outside, where the first commuter of the day slowed down without quite knowing why. Mara shaped the rye loaves by hand, dusted them, scored them with three quick cuts, and slid them in beside the baguettes. The radio murmured the weather: rain by noon, clearing by evening.
+
+Tomas arrived at six with the newspaper under his arm and the keys to the delivery van in his fist. He was the kind of man who announced himself by sighing. The van needs a new tyre, he said. The van always needs something, Mara said, and handed him a coffee and a roll still too hot to hold. He ate it anyway, shifting it from hand to hand, and read her the headlines while she filled the window: seeded rolls on the left, sweet things on the right, the big country loaves in the middle where people could see them from across the road.
+
+How a mixture-of-experts transformer decides which weights to touch
+
+A dense transformer applies the same feed-forward network to every token. A mixture-of-experts (MoE) transformer replaces that single network with many smaller networks, the experts, and adds a router in front of them. For each token, the router computes a score for every expert, keeps the top few, and sends the token only to those. Gemma 4 26B-A4B uses 128 experts per layer and activates 8 of them per token, in addition to a small dense network that every token passes through. The total parameter count is about 25 billion, but any single token only exercises about 3.8 billion of them.
+
+This matters for memory traffic more than for arithmetic. Generating one token means reading, for every layer, the weights of the eight selected experts. At four bits per weight, one expert in one layer is about 3.3 megabytes, so a token touches roughly 800 megabytes of expert weights across the thirty layers if nothing is cached. A desktop with 60 gigabytes per second of memory bandwidth barely notices. A Raspberry Pi 5, whose memory subsystem delivers about ten gigabytes per second to a CPU program and whose storage delivers somewhere between ninety megabytes per second from a microSD card and nine hundred megabytes per second from an NVMe drive on a PCIe Gen 3 lane, notices a great deal.
+
+בוא נחשוב על רעיונות איך להריץ מודלי שפה עם פחות משאבים, עם פחות GPU, פחות זיכרון. איזושהי דרך יעילה יותר. בעצם לעשות את כל זה יעיל יותר. לחשוב על אפשרויות גם מוזרות, הזויות, מטורפות, אבל תחשוב על כל מיני דברים שאפשר לעשות ואחר כך נבדוק אם זה ריאליסטי. אבל המטרה שלנו בעצם לעשות disruption לדרך שבה מריצים מודלי שפה. מריצים או מאמנים, אבל בעיקר להריץ, כי לאמן אפשר להישאר על ה-GPU, אבל בעיקר להריץ, inference.
+
+כן. והייתי מתחיל מהיפוך של השאלה: לא רק "איך מריצים את אותו מודל יותר בזול?", אלא "איזה חלק מהחישוב בכלל חייב לקרות כדי לענות על השאלה הזאת?"
+
+אפשר לחפש כאן שלושה סוגים של פריצת דרך: לבצע את אותו חישוב בצורה יעילה יותר; להגיע לאותה איכות באמצעות חישוב אחר; או לבנות מערכת שמספקת אותה תועלת בלי להפעיל מודל גדול בכל פעם. אלה מטרות שונות, והשלישית יכולה להיות מהפכה מסחרית גם בלי להיות מהפכה במתמטיקה.
+
+קודם: מה בעצם אנחנו רוצים להפסיק לבזבז? בהרצה יש הבדל בין קריאת הקלט הראשונית לבין יצירת ההמשך טוקן אחר טוקן. במיוחד בהרצה של שיחה אחת או מעט שיחות, יצירת ההמשך יכולה להיות מוגבלת לא רק בכוח החישוב אלא בהעברת משקולות ונתוני זיכרון אל יחידות החישוב. לכן פחות פעולות חשבון לא בהכרח ייתנו האצה אם עדיין מעבירים כמעט את אותם נתונים.
+
+דוגמה חשבונית מפושטת: שמונה מיליארד משקולות, בארבעה ביטים למשקולת, הן כ-4GB, לפני מידע נלווה וזיכרון השיחה. אם בכל טוקן קוראים את כל ה-4GB מחדש, וקצב היעד הוא 20 טוקנים בשנייה, נדרשת תעבורה של כ-80GB בשנייה רק למשקולות. זאת תחת ההנחה שאין שיתוף משמעותי של הקריאה בין בקשות ושאין די מקום להחזיק את המשקולות בזיכרון המטמון של המעבד.
+
+Q: A model file is 14.44 GB and a drive reads 850 MB/s. How long does a full read take?
+A: 14,440 MB / 850 MB/s = 16.99 seconds, about 17 seconds.
+
+Q: If one expert in one layer is 3.345 MB and a token visits 8 experts in each of 30 layers, how many bytes are touched?
+A: 8 x 30 = 240 expert visits; 240 x 3.345 MB = 802.8 MB per token.
+
+Q: With a 75 percent cache hit rate, how much is read from storage per token?
+A: 25 percent of 802.8 MB = 200.7 MB. At 850 MB/s that is 0.236 s, so at most 4.2 tokens per second.
+
+Q: Convert 2.4 GHz to cycles per millisecond.
+A: 2.4 GHz = 2,400,000,000 cycles per second = 2,400,000 cycles per millisecond.
+
+Q: List the Raspberry Pi 5 memory options.
+A: 2 GB, 4 GB, 8 GB and 16 GB. The 16 GB model was introduced in January 2025.
+
+Q: What is 17 percent of 262,144?
+A: 0.17 x 262,144 = 44,564.48.
+
+Q: Translate "the oven is hot" into Hebrew.
+A: התנור חם.
+
+Q: כמה זה שלוש כפול ארבע?
+A: שתים עשרה.
+
+Q: Sort these numbers: 0.28, 1.4, 0.74, 0.45.
+A: 0.28, 0.45, 0.74, 1.4.
+
+Q: Which dates fall on a Monday in October 2026?
+A: October 5, 12, 19 and 26.
+
+Q: A kernel uses 16 KiB pages. How many pages cover a 3.345 MB expert?
+A: 3,345,000 / 16,384 = 204.2, so 205 pages.
+
+    std::string str;
+    for (int i = 0; i < GGML_MAX_DIMS; ++i) {
+        str += std::to_string(t->ne[i]);
+        if (i + 1 < GGML_MAX_DIMS) {
+            str += ", ";
+        }
+    }
+    return str;
+}
+
+static float common_ggml_get_float_value(const uint8_t * data,
+                           ggml_type       type,
+                           const size_t *  nb,
+                           size_t          i0,
+                           size_t          i1,
+                           size_t          i2,
+                           size_t          i3) {
+    size_t i = i3 * nb[3] + i2 * nb[2] + i1 * nb[1] + i0 * nb[0];
+    float  v;
+    if (type == GGML_TYPE_F16) {
+        v = ggml_fp16_to_fp32(*(const ggml_fp16_t *) &data[i]);
+    } else if (type == GGML_TYPE_F32) {
+        v = *(const float *) &data[i];
+    } else if (type == GGML_TYPE_I64) {
+        v = (float) *(const int64_t *) &data[i];
+    } else if (type == GGML_TYPE_I32) {
+        v = (float) *(const int32_t *) &data[i];
+    } else if (type == GGML_TYPE_I16) {
+        v = (float) *(const int16_t *) &data[i];
+    } else if (type == GGML_TYPE_I8) {
+        v = (float) *(const int8_t *) &data[i];
+    } else if (type == GGML_TYPE_BF16) {
+
+        return 1;
+    }
+
+    llama_backend_init();
+    llama_numa_init(params.numa);
+
+    // pass the callback to the backend scheduler
+    // it will be executed for each node during the graph computation
+    params.cb_eval = common_debug_cb_eval;
+    params.cb_eval_user_data = &cb_data;
+    params.warmup = false;
+
+    // init
+    auto llama_init = common_init_from_params(params);
+
+    auto * model = llama_init->model();
+    auto * ctx   = llama_init->context();
+
+    if (model == nullptr || ctx == nullptr) {
+        LOG_ERR("%s : failed to init\n", __func__);
+        return 1;
+    }
+
+    // print system information
+    {
+        LOG_INF("\n");
+        LOG_INF("%s\n", common_params_get_system_info(params).c_str());
+        LOG_INF("\n");
+    }
+
+    bool OK = run(ctx, params);
+    if (!OK) {
+        return 1;
+    }
+
+    LOG("\n");
+    llama_perf_context_print(ctx);
+
+    llama_backend_free();
+
+    return 0;
+}
+
+
+Für eine Schule zählt am Ende nicht die Theorie, sondern die Wartezeit. Eine Antwort, die nach zwei Sekunden beginnt und flüssig weiterläuft, wird akzeptiert. Eine Antwort, die eine Minute braucht, nicht. Deshalb messen wir nicht nur Wörter pro Sekunde, sondern auch die Zeit bis zur ersten Antwort, den Speicherverbrauch und die Temperatur des Geräts über eine ganze Unterrichtsstunde hinweg.
+
+Die Rechnung ist einfach. Ein Brot beim Bäcker um die Ecke kostet drei Euro zwanzig, fünf Brote also sechzehn Euro. Ein Raspberry Pi mit sechzehn Gigabyte Arbeitsspeicher kostet heute deutlich mehr als bei seiner Einführung, weil Speicherchips teurer geworden sind. Trotzdem bleibt er günstiger als ein Server, und er passt in jede Schultasche.
+
+
+At seven the bell over the door began to ring and did not stop until nine. The regulars came in an order so fixed that Mara could have set the clock by them. The teacher who bought two croissants and ate one on the way to school. The nurse coming off a night shift who wanted only a slice of the dark bread with butter and would not sit down. The boy who was sent for the family's loaf every morning and every morning forgot the change, so that his mother came by in the afternoon, apologising, and bought a cake she had not meant to buy.
+
+Between customers Mara kneaded the next batch. Her hands knew the work and left her mind free to wander. She thought about the rent, which went up each spring like the river, and about the new place that had opened by the station selling bread that had been frozen somewhere far away and finished in an oven the size of a wardrobe. She thought about her daughter, who was studying in another city and sent photographs of other people's bakeries with the message: not as good as yours.
+
+The rain came as the radio had promised, and the shop filled with wet coats and the particular cheerfulness of people who have escaped something. Tomas came back from his round soaked and triumphant with the news that the hotel on the hill wanted forty loaves a day from next month. Forty, Mara said. Forty, he said. She did the arithmetic in flour on the counter and wiped it away before anyone could see her smile.
+
+
+The question that decides whether such a model is usable on a small board is therefore not how many operations it performs but how many bytes must cross the slowest link per token. If the eight experts chosen for the current token were also chosen for the previous token, their weights are already in RAM and nothing needs to be read from storage. If the router jumps to eight experts that have not been used in a while, each miss costs a multi-megabyte read. The hit rate of whatever cache sits between storage and the CPU is the number that matters.
+
+Three properties of real routers help. First, expert popularity is skewed: a minority of experts receives a majority of the traffic, so a cache that keeps the popular ones warm serves most requests. Second, consecutive tokens share experts far more often than chance would predict, because neighbouring tokens tend to belong to the same syntactic and semantic neighbourhood. Third, routing is partly predictable from the routing decisions of earlier layers, which allows prefetching the next layer's experts while the current layer computes.
+
+None of these properties can be assumed for a particular model. They have to be measured by recording which experts each layer selects for each token on a representative text, then replaying that record against a simulated cache of a given size with a given replacement policy. The replay yields a hit rate, the hit rate yields bytes per token, and bytes per token divided by storage bandwidth yields a lower bound on the time per token. If that bound is well below the time the CPU needs for the arithmetic, the storage link is not the bottleneck and the model is as fast as the CPU allows. If it is above, the storage link dominates and the only remedies are a faster drive, more RAM for the cache, a smarter replacement policy, or a smaller quantisation of the expert weights.
+
+
+מכאן נובעת בעיניי השאלה החשובה: איך גורמים למערכת להזיז פחות מידע, לגעת בפחות משקולות, ולעבור פחות פעמים דרך המודל הגדול?
+
+1. מודל שלא נטען לזיכרון, אלא "ממופה" אליו. הרעיון: להתייחס למודל כמו למערכת הפעלה גדולה, שלא כל הקוד שלה חייב להיות בזיכרון בכל רגע. נחזיק ליבה קטנה וקבועה שמטפלת בפעולות הבסיסיות. שאר המודל יחולק לחבילות חישוב, ורק החבילות שנדרשות כרגע ייכנסו לזיכרון המהיר. אבל החלק המעניין אינו רק "לטעון מומחים לפי הצורך". הייתי מנסה לבנות מודל שבו אותו סט קטן של חבילות נשאר שימושי לאורך מקטע שלם, במקום להחליף אותו בכל טוקן. למשל, בזמן הסבר מסוים במתמטיקה, המערכת תשתמש במסלול חישוב יציב יחסית. מעבר לנושא אחר יחליף חלק מהמסלול. אלה לא בהכרח "מומחה מתמטיקה" ו"מומחה היסטוריה" במובן האנושי, אלא קבוצות משקולות שלמדו לעבוד יחד. ההרחבה שהייתי בודק: לאמן את המודל מראש כך שעלות החלפת החבילות תהיה חלק מפונקציית המטרה. לא רק "תענה נכון", אלא גם "אל תגרום לי לקרוא עוד מאות מגה-בייט מהאחסון". הסיכון: אם החבילות מתחלפות מהר מדי, חסכנו RAM אבל יצרנו עומס קריאות שהופך את המערכת לאטית.
+
+2. משקולות שנפתחות בהדרגה, כמו תמונה שמתחילה מטושטשת. הרעיון: לא לחשב בכל פעם בדיוק המרבי. להתחיל בקירוב זול ולהוסיף דיוק רק כאשר הוא עשוי לשנות את ההחלטה. במקום גרסה אחת של המשקולות, נשמור ייצוג בסיסי קטן ועוד שכבות תיקון: קירוב גס, תיקון קטן, תיקון נוסף, חישוב מלא בעת הצורך. למשל, אחרי החישוב הגס, טוקן מסוים מקבל ציון גבוה בהרבה מכל המתחרים. אולי אין טעם לקרוא את כל ביטי התיקון. לעומת זאת, כששני מועמדים קרובים, נשלוף עוד מידע. החלק המחקרי המעניין הוא להוכיח מתי אפשר לעצור. אם הצלחנו לחסום את השגיאה האפשרית בציוני הפלט, והפער בין המועמד הראשון לשני גדול מספיק, אפשר להבטיח שהתיקון לא ישנה את הבחירה. ערבות כזאת יכולה לשמר בחירת טוקן בשיטה שבוחרת תמיד את הציון הגבוה ביותר; היא לא משמרת אוטומטית התפלגות דגימה מלאה. והיא גם לא אומרת שהתשובה נכונה, רק שהחישוב המקוצר מסכים עם החישוב המלא. למה זה עשוי להיות משמעותי: הדיוק הגבוה נשאר באחסון אטי, ולא מגיע בכלל למעבד ברוב המקרים. הסיכון: חישוב חסם שגיאה שימושי לכל הרשת עשוי להיות יקר, או שהחסם יהיה שמרני כל כך שניאלץ כמעט תמיד לבצע את החישוב המלא.
+
+
+Q: Summarise in one sentence why a dense 31B model is slow on a Raspberry Pi.
+A: Every token must read about 17 GB of weights, and the board can move only about 10 GB/s from RAM and under 1 GB/s from storage.
+
+        v = ggml_bf16_to_fp32(*(const ggml_bf16_t *) &data[i]);
+    } else {
+        GGML_ABORT("fatal error");
+    }
+    return v;
+}
+
+#define INDENT "    "
+
+static void common_debug_print_tensor(uint8_t * data, ggml_type type, const int64_t * ne, const size_t * nb, int64_t n, bool abort_on_nan) {
+    GGML_ASSERT(n > 0);
+    float sum = 0;
+    for (int64_t i3 = 0; i3 < ne[3]; i3++) {
+        for (int64_t i2 = 0; i2 < ne[2]; i2++) {
+            for (int64_t i1 = 0; i1 < ne[1]; i1++) {
+                for (int64_t i0 = 0; i0 < ne[0]; i0++) {
+                    const float v = common_ggml_get_float_value(data, type, nb, i0, i1, i2, i3);
+                    sum += v;
+                }
+            }
+        }
+    }
+    for (int64_t i3 = 0; i3 < ne[3]; i3++) {
+        LOG(INDENT "[\n");
+        for (int64_t i2 = 0; i2 < ne[2]; i2++) {
+            if (i2 == n && ne[2] > 2 * n) {
+                LOG(INDENT INDENT "..., \n");
+                i2 = ne[2] - n;
+            }
+            LOG(INDENT INDENT "[\n");
+            for (int64_t i1 = 0; i1 < ne[1]; i1++) {
+                if (i1 == n && ne[1] > 2 * n) {
+                    LOG(INDENT INDENT INDENT "..., \n");
+                    i1 = ne[1] - n;
+
+
+By two the window was almost empty. Mara swept, counted the till, and set the dough for the next morning, folding it over itself and covering it with the damp cloths. Give it the night. She turned off the lights in the front and sat for a while in the warm back room with the last roll of the day and a cup of coffee that had gone cold hours ago, listening to the rain ease and the ovens tick as they cooled.
+
+
+A dense model offers no such escape. Every token must read every weight. For a thirty-one billion parameter model at four bits that is about seventeen gigabytes per token, which takes about twenty seconds at nine hundred megabytes per second. The only known way to amortise that read is to verify several tokens in a single pass over the weights, which speculative decoding does when a small draft model proposes continuations that the large model then checks in a batch. The draft must live in RAM and be accepted often; a draft that is rejected most of the time wastes the pass.
+
+
+3. "וידאו דחוס" של מחשבה: לחשב רק מה השתנה. במקום לחשב מחדש את כל המצב הפנימי בכל צעד, המודל ישמור מצב קודם ויעדכן רק את השינוי. בחלק ליניארי זה פשוט מתמטית: W(x+Δx) = Wx + WΔx. אם כבר חישבנו את Wx, אפשר לחשב רק את התיקון. אבל יש כאן מלכודת: אם השינוי גדול ומפוזר, לא חסכנו כמעט כלום. לכן הייתי מנסה לאמן מודל שבו השינויים הפנימיים הם בדרך כלל קטנים ומרוכזים. רוב הרכיבים לא משתנים; רק רכיבים שקיבלו מידע חדש מתעוררים. מדי פעם מבצעים רענון מלא כדי למנוע הצטברות שגיאות. הקושי העיקרי: תוספת קטנה בטקסט, למשל המילה "לא", יכולה לשנות לחלוטין את המשמעות. מנגנון כזה חייב לדעת מתי עדכון קטן מספיק ומתי צריך לחשב מחדש הרבה.
+
+4. מוח איטי ופה מהיר. המודל הגדול מחליט מה לומר; מודל קטן אחראי להגיד את זה. הייתי בונה מערכת בשני קצבים: מתכנן כבד שמייצר מבנה תשובה קומפקטי, ומנסח קטן שמפתח אותו לטקסט. המתכנן חוזר לפעולה רק כשנדרשת החלטה חדשה, התגלתה סתירה או שהמנסח הגיע למשהו שלא נכלל בתוכנית. הסיכון: המנסח עלול להוסיף טענות שלא היו בתוכנית, או שתכנון מדויק מספיק יהיה ארוך ויקר כמעט כמו כתיבת התשובה. ועוד דבר: זה עשוי לחסוך עבודה ואנרגיה, אבל לא בהכרח זיכרון שיא.
+
+5. מודל קטן שמעמיק בלולאה, במקום מודל עמוק עם המון משקולות. לשמור מעט שכבות ולהפעיל אותן שוב ושוב. שאלה קלה תסתיים אחרי מעט סיבובים. שאלה קשה תקבל יותר. כך אפשר לנסות להחליף קיבולת משקולות קבועה בזמן חישוב משתנה. הסיכון ברור: אפשר לחסוך זיכרון ובו בזמן להגדיל את זמן ההרצה ואת צריכת האנרגיה.
+
+                }
+                LOG(INDENT INDENT INDENT "[");
+                for (int64_t i0 = 0; i0 < ne[0]; i0++) {
+                    if (i0 == n && ne[0] > 2 * n) {
+                        LOG("   ..., ");
+                        i0 = ne[0] - n;
+                    }
+                    const float v = common_ggml_get_float_value(data, type, nb, i0, i1, i2, i3);
+                    LOG("%12.4f", v);
+                    if (i0 < ne[0] - 1) {
+                        LOG(", ");
+                    }
+                }
+                LOG("  ],\n");
+            }
+            LOG(INDENT INDENT "],\n");
+        }
+        LOG(INDENT "]\n");
+        LOG(INDENT "sum = %f\n", sum);
+    }
+
+    if (abort_on_nan) {
+        if (std::isnan(sum)) {
+            LOG("encountered NaN - aborting\n");
+            exit(0);
+        }
+    }
+}
+
+/**
+ * GGML operations callback during the graph execution.
+ *
+ * @param t current tensor
+ * @param ask when ask is true, the scheduler wants to know if we are interested in data from this tensor
+ *            if we return true, a follow-up call will be made with ask=false in which we can do the actual collection.
+ *            see ggml_backend_sched_eval_callback
+
+
+6. להוציא "זיכרון של דברים" מתוך "המנגנון שחושב". נבנה מנוע חישוב קטן יחסית, ומאגר גדול של ייצוגים שהמערכת יכולה לשלוף בזול. המאגר אינו חייב להיות כולו בזיכרון מהיר. אפשר לאמן מודל שמעדיף שליפה כששליפה מספיקה, ולומד להפעיל חישוב רק כדי לשלב, להסיק או לפתור סתירה. הסיכון: הידע לא נעלם, עדיין צריך לאחסן אותו.
+
+7. זיכרון של מצב, לא זיכרון של כל ההיסטוריה. המודל יחזיק "איפה אנחנו עכשיו", במקום לשמר ייצוג נרחב של כל מה שנאמר. מצב של המשפט הנוכחי, מצב של השיחה, ומצב ארוך-טווח. כל שכבה מתעדכנת בתדירות אחרת. הסיכון: דחיסה יכולה למחוק בדיוק את הפרט שיישאל בהמשך.
+
+8. לקמפל יכולת, במקום להריץ מודל כללי שוב ושוב. מודל גדול שמבין משימה, ואז לא רק עונה עליה, אלא מייצר מנגנון קטן שיוכל לטפל במשפחה של משימות דומות. לא מטמון של תשובות, מטמון של יכולות. אם יצירת המנגנון עולה C, וכל שימוש חוסך S, צריך יותר מ-C/S שימושים כדי שההשקעה תשתלם.
+
+9. לאמן על GPU מודל שנועד בכלל לפעולות פשוטות. מותר שהאימון יהיה יקר, אבל תוצר האימון לא חייב להיראות כמו רשת רגילה במספרים בעלי דיוק גבוה. לאמן ישירות מול מחיר הפעולות של מעבד היעד.
+
+10. לא לאחסן את המשקולות, לאחסן "מתכון" שמייצר אותן. במקום לשמור מיליארדי מספרים עצמאיים, נשמור מבנים משותפים, מילון של רכיבים, וחוק קטן שמייצר מהם את חלקי המודל הדרושים. מתכון קצר אינו יכול לשחזר באופן כללי כל אוסף שרירותי של משקולות.
+
+ * @param user_data user data to pass at each call back
+ * @return true to receive data or continue the graph, false otherwise
+ */
+bool common_debug_cb_eval(struct ggml_tensor * t, bool ask, void * user_data) {
+    auto * cb_data = (common_debug_cb_user_data *) user_data;
+    auto * pimpl = cb_data->pimpl.get();
+
+    const struct ggml_tensor * src0 = t->src[0];
+    const struct ggml_tensor * src1 = t->src[1];
+
+    if (ask) {
+        return true;  // Always retrieve data
+    }
+
+    bool matches_filter = pimpl->tensor_filters.empty();
+
+    if (!matches_filter) {
+        for (const auto & filter : pimpl->tensor_filters) {
+            if (std::regex_search(t->name, filter)) {
+                matches_filter = true;
+                break;
+            }
+        }
+    }
+
+    char src1_str[128] = { 0 };
+    if (src1) {
+        snprintf(src1_str, sizeof(src1_str), "%s{%s}", src1->name, common_ggml_ne_string(src1).c_str());
+    }
+
+    if (matches_filter) {
+        LOG("%s: %24s = (%s) %10s(%s{%s}, %s}) = {%s}\n", __func__, t->name, ggml_type_name(t->type),
+            ggml_op_desc(t), src0->name, common_ggml_ne_string(src0).c_str(), src1 ? src1_str : "",
+            common_ggml_ne_string(t).c_str());
+
+
+11. המשקולות הן חומר פיזי, ולא נתונים שהמעבד קורא. לתת למערכת הפיזיקלית לבצע חלק מהחישוב. למשל, לייצג משקולות באמצעות מוליכות חשמלית. זה מסלול למחקר עם שותף חומרה, לא הניסוי הראשון שהייתי בוחר לפרויקט תוכנה.
+
+בוא נמשיך עם החשיבה. בוא נמקד את זה במשהו שיכול להיות באמת פריצת דרך. אני לוקח מודל open source קיים מ-Hugging Face, נניח גמא 4, שצריך לפחות איזה 30 גיגה ראם, ואני גורם לו לרוץ על מחשב קטן על Raspberry Pi. בוא נחשוב על איך לעשות את זה.
+
+כן. אני הייתי מכוון למנוע הרצה שמחזיק את המודל הגדול במלואו, אבל לא מחשב אותו במלואו בכל טוקן. לא מודל קטן שמחליף אותו, לא חיבור נסתר לענן, ולא Raspberry Pi שמחובר למעשה למחשב חזק אחר. והייתי ממקד את המחקר ברעיון אחד: לשמור בזיכרון ייצוג זול של החישוב, ולהביא מהמודל המלא רק את התיקונים שבאמת דרושים להחלטה הנוכחית. החלק המעניין אינו עצם הדחיסה. החלק המעניין הוא לזהות איזה מידע חסר יכול לשנות את התוצאה, לפני שקראנו וחישבנו את כל המידע החסר.
+
+בדקתי את Gemma 4. יש שתי גרסאות גדולות שרלוונטיות כאן. לגרסה הצפופה יש כ-30.7 מיליארד פרמטרים, ולגרסת המומחים כ-25.2 מיליארד, שמתוכם כ-3.8 מיליארד פעילים בכל צעד. למחקר השאפתני הייתי בוחר דווקא ב-31B הצפוף. הצלחה בגרסת המומחים יכולה להיות אבן דרך טובה, אבל לא נציג אותה כאילו פתרנו גם את הבעיה הצפופה. לצורך הדיון אני מציע יעד ברור: Raspberry Pi 5 עם 8GB RAM, אחסון SSD מקומי, ללא מאיץ חיצוני וללא רשת בזמן ההרצה.
+
+    }
+
+    const bool is_host = ggml_backend_buffer_is_host(t->buffer);
+
+    if (!is_host) {
+        auto n_bytes = ggml_nbytes(t);
+        pimpl->data.resize(n_bytes);
+        ggml_backend_tensor_get(t, pimpl->data.data(), 0, n_bytes);
+    }
+
+    if (!ggml_is_quantized(t->type) && matches_filter) {
+        uint8_t * data = is_host ? (uint8_t *) t->data : pimpl->data.data();
+        common_debug_print_tensor(data, t->type, t->ne, t->nb, 3, pimpl->abort_on_nan);
+    }
+
+    return true;
+}
+
+
+למה לא מספיק לחלק את המודל לשכבות ולטעון אותן. נניח שאחרי כל המטמונים עדיין צריך לקרוא 9GB מהאחסון לכל טוקן, ושקצב הקריאה האפקטיבי הוא 400MB בשנייה. רק הקריאה תדרוש 22.5 שניות לטוקן. באותה הנחת רוחב פס, כדי להגיע לשלושה טוקנים בשנייה, מותר לנו לקרוא לכל היותר כ-133MB חדשים לטוקן. מכאן אני גוזר את היעד האמיתי: לא רק להקטין את הזיכרון, אלא להוריד את כמות המידע החדש שצריך להביא בכל צעד, מגיגה-בייטים לעשרות מגה-בייטים.
+
+הרעיון: מודל מלא עם חישוב מדורג. אנחנו לוקחים checkpoint קיים. בשלב הכנה על מחשב חזק, מפרקים את החישובים שלו לשני חלקים. החלק הראשון הוא קירוב זול שנשאר ב-RAM. החלק השני הוא המידע שמשלים את הקירוב בחזרה לחישוב המקורי, שנשמר ב-SSD בחבילות שאפשר לקרוא בנפרד. למטריצת משקולות מסוימת אפשר לכתוב W = W_base + R_1 + R_2 + ... + R_n, ולכן Wx = W_base x + R_1 x + ... + R_n x. ההימור שלנו הוא שעבור קלט מסוים, חלק קטן מהתיקונים יספיק כדי לקבל תוצאה שימושית מאוד.
+
+איך יודעים איזה תיקון חשוב, בלי לקרוא אותו. לכל חבילת תיקון תקציר מתמטי קטן שנשאר בזיכרון, מידע על גודל ההשפעה האפשרית שלה. נניח שחילקנו את מטריצת השארית לקבוצות עמודות. לכל קבוצה g אפשר לחסום את השפעת החבילה באמצעות הנורמה של R_g כפול הנורמה של x_g. את החסם על הנורמה של R_g מחשבים מראש. כלומר, לפעמים אפשר לדעת שחבילה אינה יכולה להשפיע הרבה, בלי לקרוא את המשקולות שלה.
+
+
+הניסוי הראשון שהייתי עושה: לא לכתוב מנוע שלם ל-Raspberry Pi, אלא לברר אם יש בכלל מספיק חיסכון בייצוג המוצע. מודל ייחוס אחד, ללא ערבוב בין רמות דיוק. לבדוק תחילה בחירה אידאלית של תיקונים. להחליף את הבחירה האידאלית במנגנון זול. ולבסוף להריץ על ה-Pi ולמדוד את כל המערכת: זמן עד הטוקן הראשון, קצב המשך התשובה, זיכרון כולל, קריאות SSD ואנרגיה.
+
+ההימור המרכזי שלי הוא שהפריצה לא חייבת להיות "מודל קטן שיודע פחות". היא יכולה להיות מודל בעל יכולת רחבה, שבכל רגע משלם רק על החלק הקטן מהיכולת שבאמת נחוץ עכשיו.

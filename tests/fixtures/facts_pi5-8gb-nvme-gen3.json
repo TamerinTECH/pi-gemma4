@@ -1,0 +1,64 @@
+{
+  "hostname": "pi5-lab-nvme8",
+  "kernel": "6.18.50+rpt-rpi-2712",
+  "page_size": 16384,
+  "cpu_model": "Cortex-A76",
+  "cpu_flags": [
+    "fp",
+    "asimd",
+    "evtstrm",
+    "aes",
+    "pmull",
+    "sha1",
+    "sha2",
+    "crc32",
+    "atomics",
+    "fphp",
+    "asimdhp",
+    "cpuid",
+    "asimdrdm",
+    "lrcpc",
+    "dcpop",
+    "asimddp"
+  ],
+  "nproc": 4,
+  "ram_total_kb": 8245000,
+  "ram_available_kb": 7650000,
+  "swap_total_kb": 2097136,
+  "loadavg1": 0.3,
+  "model_dir": "/mnt/nvme/pi-gemma4/models",
+  "storage": {
+    "dev": "/dev/nvme0n1p2",
+    "type": "nvme",
+    "rotational": false,
+    "pcie_link_speed": "8.0 GT/s PCIe",
+    "pcie_link_width": 1,
+    "read_ahead_kb": 128
+  },
+  "free_disk_bytes": 450000000000,
+  "running_services": [
+    "cron.service",
+    "dbus.service",
+    "NetworkManager.service",
+    "ssh.service",
+    "systemd-journald.service",
+    "systemd-logind.service",
+    "systemd-udevd.service"
+  ],
+  "hat_product": "Raspberry Pi M.2 HAT+",
+  "pciex1_gen_cfg": 3,
+  "governor": "ondemand",
+  "memlock_limit": 8192,
+  "tools": {
+    "cmake": "3.31.6",
+    "gcc": "14.2.0",
+    "git": "2.47.3",
+    "python3": "3.13.5"
+  },
+  "override": null,
+  "collected_at": "2026-10-05T10:00:00Z",
+  "notes": [
+    "tests fixture (tests/synth.py FACTS_NAMES). Shape = data_formats facts.json. Values not quoted from docs/design/FACTS.md are illustrative, not measurements.",
+    "Pi 5 8 GB with an NVMe SSD on the M.2 HAT+, dtparam=pciex1_gen=3. Expected: 26B streams experts with -nr."
+  ]
+}

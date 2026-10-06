@@ -1,0 +1,326 @@
+{
+ "schema": "x2-prompts/1",
+ "note": "Quality-parity diagnostic for X2: the 34 non-code items of data/prompts/qa_heldout_v2.json (objective graders), rendered with pigemma.workloads.render_gemma4 exactly like the chat endpoint would (one user turn, thinking off), sent as identical bytes to POST /completion of each engine; graded offline with pigemma.quality_v2.grade_item. The 10 code items (384 tokens each) are not run (time). The 4 held-out prompts are included again only for the diagnostic ik block without --swa-compress.",
+ "source_sha256": {
+  "qa_heldout_v2.json": "51fd1e82f6c5299ef1c9c81883452899b103c1b31cce0c2ef9e22c3af077c747"
+ },
+ "prompts": [
+  {
+   "id": "warmup",
+   "set": "none",
+   "lang": "en",
+   "category": "warmup",
+   "max_tokens": 16,
+   "user_text": "Reply with the single word: ready",
+   "prompt": "<|turn>user\nReply with the single word: ready<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-en-01",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "negation",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nWhich of these numbers is NOT divisible by 3: 51, 87, 91, 117? Answer with the number only.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-en-02",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "negation",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nName one country in South America that does NOT share a land border with Brazil. Answer with the country name only.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-en-03",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "negation",
+   "max_tokens": 48,
+   "prompt": "<|turn>user\nFrom this list, give every word that does NOT contain the letter 'e': table, chair, window, lamp, shelf, sofa, mirror, bench. Keep the original order and separate the words with commas.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-he-01",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "negation",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nאיזה מהמספרים הבאים אינו מספר ראשוני: 2, 13, 21, 29? ענה במספר בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-he-02",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "negation",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nכמה מהמספרים 4, 9, 15, 22, 27, 30 אינם זוגיים? ענה במספר בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-he-03",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "negation",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nאיזו מהערים הבאות אינה נמצאת בישראל: חיפה, אילת, עמאן, נתניה? ענה בשם העיר בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-de-01",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "negation",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nWelches dieser Metalle ist bei Raumtemperatur NICHT fest: Eisen, Quecksilber, Kupfer, Zink? Antworte mit einem Wort.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "neg-de-02",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "negation",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nWie viele der folgenden Zahlen sind NICHT größer als 10: 3, 12, 10, 7, 15, 11? Antworte nur mit der Zahl.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-en-01",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nA recipe needs 250 g of flour for 4 servings. How many grams of flour are needed for 10 servings? Answer with the number only.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-en-02",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nA shirt costs 40 euros. It is discounted by 25%, and then a 10% coupon is applied to the discounted price. What is the final price in euros? Answer with the number only.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-en-03",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nA car travels 180 km in 2 hours and 15 minutes. What is its average speed in km/h? Answer with the number only.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-en-04",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nToday is Wednesday. Which weekday falls exactly 100 days after today? Answer with the name of the day only.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-he-01",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nבמיכל יש 12 ליטר מים. שפכו ממנו שליש, ואחר כך הוסיפו 5 ליטר. כמה ליטר יש עכשיו במיכל? ענה במספר בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-he-02",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nיוסי קרא 24 עמודים ביום הראשון, ובכל יום שאחריו קרא 6 עמודים יותר מאשר ביום הקודם. כמה עמודים קרא בסך הכול בארבעת הימים הראשונים? ענה במספר בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-he-03",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nהשעון מראה 22:45. מה תהיה השעה בעוד 3 שעות ו-50 דקות? ענה בפורמט HH:MM בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-de-01",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nEin Zug fährt um 14:52 ab und kommt um 17:09 an. Wie viele Minuten dauert die Fahrt? Antworte nur mit der Zahl.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-de-02",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nLena hat 3 Packungen mit je 18 Stiften. Sie verteilt die Stifte gleichmäßig an 4 Gruppen, jede Gruppe bekommt gleich viele ganze Stifte. Wie viele Stifte bleiben übrig? Antworte nur mit der Zahl.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "num-de-03",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "numbers",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nEin Rechteck hat einen Umfang von 46 cm und ist 15 cm lang. Wie groß ist seine Fläche in Quadratzentimetern? Antworte nur mit der Zahl.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-en-he-01",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nAnswer in Hebrew only, with one word: what is the opposite of 'early'?<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-en-de-01",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nAnswer in German only, with one word: what is the season after summer called?<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-he-en-01",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nענה באנגלית בלבד, במילה אחת: איך אומרים 'ספרייה' באנגלית?<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-he-de-01",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nענה בגרמנית בלבד: איזה מספר בא אחרי שבע? כתוב אותו במילה בגרמנית, בלי ספרות.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-de-he-01",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nAntworte ausschließlich auf Hebräisch und mit einem Wort: Welche Farbe hat frischer Schnee?<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-de-en-01",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nAntworte nur auf Englisch: Wie viele Tage hat ein Schaltjahr? Schreibe die Zahl in Worten, nicht in Ziffern.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-en-mix-01",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nWrite the word 'water' first in Hebrew and then in German, separated by a single comma, and nothing else.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ml-he-01",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "multilingual",
+   "max_tokens": 64,
+   "prompt": "<|turn>user\nכתוב את שלושת הצבעים הראשונים של הקשת בענן, מהצבע החיצוני פנימה, בעברית, מופרדים בפסיקים ובלי טקסט נוסף.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-en-01",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nDelivery note: \"DN-7781. Shipped on 3 March 2025 from Kessler Tools, Leipzig, to Oakridge Workshop, Bristol. Items: 12 hammers, 30 screwdriver sets, 5 toolboxes. Carrier: NordFreight. Gross weight: 142.5 kg.\"\n\nReturn a JSON object with exactly these keys: note_id (string), ship_date (YYYY-MM-DD), carrier (string), total_items (integer, the sum of all item quantities), weight_kg (number). Output only the JSON.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-en-02",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nE-mail: \"Hi Sam, quick update on Thursday's workshop: it moves from room B12 to the main hall, starts at 10:30 instead of 9:00, and we now expect 48 participants (up from 35). Lunch is still provided. Best, Priya\"\n\nExtract new_room, new_start_time (HH:MM), participants (integer), lunch_provided (true or false) and sender into a JSON object. Output only the JSON.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-en-03",
+   "set": "qa_heldout_v2",
+   "lang": "en",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nChess club results: \"Maya won 5 games and lost 1. Omer won 4, drew 1 and lost 1. Lior won 3 and lost 3. Dana won 2, drew 2 and lost 2.\" A win scores 1 point, a draw 0.5 and a loss 0.\n\nReturn JSON with the keys winner (the player with the most points), winner_points, second_place and second_place_points. Output only the JSON.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-he-01",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nהזמנה: \"הזמנה מספר 5521: שלוש חולצות במחיר 45 שקלים כל אחת ומכנסיים במחיר 120 שקלים. משלוח עד הבית בעלות 25 שקלים. שם הלקוחה: רותם אלון. תאריך ההזמנה: 14 באפריל 2025.\"\n\nהחזר אובייקט JSON עם המפתחות order_id, customer, items_total (סכום המוצרים בלי המשלוח), shipping, grand_total ו-date (בפורמט YYYY-MM-DD). החזר JSON בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-he-02",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nהודעה: \"חוג הרובוטיקה ייפתח ביום שני, 3 בנובמבר, בשעה 16:30 בחדר 108. המדריך: אורי שמעוני. מספר המקומות מוגבל ל-14 משתתפים, ומחיר החוג לשנה הוא 950 שקלים.\"\n\nחלץ את הנתונים לאובייקט JSON עם המפתחות day, start_time, room, instructor, max_participants ו-yearly_price. החזר JSON בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-he-03",
+   "set": "qa_heldout_v2",
+   "lang": "he",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nתוצאות: \"בבחירות למועצת התלמידים קיבלה נועה 132 קולות, איתי קיבל 98 קולות ושירה קיבלה 115 קולות. בנוסף נפסלו 7 פתקים.\"\n\nהחזר JSON עם המפתחות winner, winner_votes, valid_votes (סך הקולות הכשרים), invalid_votes ו-total_ballots (כל הפתקים, כולל הפסולים). JSON בלבד.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-de-01",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nRechnung: \"Rechnung Nr. 2025-114 der Tischlerei Brandt vom 9. Mai 2025: 2 Regale zu je 180 Euro, 1 Schreibtisch zu 420 Euro, Montage pauschal 95 Euro. Zahlbar innerhalb von 14 Tagen.\"\n\nGib ein JSON-Objekt mit den Schlüsseln invoice_no, vendor, date (YYYY-MM-DD), total_eur (Gesamtbetrag) und payment_days zurück. Nur das JSON.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ext-de-02",
+   "set": "qa_heldout_v2",
+   "lang": "de",
+   "category": "extraction",
+   "max_tokens": 160,
+   "prompt": "<|turn>user\nKursinfo: \"Der Kurs Fotografie für Einsteiger findet an vier Samstagen statt, jeweils von 10:00 bis 13:00 Uhr. Kursleiterin ist Jana Weiß. Die Teilnahme kostet 160 Euro, Vereinsmitglieder zahlen 25 Prozent weniger.\"\n\nErstelle ein JSON-Objekt mit den Schlüsseln sessions (Anzahl der Termine), hours_total (Kursstunden insgesamt), instructor, price_eur und member_price_eur. Nur das JSON.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ho-01",
+   "set": "heldout",
+   "lang": "en",
+   "category": "chat",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 33,
+   "prompt": "<|turn>user\nExplain in two sentences why a metal spoon feels colder than a wooden spoon at the same room temperature.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ho-03",
+   "set": "heldout",
+   "lang": "he",
+   "category": "chat",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 40,
+   "prompt": "<|turn>user\nמדוע לחם מתייבש מהר יותר במקרר מאשר על השיש? הסבר בשני משפטים.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ho-05",
+   "set": "heldout",
+   "lang": "de",
+   "category": "chat",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 36,
+   "prompt": "<|turn>user\nWarum beschlagen Brillengläser, wenn man im Winter einen warmen Raum betritt? Zwei Sätze.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  },
+  {
+   "id": "ho-13",
+   "set": "heldout",
+   "lang": "he",
+   "category": "summarization",
+   "max_tokens": 64,
+   "prompt_tokens_expected_a7b94df_tokenizer": 884,
+   "prompt": "<|turn>user\nסכם את הדו\"ח הבא בשלוש נקודות קצרות: הישג אחד, קושי אחד ותוכנית אחת לשנה הבאה.\n\nגינה קהילתית נווה אלון – דו\"ח שנתי לשנת 2024\n\nהגינה הקהילתית בשכונת נווה אלון פועלת זו השנה הרביעית על מגרש של כדונם וחצי, שהעירייה העמידה לרשות התושבים ליד המרכז הקהילתי. את הגינה מנהל צוות של שבעה מתנדבים מהשכונה, בתיאום עם רכזת הקהילה של המרכז, מיכל ברק.\n\nמשתתפים ופעילות\nבתחילת השנה היו בגינה 34 ערוגות משפחתיות, ובסופה 41. שבע הערוגות החדשות נבנו בחודש מרץ בעזרת תלמידי שכבת ח' של בית הספר \"הרימון\", שמאז מטפלים גם בערוגה משותפת של צמחי תבלין. בכל יום שישי בבוקר מתקיים מפגש עבודה פתוח לכל תושבי השכונה, ובממוצע הגיעו אליו כעשרים משתתפים. במהלך השנה נערכו בגינה תשע סדנאות, ובהן סדנת קומפוסט, סדנת השקיה חסכונית וסדנה לגידול עגבניות בעציצים למי שגר בדירה בלי חצר.\n\nמים והשקיה\nאחרי שבקיץ 2023 נרשמה צריכת מים גבוהה מהצפוי, הותקנה באביב מערכת השקיה בטפטוף עם מחשב השקיה ושני חיישני לחות. בעקבות זאת ירדה צריכת המים השנתית מ-610 קוב ל-430 קוב, ירידה של כשלושים אחוז. חשבון המים, שמשולם מתקציב המרכז הקהילתי, ירד בהתאם.\n\nיבול וחלוקה\nמהיבול של הערוגה המשותפת נמסרו במהלך השנה כ-380 קילוגרם ירקות לבית התמחוי השכונתי. בנוסף, בחודש אוקטובר התקיים בגינה שוק קטן לתוצרת עודפת, וההכנסות ממנו, 2,300 שקלים, הוקדשו לקניית שתילים לעונה הבאה.\n\nקשיים\nהקושי העיקרי השנה היה ונדליזם: בשלוש הזדמנויות נפרץ המחסן ונגנבו כלי עבודה. לאחר המקרה השלישי הותקנו מנעול חדש ותאורה עם חיישן תנועה, ומאז לא נרשמו פריצות נוספות. קושי נוסף הוא מחסור במתנדבים בחודשי הקיץ, כשמשפחות רבות נוסעות לחופשה והערוגות נשארות בלי טיפול.\n\nתוכניות לשנה הבאה\nבשנה הבאה מתכנן הצוות להקים פינת ישיבה מוצלת עם פרגולה, להוסיף שתי ערוגות מוגבהות שיתאימו לתושבים מבוגרים ולאנשים בכיסא גלגלים, ולהפעיל לוח תורנויות קיץ כדי שאף ערוגה לא תישאר מוזנחת. הצוות מזמין תושבים חדשים להצטרף למפגש של יום שישי או לפנות למיכל ברק במרכז הקהילתי.<turn|>\n<|turn>model\n<|channel>thought\n<channel|>"
+  }
+ ]
+}

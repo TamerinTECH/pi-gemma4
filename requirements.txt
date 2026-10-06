@@ -1,0 +1,20 @@
+# pigemma runtime + test requirements. Mirrors [project].dependencies in pyproject.toml plus pytest.
+# Install into a venv if you need to (never into the global interpreter on the operator's desktop):
+#   python -m pip install -r requirements.txt
+# On the Pi (Debian 13, Python 3.13) the apt equivalents are:
+#   python3-numpy python3-psutil python3-yaml python3-pytest
+# pigemma.feasibility (and everything the pi/*.sh scripts call before a model is chosen) is
+# stdlib-only and runs without any of these.
+#
+# gguf (gguf-py) is deliberately NOT listed: it is used from the llama.cpp checkout at the pinned
+# commit a7b94df (third_party/llama.cpp/gguf-py on the desktop, $LLAMA_DIR/gguf-py on the Pi);
+# pigemma/__init__.py adds that directory to sys.path when `import gguf` would fail.
+numpy>=2.0
+psutil>=5.9
+# import-time dependency of gguf-py at a7b94df (gguf/metadata.py: `import yaml`)
+pyyaml>=5.1
+pytest>=8
+
+# Optional extras (pyproject [project.optional-dependencies]); uncomment when needed:
+# torch>=2.4              # extra "h2": low-rank bases in pigemma.h2.decompose (CPU build is enough)
+# huggingface_hub>=0.30   # extra "hf": desktop-side model downloads

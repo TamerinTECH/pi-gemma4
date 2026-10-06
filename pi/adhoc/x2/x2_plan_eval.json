@@ -1,0 +1,183 @@
+{
+ "schema": "x2-plan/1",
+ "model": "~/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+ "prompts_file": "~/pigemma/x2/x2_prompts.json",
+ "warmup_prompt_id": "warmup",
+ "port": 18090,
+ "gap_s": 45,
+ "prewarm": true,
+ "load_timeout_s": 900,
+ "engines": {
+  "ours": {
+   "what": "ggml-org/llama.cpp a7b94df (our pinned build, native on the Pi 08:51)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-nr",
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  },
+  "ik": {
+   "what": "ikawrakow/ik_llama.cpp 3d27f5bb (native on the Pi, X2)",
+   "bin": "~/pigemma/ik_llama.cpp/build/bin/llama-server",
+   "args": [
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  }
+ },
+ "common_request": {
+  "endpoint": "POST /completion",
+  "temperature": 0,
+  "top_k": 1,
+  "seed": 1,
+  "cache_prompt": false,
+  "stream": true,
+  "mtp": "off (no -md / --spec-type)",
+  "ik": "no -rtr, no -ser, no -prexp, no -khad"
+ },
+ "purpose": "HELD-OUT EVALUATION, frozen 2026-10-05 23:15 before any held-out request was sent to any engine. Frozen settings (from tuning passes 1+2, revised rule S): ours = a7b94df llama-server -nr -t 4; ik = ik_llama.cpp 3d27f5bb llama-server -t 4 --swa-compress (ik -t 4 with and without --swa-compress tied within 2 %: S 76.97 vs 76.69 s; the tie-break goes to --swa-compress). Common: -c 4096 -np 1 -b 2048 -ub 512 --cache-ram 0, greedy (temperature 0, top_k 1), cache_prompt false, MTP off, one discarded warm-up request per server start, 45 s idle gap between blocks. 3 repeats, order alternated: R1 ours->ik, R2 ik->ours, R3 ours->ik. Requests per block (fixed order): ho-01 (EN, 33 tok), ho-03 (HE, 40 tok), ho-05 (DE, 36 tok), ho-13 (HE summarisation, 884 tok = the longest held-out prompt; no held-out prompt reaches 1000 tokens).",
+ "blocks": [
+  {
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "ho-01",
+    "ho-03",
+    "ho-05",
+    "ho-13"
+   ],
+   "label": "eval-r1-1-ours"
+  },
+  {
+   "engine": "ik",
+   "config": "t4-swac",
+   "args": [
+    "-t",
+    "4",
+    "--swa-compress"
+   ],
+   "prompts": [
+    "ho-01",
+    "ho-03",
+    "ho-05",
+    "ho-13"
+   ],
+   "label": "eval-r1-2-ik"
+  },
+  {
+   "engine": "ik",
+   "config": "t4-swac",
+   "args": [
+    "-t",
+    "4",
+    "--swa-compress"
+   ],
+   "prompts": [
+    "ho-01",
+    "ho-03",
+    "ho-05",
+    "ho-13"
+   ],
+   "label": "eval-r2-1-ik"
+  },
+  {
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "ho-01",
+    "ho-03",
+    "ho-05",
+    "ho-13"
+   ],
+   "label": "eval-r2-2-ours"
+  },
+  {
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "ho-01",
+    "ho-03",
+    "ho-05",
+    "ho-13"
+   ],
+   "label": "eval-r3-1-ours"
+  },
+  {
+   "engine": "ik",
+   "config": "t4-swac",
+   "args": [
+    "-t",
+    "4",
+    "--swa-compress"
+   ],
+   "prompts": [
+    "ho-01",
+    "ho-03",
+    "ho-05",
+    "ho-13"
+   ],
+   "label": "eval-r3-2-ik"
+  }
+ ],
+ "frozen": {
+  "ours": [
+   "-nr",
+   "-c",
+   "4096",
+   "-np",
+   "1",
+   "-b",
+   "2048",
+   "-ub",
+   "512",
+   "--cache-ram",
+   "0",
+   "-t",
+   "4"
+  ],
+  "ik": [
+   "-c",
+   "4096",
+   "-np",
+   "1",
+   "-b",
+   "2048",
+   "-ub",
+   "512",
+   "--cache-ram",
+   "0",
+   "-t",
+   "4",
+   "--swa-compress"
+  ]
+ }
+}

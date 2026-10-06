@@ -1,0 +1,50 @@
+[
+  {
+    "id": "gen-en-explain-01",
+    "lang": "en",
+    "prompt": "Explain in plain language how a refrigerator keeps food cold. Write about 150 words in one or two paragraphs, without bullet points.",
+    "max_tokens": 256
+  },
+  {
+    "id": "gen-en-explain-02",
+    "lang": "en",
+    "prompt": "Explain to a curious twelve-year-old why the sky looks blue during the day and red or orange at sunset. Write one paragraph of about 150 words.",
+    "max_tokens": 256
+  },
+  {
+    "id": "gen-en-story-01",
+    "lang": "en",
+    "prompt": "Write a short story of about 200 words about a lighthouse keeper who finds a message in a bottle. Use the past tense and end with a small surprise.",
+    "max_tokens": 256
+  },
+  {
+    "id": "gen-he-explain-01",
+    "lang": "he",
+    "prompt": "הסבר בעברית פשוטה, בפסקה אחת של כ-150 מילים, למה חשוב לשתות מים לאורך היום ומה קורה לגוף כשהוא לא מקבל מספיק נוזלים.",
+    "max_tokens": 256
+  },
+  {
+    "id": "gen-he-story-01",
+    "lang": "he",
+    "prompt": "כתוב סיפור קצר בעברית, של כ-150 מילים, על ילדה שמגלה גינה סודית מאחורי בית הספר שלה. סיים את הסיפור בהפתעה קטנה.",
+    "max_tokens": 256
+  },
+  {
+    "id": "gen-code-01",
+    "lang": "code",
+    "prompt": "Write a Python function word_frequencies(text: str, top_n: int = 5) -> list[tuple[str, int]] that returns the top_n most common words in a text, case-insensitive and ignoring punctuation. Use only the standard library, add type hints and a docstring, then show one example call and its output.",
+    "max_tokens": 256
+  },
+  {
+    "id": "gen-mixed-01",
+    "lang": "mixed",
+    "prompt": "Answer in Hebrew only: in three or four sentences, explain what a computer's RAM is used for and why a program slows down when RAM runs out.",
+    "max_tokens": 256
+  },
+  {
+    "id": "gen-mixed-02",
+    "lang": "mixed",
+    "prompt": "Translate this English sentence into Hebrew: \"The early bird catches the worm, but the second mouse gets the cheese.\" Then, in Hebrew, explain in two or three sentences what the sentence means.",
+    "max_tokens": 256
+  }
+]

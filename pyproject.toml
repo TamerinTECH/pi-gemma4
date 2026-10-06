@@ -1,0 +1,97 @@
+# pigemma - Gemma 4 (26B-A4B MoE / 31B dense) on a Raspberry Pi 5: measurement harness for
+# H1 (MoE expert streaming from storage) and H2 (dense base + streamed residual corrections).
+#
+# Owner: docs/design/manifest.json files[] entry "pyproject.toml" (+ requirements.txt, .gitignore).
+#
+# Decisions (see docs/design/FACTS.md "Process rules for agents"):
+# - The package is NOT meant to be pip-installed into the global interpreter. Every CLI runs as
+#   `python -m pigemma.<module>` (Windows: python, Pi: python3) from the repo root, and pytest
+#   finds the package through [tool.pytest.ini_options] pythonpath = ["."]. `pip install -e .`
+#   into a private venv also works (setuptools >= 64, PEP 660 editable install).
+# - No console_scripts / [project.scripts] on purpose: one way to run things, `python -m`.
+# - gguf (gguf-py) is NOT a pip dependency. It ships inside llama.cpp at the pinned commit a7b94df
+#   (gguf-py 0.19.0); pigemma/__init__.py puts <repo>/third_party/llama.cpp/gguf-py (or
+#   $LLAMA_DIR/gguf-py on the Pi) at the front of sys.path when `gguf` is not importable.
+# - pyyaml is listed although the manifest spec names only numpy + psutil: gguf-py at a7b94df
+#   does `import yaml` at import time (gguf/metadata.py line 5), so `import gguf` through the
+#   sys.path trick fails without it. tqdm/requests (also in gguf-py's metadata) are imported
+#   lazily by writer/download paths pigemma never uses, so they are not listed.
+# - numpy >= 2.0 (manifest) although gguf-py's own metadata says >= 2.2.6: that pin is metadata
+#   only and we never pip-install gguf; Debian 13 ships python3-numpy 2.2.x, Windows has 2.3.3.
+# - Stdlib-only modules (pigemma.feasibility) must keep working on a stock Pi Python 3.13 with
+#   none of the dependencies installed; pigemma/__init__.py therefore imports nothing heavy.
+# - readme = README.md (added once README.md existed); no license field: the licence is the operator's
+#   decision.
+#   The "Private :: Do Not Upload" classifier makes PyPI reject an accidental upload.
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pigemma"
+dynamic = ["version"]
+description = "Measure whether Gemma 4 26B-A4B / 31B can run on a Raspberry Pi 5 (CPU only): expert-routing traces, cache simulation, feasibility verdicts, H2 residual-streaming oracle."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "TamerinTECH" }]
+keywords = ["gemma", "llama.cpp", "raspberry-pi", "moe", "gguf", "benchmark"]
+classifiers = [
+    "Private :: Do Not Upload",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=2.0",
+    "psutil>=5.9",
+    "pyyaml>=5.1",   # import-time dependency of gguf-py (gguf/metadata.py), see header
+]
+
+[project.optional-dependencies]
+# H2 low-rank bases (pigemma.h2.decompose imports torch lazily; numpy fallback exists).
+h2 = ["torch>=2.4"]
+# Model downloads from the desktop side (the Pi uses curl in pi/04_fetch_model.sh).
+hf = ["huggingface_hub>=0.30"]
+# Test runner (also in requirements.txt).
+test = ["pytest>=8"]
+
+[tool.setuptools.dynamic]
+# Single source of truth: pigemma/__init__.py (read statically via AST, not executed).
+version = { attr = "pigemma.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pigemma", "pigemma.*"]
+exclude = ["*__pycache__*"]
+# Namespace discovery so sub-packages (pigemma.h2, pigemma.data) are picked up even if an
+# __init__.py is missing; `python -m pigemma.h2.decompose` works either way.
+namespaces = true
+
+[tool.setuptools.package-data]
+# pigemma/data/catalog.json (device/storage/model catalog) must ship with the package.
+"pigemma.data" = ["*.json"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+# Import `pigemma` from the repo root without installing it.
+pythonpath = ["."]
+# Integration tests (real GGUFs, Docker, native llama.cpp binaries) are deselected by default.
+# A later `-m` on the command line wins over this one: `pytest -m integration` runs only them,
+# `pytest -m "integration or not integration"` runs everything.
+addopts = '-q -m "not integration"'
+markers = [
+    "integration: needs the real Gemma 4 GGUFs, Docker or native llama.cpp binaries; deselected by default, run with `pytest -m integration`",
+    "linux: needs Linux (/proc, mmap/mlock/mincore semantics, bash); skipped on Windows by tests/conftest.py",
+]
+# Explicit `pytest <dir>` / `pytest .` must never wander into the llama.cpp tree, the models or
+# multi-GB traces. (Setting norecursedirs replaces pytest's defaults, so they are repeated.)
+norecursedirs = [
+    "*.egg", ".*", "_darcs", "build", "CVS", "dist", "node_modules", "venv", "{arch}",
+    "third_party", "models", "traces", "results", "__pycache__",
+]

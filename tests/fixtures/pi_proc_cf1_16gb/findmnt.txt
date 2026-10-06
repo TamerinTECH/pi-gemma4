@@ -1,0 +1,1 @@
+SOURCE="/dev/mmcblk0p2" FSTYPE="ext4" TARGET="/" MAJ:MIN="179:2"

@@ -1,0 +1,138 @@
+{
+ "schema": "x2-plan/1",
+ "model": "~/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+ "prompts_file": "~/pigemma/x2/x2_prompts.json",
+ "warmup_prompt_id": "warmup",
+ "port": 18090,
+ "gap_s": 45,
+ "prewarm": true,
+ "load_timeout_s": 900,
+ "engines": {
+  "ours": {
+   "what": "ggml-org/llama.cpp a7b94df (our pinned build, native on the Pi 08:51)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-nr",
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  },
+  "ik": {
+   "what": "ikawrakow/ik_llama.cpp 3d27f5bb (native on the Pi, X2)",
+   "bin": "~/pigemma/ik_llama.cpp/build/bin/llama-server",
+   "args": [
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  }
+ },
+ "common_request": {
+  "endpoint": "POST /completion",
+  "temperature": 0,
+  "top_k": 1,
+  "seed": 1,
+  "cache_prompt": false,
+  "stream": true,
+  "mtp": "off (no -md / --spec-type)",
+  "ik": "no -rtr, no -ser, no -prexp, no -khad"
+ },
+ "purpose": "TUNING (2 tuning requests only). Pre-declared rule: per engine choose the config with the smallest SUM of client total latency over tun-01 + tun-06 (one run each); configs within 2 % of the best count as tied and the tie goes to -t 4, then (ik) to --swa-compress because it matches our build's window-sized SWA KV cache. The chosen settings are frozen before any held-out request is sent.",
+ "blocks": [
+  {
+   "label": "tune-ours-t4",
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "tune-ik-t4",
+   "engine": "ik",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "tune-ik-t4-swac",
+   "engine": "ik",
+   "config": "t4-swac",
+   "args": [
+    "-t",
+    "4",
+    "--swa-compress"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "tune-ours-t3",
+   "engine": "ours",
+   "config": "t3",
+   "args": [
+    "-t",
+    "3"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "tune-ik-t3-swac",
+   "engine": "ik",
+   "config": "t3-swac",
+   "args": [
+    "-t",
+    "3",
+    "--swa-compress"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  },
+  {
+   "label": "tune-ik-t3",
+   "engine": "ik",
+   "config": "t3",
+   "args": [
+    "-t",
+    "3"
+   ],
+   "prompts": [
+    "tun-01",
+    "tun-06"
+   ]
+  }
+ ]
+}

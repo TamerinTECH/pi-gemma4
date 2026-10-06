@@ -1,0 +1,11 @@
+# pi-gemma4-build:fuse - the build image plus FUSE 3 (P5 controlled-memory harness, 2026-10-05).
+# Needed because the Docker Desktop VM kernel (5.15.167.4-microsoft-standard-WSL2) has no
+# blk-throttling (no io.max / blkio.throttle, --device-read-bps is discarded): model reads are
+# rate-limited by tools/fusethrottle (a FUSE passthrough with O_DIRECT backing reads) instead.
+# Build:  docker build -t pi-gemma4-build:fuse -f docker/Dockerfile.fuse docker
+FROM pi-gemma4-build:latest
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      fuse3 libfuse3-dev procps util-linux \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

@@ -1,0 +1,4 @@
+# X1c analysis image: the harness image + strace (used only to watch the madvise calls of
+# ik_llama.cpp --prefetch-experts on the UNMODIFIED engine binary). Not used for any cell.
+FROM pi-gemma4-build:fuse
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends strace && rm -rf /var/lib/apt/lists/*

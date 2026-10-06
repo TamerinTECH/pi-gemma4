@@ -1,0 +1,41 @@
+models/
+traces/*.bin
+traces/*.jsonl
+results/*.raw
+third_party/llama.cpp/build*/
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# --- pigemma additions (owner: docs/design/manifest.json entry "pyproject.toml", 2026-10-05) ---
+# Large or regenerable artefacts. results/**/*.json and results/**/*.md stay tracked (the record).
+traces/**/*.moetrace
+traces/**/*.bin
+traces/**/*.npy
+traces/**/*.npz
+results/**/*.logits
+results/**/*.log
+# ...except the hand-run desktop baseline evidence logs (2026-10-04/05, a few KB each) that
+# results/desktop-baseline-2026-10-04.md and docs/design/FACTS.md cite as measurements.
+!results/adhoc-*.log
+!results/specsrv-*.log
+# lock that serialises model-loading jobs (pigemma.paths.bench_lock)
+results/.bench.lock
+# native tool build trees (tools/build on the Pi, tools/build-linux-x86 etc. from Docker)
+tools/build/
+tools/build-*/
+**/__pycache__/
+.pytest_cache/
+# setuptools artefacts of `pip wheel .` / `pip install -e .` (repo root only)
+/build/
+/dist/
+# per-run outputs of the pi/*.sh scripts
+pi/out/
+cf-engine/vendor-llama/
+cf-engine/build*/
+cf-engine/artifacts/
+results/cf-engine/own-baseline.tar.gz
+models/_split_tmp/
+results/cf-engine/*.tar.gz
+third_party/kleidiai-v1.24.0/

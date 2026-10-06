@@ -1,0 +1,152 @@
+[
+  {
+    "id": "en-01",
+    "lang": "en",
+    "prompt": "What is the capital of France? Answer with one word.",
+    "kind": "contains",
+    "expect": [
+      "Paris"
+    ]
+  },
+  {
+    "id": "en-02",
+    "lang": "en",
+    "prompt": "Which planet is the largest in our solar system? Answer with one word.",
+    "kind": "contains",
+    "expect": [
+      "Jupiter"
+    ]
+  },
+  {
+    "id": "en-03",
+    "lang": "en",
+    "prompt": "What is the chemical symbol for gold? Answer with the symbol only.",
+    "kind": "regex",
+    "expect": [
+      "(?i)\\bau\\b"
+    ]
+  },
+  {
+    "id": "en-04",
+    "lang": "en",
+    "prompt": "Who wrote the play Romeo and Juliet? Answer with the author's surname only.",
+    "kind": "contains",
+    "expect": [
+      "Shakespeare"
+    ]
+  },
+  {
+    "id": "en-05",
+    "lang": "en",
+    "prompt": "How many legs does a spider have? Answer with one word.",
+    "kind": "regex",
+    "expect": [
+      "(?i)\\b(eight|8)\\b"
+    ]
+  },
+  {
+    "id": "en-06",
+    "lang": "en",
+    "prompt": "If today is Monday, what day of the week will it be in three days? Answer with one word.",
+    "kind": "contains",
+    "expect": [
+      "Thursday"
+    ]
+  },
+  {
+    "id": "en-07",
+    "lang": "en",
+    "prompt": "Which gas do plants take in from the air for photosynthesis? Answer with the name of the gas only.",
+    "kind": "contains",
+    "expect": [
+      "carbon dioxide",
+      "CO2"
+    ]
+  },
+  {
+    "id": "he-01",
+    "lang": "he",
+    "prompt": "מהי בירת צרפת? ענה במילה אחת.",
+    "kind": "contains",
+    "expect": [
+      "פריז",
+      "פאריס"
+    ]
+  },
+  {
+    "id": "he-02",
+    "lang": "he",
+    "prompt": "מהו ההפך של המילה \"קר\"? ענה במילה אחת.",
+    "kind": "contains",
+    "expect": [
+      "חם"
+    ]
+  },
+  {
+    "id": "he-03",
+    "lang": "he",
+    "prompt": "על איזה כוכב לכת אנחנו חיים? ענה בשתי מילים לכל היותר.",
+    "kind": "contains",
+    "expect": [
+      "כדור הארץ",
+      "הארץ"
+    ]
+  },
+  {
+    "id": "he-04",
+    "lang": "he",
+    "prompt": "איזה צבע מתקבל כשמערבבים צבע כחול עם צבע צהוב? ענה במילה אחת.",
+    "kind": "contains",
+    "expect": [
+      "ירוק"
+    ]
+  },
+  {
+    "id": "he-05",
+    "lang": "he",
+    "prompt": "באיזו יבשת נמצאת מצרים? ענה במילה אחת.",
+    "kind": "contains",
+    "expect": [
+      "אפריקה"
+    ]
+  },
+  {
+    "id": "he-06",
+    "lang": "he",
+    "prompt": "באיזו עיר נמצא הכותל המערבי? ענה במילה אחת.",
+    "kind": "contains",
+    "expect": [
+      "ירושלים",
+      "ירושלם"
+    ]
+  },
+  {
+    "id": "num-01",
+    "lang": "num",
+    "prompt": "What is 17*23? Answer with the number only.",
+    "kind": "number",
+    "expect": [
+      391
+    ],
+    "tolerance": 0
+  },
+  {
+    "id": "num-02",
+    "lang": "num",
+    "prompt": "A pen costs 2.40 shekels. How many shekels do 7 pens cost? Answer with the number only.",
+    "kind": "number",
+    "expect": [
+      16.8
+    ],
+    "tolerance": 0.001
+  },
+  {
+    "id": "num-03",
+    "lang": "num",
+    "prompt": "List the first five prime numbers in increasing order, separated by commas. Answer with the list only.",
+    "kind": "regex",
+    "expect": [
+      "(?<!\\d)2\\D{0,12}3\\D{0,12}5\\D{0,12}7\\D{0,12}11(?!\\d)"
+    ]
+  }
+]

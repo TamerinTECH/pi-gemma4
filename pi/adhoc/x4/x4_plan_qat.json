@@ -1,0 +1,99 @@
+{
+ "schema": "x4-plan/1 (x2-plan/1 + model_files, cool_below_c, perf_counters, body_extra, repeated prompt ids)",
+ "model": "/mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00001-of-00005.gguf",
+ "prompts_file": "~/pigemma/x4/x4_prompts.json",
+ "warmup_prompt_id": "warmup",
+ "port": 18190,
+ "gap_s": 45,
+ "prewarm": true,
+ "load_timeout_s": 900,
+ "cool_below_c": 62,
+ "cool_max_wait_s": 420,
+ "perf_counters": true,
+ "engines": {
+  "ours": {
+   "what": "ggml-org/llama.cpp a7b94df, native Pi build, weights memory-mapped (-nr)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-nr",
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  },
+  "ours-repack": {
+   "what": "same binary WITHOUT -nr: llama.cpp default repack (eligible tensors are copied into anonymous CPU_REPACK memory)",
+   "bin": "~/pigemma/llama.cpp/build/bin/llama-server",
+   "args": [
+    "-c",
+    "4096",
+    "-np",
+    "1",
+    "-b",
+    "2048",
+    "-ub",
+    "512",
+    "--cache-ram",
+    "0"
+   ]
+  }
+ },
+ "common_request": {
+  "endpoint": "POST /completion",
+  "temperature": 0,
+  "top_k": 1,
+  "seed": 1,
+  "cache_prompt": false,
+  "stream": true,
+  "mtp": "off (no -md / --spec-type)"
+ },
+ "purpose": "Google QAT Q4_0 26B (5 split parts on the FAT32 USB stick, 14.44 GB), -nr, 4 threads then 3 threads. The file is at the page-cache limit of this board, so every part is read once before the block and the requests are repeated; only requests with zero storage reads count as resident. Loading it pushes part of the UD-Q3_K_M file out of the page cache (no drop_caches is used); x4_plan_udref.json re-reads it afterwards.",
+ "blocks": [
+  {
+   "label": "qat-t4",
+   "engine": "ours",
+   "config": "t4",
+   "args": [
+    "-t",
+    "4"
+   ],
+   "prompts": [
+    "tun-06",
+    "tun-01",
+    "tun-06",
+    "tun-01",
+    "tun-06",
+    "tun-01"
+   ]
+  },
+  {
+   "label": "qat-t3",
+   "engine": "ours",
+   "config": "t3",
+   "args": [
+    "-t",
+    "3"
+   ],
+   "prompts": [
+    "tun-06",
+    "tun-01",
+    "tun-06",
+    "tun-01"
+   ]
+  }
+ ],
+ "model_files": [
+  "/mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00001-of-00005.gguf",
+  "/mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00002-of-00005.gguf",
+  "/mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00003-of-00005.gguf",
+  "/mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00004-of-00005.gguf",
+  "/mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00005-of-00005.gguf"
+ ]
+}
