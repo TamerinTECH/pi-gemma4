@@ -1,0 +1,193 @@
+{
+ "label": "reasoning-check",
+ "model": "/b6/m/gemma-4-E2B_q4_0-it.gguf",
+ "model_bytes": 3349516256,
+ "max_tokens": 128,
+ "threads": 4,
+ "configs": {
+  "off": "--reasoning off",
+  "on": "--reasoning on",
+  "auto": "",
+  "budget0": "--reasoning-budget 0"
+ },
+ "order": [
+  "off",
+  "on",
+  "auto",
+  "budget0"
+ ],
+ "runs": [
+  {
+   "index": 0,
+   "config": "off",
+   "command": "nice -n 10 /b6/bin/llama-server -m /b6/m/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18530 --reasoning off",
+   "env": {},
+   "requests": [
+    {
+     "id": "mul",
+     "lang": "en",
+     "wall_s": 0.61,
+     "prompt_n": 24,
+     "gen_n": 4,
+     "gen_tok_s": 16.534391534391535,
+     "prompt_tok_s": 56.855735677684834,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 6.6,
+     "temp_c": null,
+     "content": "391",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "54faa79f10c232799f5c874b5681ef2a08e6505e8f66469d5e9648b3d9122073",
+     "prompt_ms": 422.121,
+     "gen_ms": 181.44,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 0.425,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 0.425
+    }
+   ],
+   "load_s": 4.0,
+   "rendered_prompt": "<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 4483288,
+    "VmRSS": 4483288,
+    "RssAnon": 1215588,
+    "RssFile": 3267700,
+    "VmSwap": 0
+   },
+   "draft_log": [],
+   "spec_lines": [],
+   "draft_stats": []
+  },
+  {
+   "index": 1,
+   "config": "on",
+   "command": "nice -n 10 /b6/bin/llama-server -m /b6/m/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18531 --reasoning on",
+   "env": {},
+   "requests": [
+    {
+     "id": "mul",
+     "lang": "en",
+     "wall_s": 16.65,
+     "prompt_n": 31,
+     "gen_n": 276,
+     "gen_tok_s": 16.972067186674348,
+     "prompt_tok_s": 69.94174529472548,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 16.58,
+     "temp_c": null,
+     "content": "391",
+     "reasoning": "Thinking Process:\n\n1.  **Identify the core task:** The user wants to know the product of 17 and 23.\n2.  **Perform the calculation:** $17 \\times 23$.\n    *   Method 1: Standard multiplication.\n        *   $17 \\times 20 = 340$\n        *   $17 \\times 3 = 51$\n        *   $340 + 51 = 391$\n    *   Method 2: Distributive property (or standard algorithm).\n        *   $17 \\times 23 = (10 + 7) \\times 23$\n        *   $10 \\times 23 = 230$\n        *   $7 \\times 23 = 7 \\times (20 + 3) = 140 + 21 = 161$\n        *   $230 + 161 = 391$\n3.  **Verify the result:** $17 \\times 23 = 391$.\n4.  **Format the output:** The user requested the answer with the number.",
+     "finish": "stop",
+     "text_sha256": "47c4dbc47a1447a7c899293de0bb259853a8e69b5ab0be928aac8934d66a859c",
+     "prompt_ms": 443.226,
+     "gen_ms": 16203.094,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 16.47,
+     "ttft_reasoning_s": 0.634,
+     "ttft_any_s": 0.634
+    }
+   ],
+   "load_s": 4.0,
+   "rendered_prompt": "<|turn>system\n<|think|>\n<turn|>\n<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 4481468,
+    "VmRSS": 4481468,
+    "RssAnon": 1214036,
+    "RssFile": 3267432,
+    "VmSwap": 0
+   },
+   "draft_log": [],
+   "spec_lines": [],
+   "draft_stats": []
+  },
+  {
+   "index": 2,
+   "config": "auto",
+   "command": "nice -n 10 /b6/bin/llama-server -m /b6/m/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18532",
+   "env": {},
+   "requests": [
+    {
+     "id": "mul",
+     "lang": "en",
+     "wall_s": 17.03,
+     "prompt_n": 31,
+     "gen_n": 276,
+     "gen_tok_s": 16.581831004369946,
+     "prompt_tok_s": 69.26817060526975,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 16.2,
+     "temp_c": null,
+     "content": "391",
+     "reasoning": "Thinking Process:\n\n1.  **Identify the core task:** The user wants to know the product of 17 and 23.\n2.  **Perform the calculation:** $17 \\times 23$.\n    *   Method 1: Standard multiplication.\n        *   $17 \\times 20 = 340$\n        *   $17 \\times 3 = 51$\n        *   $340 + 51 = 391$\n    *   Method 2: Distributive property (or standard algorithm).\n        *   $17 \\times 23 = (10 + 7) \\times 23$\n        *   $10 \\times 23 = 230$\n        *   $7 \\times 23 = 7 \\times (20 + 3) = 140 + 21 = 161$\n        *   $230 + 161 = 391$\n3.  **Verify the result:** $17 \\times 23 = 391$.\n4.  **Format the output:** The user requested the answer with the number.",
+     "finish": "stop",
+     "text_sha256": "47c4dbc47a1447a7c899293de0bb259853a8e69b5ab0be928aac8934d66a859c",
+     "prompt_ms": 447.536,
+     "gen_ms": 16584.417,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 16.855,
+     "ttft_reasoning_s": 0.598,
+     "ttft_any_s": 0.598
+    }
+   ],
+   "load_s": 4.0,
+   "rendered_prompt": "<|turn>system\n<|think|>\n<turn|>\n<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 4481516,
+    "VmRSS": 4481516,
+    "RssAnon": 1214004,
+    "RssFile": 3267512,
+    "VmSwap": 0
+   },
+   "draft_log": [],
+   "spec_lines": [],
+   "draft_stats": []
+  },
+  {
+   "index": 3,
+   "config": "budget0",
+   "command": "nice -n 10 /b6/bin/llama-server -m /b6/m/gemma-4-E2B_q4_0-it.gguf -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18533 --reasoning-budget 0",
+   "env": {},
+   "requests": [
+    {
+     "id": "mul",
+     "lang": "en",
+     "wall_s": 17.97,
+     "prompt_n": 31,
+     "gen_n": 152,
+     "gen_tok_s": 8.603529749068652,
+     "prompt_tok_s": 58.42871978905347,
+     "draft_n": null,
+     "draft_n_accepted": null,
+     "wall_tok_s": 8.46,
+     "temp_c": null,
+     "content": "The user wants me to calculate the product of 17 and 23.\n\nCalculation:\n$17 \\times 23$\n\nMethod 1: Standard multiplication\n$17 \\times 20 = 340$\n$17 \\times 3 = 51$\n$340 + 51 = 391$\n\nMethod 2: Distributive property\n$17 \\times (20 + 3) = (17 \\times 20) + (17 \\times 3)$\n$340 + 51 = 391$\n\nThe result is 391.",
+     "reasoning": "",
+     "finish": "stop",
+     "text_sha256": "7d168deb6eac386975c95c7150528c66a9b92aeb4726048d028daefe91fd5e8a",
+     "prompt_ms": 530.561,
+     "gen_ms": 17550.936,
+     "cool_wait_s": 0.0,
+     "ttft_visible_s": 0.618,
+     "ttft_reasoning_s": null,
+     "ttft_any_s": 0.618
+    }
+   ],
+   "load_s": 4.0,
+   "rendered_prompt": "<|turn>system\n<|think|>\n<turn|>\n<|turn>user\nHello<turn|>\n<|turn>model\n",
+   "mem_kb": {
+    "VmHWM": 4481836,
+    "VmRSS": 4481836,
+    "RssAnon": 1214080,
+    "RssFile": 3267756,
+    "VmSwap": 0
+   },
+   "draft_log": [],
+   "spec_lines": [],
+   "draft_stats": []
+  }
+ ]
+}

@@ -85,11 +85,28 @@ only; the other consumers are the guarded cases.
 
 ### Evidence
 
-Filled in below from `results/desktop-fast/upstream-51ce9c1/` (desktop x86, master + patch vs clean master) and
-from the Pi 5 measurements of the same change on a7b94df (`docs/fast/LAYER_SKIP.md`,
-`docs/fast/DECISION_2026-10-06.md`).
+Correctness, desktop x86, master 51ce9c1 + patch against clean master (same tool, E2B QAT Q4_0, 140 logit
+vectors, 32 KV-state digests, 3 token sequences per run; `results/desktop-fast/upstream-51ce9c1/`):
 
-RESULTS_LAYER_SKIP
+| Context settings | Bit-identical vectors | Argmax changes | Worst KL | KV digests equal | Token sequences equal |
+|---|---|---|---|---|---|
+| default (flash attention auto, f16 KV) | 137 / 140 | 0 | 3.6e-5 | 32 / 32 | 3 / 3 |
+| flash attention off | 137 / 140 | 0 | 4.9e-4 | 32 / 32 | 3 / 3 |
+| flash attention on, KV cache q8_0 | 140 / 140 | 0 | 0 | 32 / 32 | 3 / 3 |
+| control: clean master against itself, 513 tokens as one call or as 511+2 | - | 0 | 5.4e-4 | - | - |
+
+Speed, desktop x86 (Ryzen 5 8400F, 6 threads, inside the Docker VM, so noisy), `llama-bench -p 512 -n 32`:
+prompt processing 159-167 tok/s on clean master, 467-609 tok/s with the patch (seven runs each side);
+decode 23.4-27.1 against 22.7-24.4 tok/s, i.e. no difference outside the run-to-run noise. Prompt and
+generation in one context (`-pg 512,32`): 118.5 against 243.4 tok/s.
+
+Speed and correctness on the Raspberry Pi 5 with the same change on a7b94df (the experiment-local patch, switch
+on): prompt processing 61.9 -> 170 tok/s in `llama-bench -p 512`, 56.6 -> 147.4 tok/s in real chat requests,
+decode unchanged (7.45 -> 7.46 tok/s), time to the first visible text 2.1-2.8 times shorter, same greedy text
+in every request; E2B and E4B: KV state identical, logits within the reference's own batch-split variation
+(`docs/fast/LAYER_SKIP.md`, `docs/fast/DECISION_2026-10-06.md`).
+
+Pi 5 with master + this patch: PI_MASTER_LAYER_SKIP
 
 ### Commands a reviewer can run
 
@@ -148,7 +165,24 @@ API that day; read them before writing an issue):
 
 ### Evidence
 
-RESULTS_PAD_TAIL
+Correctness, desktop x86, master 51ce9c1 + patch against clean master: 140 / 140 logit vectors bit-identical,
+32 / 32 KV digests, 3 / 3 token sequences (on x86 the 4-row and 1-row kernels give the same bits; on the Pi
+they differ in the last bits, see above).
+
+Speed, desktop x86 (6 threads, Docker VM), `llama-bench -p 420 -n 0 -b N`, tok/s:
+
+| Rows per pass | 2 | 3 | 4 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|
+| clean master | 40.5 | 54.6 | 80.4 | 72.4 | 72.9 | 96.0 |
+| with the patch | 38.0 | 56.9 | 71.9 (noisy, +-8) | 77.7 | 84.9 | 100.0 |
+
+So on this x86 machine: 3 leftover rows +4 %, 6 rows +7 %, 7 rows +17 %, but 2 leftover rows -6 % (one 4-row
+block costs more arithmetic than two single-row sweeps when memory bandwidth is not the limit). On the Pi 5,
+where it is the limit, the experiment-local version gave 2 rows 10.3 -> 13.5, 3 rows 13.1 -> 19.7,
+6 rows 24.8 -> 31.2, 7 rows 24.3 -> 35.8 tok/s, and draft verification with 2 drafts per pass 7.0 -> 12.6 tok/s.
+A reviewer may therefore ask to pad only 3 leftover rows, or to decide by weight size against cache size.
+
+Pi 5 with master + this patch (per-thread buffers): PI_MASTER_PAD_TAIL
 
 ## Reproduce the check
 

@@ -1,0 +1,17 @@
+{
+ "file": "models/google__gemma-4-26B-A4B-it-qat-q4_0-gguf/gemma-4-26B_q4_0-it.gguf",
+ "total_bytes": 14423538808,
+ "groups": {
+  "other": 2039928,
+  "token embedding / output head": 605552640,
+  "attention": 624885760,
+  "dense feed-forward": 301086720,
+  "experts (all 128)": 12846382080,
+  "router": 43591680
+ },
+ "expert_count": 128,
+ "expert_used_count": 8,
+ "dense_bytes_per_pass": 1577156728,
+ "expert_bytes_per_token": 802898880.0,
+ "modeled_bytes_per_one_token_pass": 2380055608.0
+}
