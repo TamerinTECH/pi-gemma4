@@ -106,7 +106,17 @@ decode unchanged (7.45 -> 7.46 tok/s), time to the first visible text 2.1-2.8 ti
 in every request; E2B and E4B: KV state identical, logits within the reference's own batch-split variation
 (`docs/fast/LAYER_SKIP.md`, `docs/fast/DECISION_2026-10-06.md`).
 
-Pi 5 with master + this patch: PI_MASTER_LAYER_SKIP
+Pi 5 with master + this patch: correctness: 137 / 140 vectors bit-identical, 32 / 32 KV digests, 3 / 3 token sequences, no argmax
+change, worst KL 2.9e-4 (controls in the same run, clean master against itself: 2.4e-4 for 513 tokens as one
+call or as 511+2, 5.0e-4 for 45 tokens in one batch or in chunks of 3). Speed, `llama-bench -p 512 -n 32 -r 3`,
+4 threads: prompt processing 62.7 +- 0.7 -> 171.4 +- 0.7 tok/s; decode 7.53 +- 0.11 -> 7.38 +- 0.08 tok/s.
+Raw: `results/pi-real/fast3/upstream-pi/`.
+
+Note on decode: in `llama-bench` the build with the layer skip reads 1-2 % lower in decode on the Pi (7.50 -> 7.44
+on a7b94df, 7.53 -> 7.38 on master), about the size of the spread; in real server requests it is 7.45 -> 7.46.
+A one-row pass now carries about 60 small extra graph nodes (the row gathers of the 20 upper layers). The gather
+could be skipped when every row is an output, but then the graph topology would depend on the number of
+outputs, which llama.cpp avoids on purpose (comment in `build_inp_out_ids`).
 
 ### Commands a reviewer can run
 
@@ -134,13 +144,14 @@ llama-server -m gemma-4-E2B_q4_0-it.gguf -md mtp-gemma-4-E2B-it.gguf --spec-type
 
 ### The change
 
-Each thread builds one zero-padded 4-row block from the 2-3 leftover rows (a few kilobytes, quantized like the
-other blocks) and runs one `gemm` sweep for it; the padded result rows are dropped. One leftover row keeps the
-`gemv` path. No shared state: the block is a local buffer of the calling thread.
+Thread 0 builds one zero-padded 4-row block from the 2-3 leftover rows in the operation's work buffer (the work
+size of the op is enlarged by that block), quantized like the other blocks. Every thread then runs one `gemm`
+sweep over its weight chunk for that block and drops the padded result rows. One leftover row keeps the `gemv`
+path. No process-wide state: the work buffer belongs to one graph computation.
 
 Difference to the experiment-local version in `pigemma-fast-v7.patch`: that one keeps the padded block in one
 process-wide buffer filled by thread 0. That is fine for `llama-server` (one decode at a time) but would be a data
-race for a program that decodes on two contexts at once, so the upstream version uses per-thread buffers.
+race for a program that decodes on two contexts at once.
 
 ### Relation to existing upstream work
 
@@ -165,24 +176,43 @@ API that day; read them before writing an issue):
 
 ### Evidence
 
-Correctness, desktop x86, master 51ce9c1 + patch against clean master: 140 / 140 logit vectors bit-identical,
-32 / 32 KV digests, 3 / 3 token sequences (on x86 the 4-row and 1-row kernels give the same bits; on the Pi
-they differ in the last bits, see above).
+Correctness, desktop x86, master 51ce9c1 + patch against clean master at the same thread count: bit-identical
+with 6 threads (140 / 140 logit vectors, 32 / 32 KV digests, 3 / 3 token sequences) and with 1 and 3 threads
+(65 / 65 vectors of the scenarios s1, s2, s6, s9). On x86 the 4-row and 1-row kernels give the same bits; on the
+Pi they differ in the last bits.
 
-Speed, desktop x86 (6 threads, Docker VM), `llama-bench -p 420 -n 0 -b N`, tok/s:
+Speed, desktop x86 (6 threads, Docker VM, three alternated rounds, noisy): 3 leftover rows 52-57 -> 62-65 tok/s
+(about +19 %), 2 leftover rows 39-44 -> 38-42 tok/s (about -4 %, inside the spread), 4-8 rows per pass no
+difference outside the spread. With large caches a padded 4-row block costs about as much arithmetic as two
+single-row sweeps, so two leftover rows gain nothing there. A reviewer may ask to pad only 3 leftover rows, or to
+decide by weight size against cache size; on the Pi both cases gain.
 
-| Rows per pass | 2 | 3 | 4 | 6 | 7 | 8 |
-|---|---|---|---|---|---|---|
-| clean master | 40.5 | 54.6 | 80.4 | 72.4 | 72.9 | 96.0 |
-| with the patch | 38.0 | 56.9 | 71.9 (noisy, +-8) | 77.7 | 84.9 | 100.0 |
+Pi 5 with master + this patch: correctness: 126 / 140 vectors bit-identical, largest logit difference 5.7e-6, 32 / 32 KV digests,
+3 / 3 token sequences, no argmax change. Speed, `llama-bench -p 420 -n 0 -b N -r 2`, 4 threads, mean of two
+alternated rounds (`results/pi-real/fast3/upstream-pi-pt3/`):
 
-So on this x86 machine: 3 leftover rows +4 %, 6 rows +7 %, 7 rows +17 %, but 2 leftover rows -6 % (one 4-row
-block costs more arithmetic than two single-row sweeps when memory bandwidth is not the limit). On the Pi 5,
-where it is the limit, the experiment-local version gave 2 rows 10.3 -> 13.5, 3 rows 13.1 -> 19.7,
-6 rows 24.8 -> 31.2, 7 rows 24.3 -> 35.8 tok/s, and draft verification with 2 drafts per pass 7.0 -> 12.6 tok/s.
-A reviewer may therefore ask to pad only 3 leftover rows, or to decide by weight size against cache size.
+| Rows per pass | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|
+| clean master, tok/s | 10.9 | 13.2 | 27.3 | 25.1 | 24.8 | 24.6 | 37.1 |
+| with the patch, tok/s | 13.6 | 20.0 | 27.2 | 25.1 | 27.5 | 31.3 | 37.1 |
+| change | +25 % | +51 % | same | same | +11 % | +27 % | same |
 
-Pi 5 with master + this patch (per-thread buffers): PI_MASTER_PAD_TAIL
+Six rows gain less than seven because one 4-row sweep plus one padded sweep costs about as much as the clean
+build's one sweep plus two single-row sweeps; with seven rows the clean build needs three single-row sweeps.
+
+How the block is prepared matters, measured on the Pi with four variants of this patch on master (the third one
+is produced by `experiment_shared_tail.py` and exists only for this comparison):
+
+| Variant | 2 rows | 3 rows | 7 rows | Remark |
+|---|---|---|---|---|
+| every thread prepares its own block, fresh buffers per call | 12.2 | 18.0 | 28.9 | first version |
+| every thread prepares its own block, reused thread-local buffers | 12.1 | 17.8 | 28.7 | allocation is not the cost |
+| one thread prepares one shared static block | 13.5 | 19.9 | 31.3 | fast, but a data race between two contexts |
+| **one thread prepares the block in the op's work buffer (this patch)** | 13.6 | 20.0 | 31.3 | fast and without shared state |
+
+The patch therefore enlarges the work size of `GGML_OP_MUL_MAT` in `work_size()` by one block of 4 rows per
+plane and lets thread 0 fill it before the barrier; the other threads read it after the barrier. If the work
+buffer is smaller than expected the code falls back to the single-row path.
 
 ## Reproduce the check
 

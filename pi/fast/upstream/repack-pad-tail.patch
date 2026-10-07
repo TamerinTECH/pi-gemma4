@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-cpu/repack.cpp b/ggml/src/ggml-cpu/repack.cpp
-index 2632ae3..4ff7877 100644
+index 2632ae3..33fb368 100644
 --- a/ggml/src/ggml-cpu/repack.cpp
 +++ b/ggml/src/ggml-cpu/repack.cpp
 @@ -15,6 +15,7 @@
@@ -10,7 +10,16 @@ index 2632ae3..4ff7877 100644
  
  #include "repack.h"
  
-@@ -4603,7 +4604,8 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
+@@ -4560,6 +4561,8 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
+             case GGML_OP_MUL_MAT:
+                 {
+                     size = ggml_row_size(PARAM_TYPE, ggml_nelements(op->src[1]));
++                    // + one zero-padded block of 4 rows per plane for 2-3 leftover rows
++                    size += 4 * ggml_row_size(PARAM_TYPE, op->src[1]->ne[0]) * op->src[1]->ne[2];
+                     return true;
+                 }
+             case GGML_OP_MUL_MAT_ID:
+@@ -4603,7 +4606,8 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
                                     int64_t               src0_start,
                                     int64_t               src0_end,
                                     int64_t               src1_start,
@@ -20,14 +29,15 @@ index 2632ae3..4ff7877 100644
          const ggml_tensor * src0 = op->src[0];
          const ggml_tensor * src1 = op->src[1];
          ggml_tensor *       dst  = op;
-@@ -4640,6 +4642,19 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
+@@ -4640,6 +4644,20 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
                                                               src0_ptr + src0_start * nb01, src1_ptr,
                                                               nrows - (nrows % 4), ncols);
          }
 +        // 2-3 leftover rows: one gemm over the zero-padded block instead of one gemv per row
 +        if (src1_tail != nullptr && ncols > 0) {
-+            const int64_t      n_tail = nrows % 4;
-+            std::vector<float> tail_out((size_t) 4 * ncols);
++            const int64_t n_tail = nrows % 4;
++            static thread_local std::vector<float> tail_out; // reused, one per thread
++            tail_out.resize((size_t) 4 * ncols);
 +            gemm<BLOC_TYPE, INTER_SIZE, NB_COLS, PARAM_TYPE>(ne00, tail_out.data(), (size_t) ncols,
 +                                                             src0_ptr + src0_start * nb01,
 +                                                             src1_tail + (size_t) i12 * 4 * src1_col_stride, 4, ncols);
@@ -40,29 +50,26 @@ index 2632ae3..4ff7877 100644
          for (int iter = nrows - (nrows % 4); iter < nrows; iter++) {
              gemv<BLOC_TYPE, INTER_SIZE, NB_COLS, PARAM_TYPE>(ne00, (float *) (dst_ptr + (iter * nb1)) + src0_start,
                                                               ne01, src0_ptr + src0_start * nb01,
-@@ -4705,6 +4720,26 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
+@@ -4705,6 +4723,23 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
              }
          }
  
-+        // 2-3 leftover rows, zero-padded to one block of 4 (own copy per thread)
-+        std::vector<char> tail_q;
-+        if (ne11 % 4 >= 2) {
++        // 2-3 leftover rows: thread 0 also stores them as one zero-padded block of 4, behind the row data in wdata
++        char *     wdata_tail = wdata + nbw2 * ne12;
++        const bool pad_tail   = ne11 % 4 >= 2 && params->wsize >= (nbw2 + 4 * nbw1) * ne12;
++        if (pad_tail && ith == 0) {
 +            const int64_t      n_tail = ne11 % 4;
-+            std::vector<float> tail_x((size_t) 4 * ne10);
-+            tail_q.resize((size_t) ne12 * 4 * nbw1);
++            std::vector<float> tail_x((size_t) 4 * ne10, 0.0f);
 +            for (int64_t i12 = 0; i12 < ne12; i12++) {
 +                const char * data_ptr = (const char *) src1->data + i12 * nb12 + (ne11 - n_tail) * nb11;
-+                for (int64_t t = 0; t < 4; t++) {
-+                    if (t < n_tail) {
-+                        memcpy(tail_x.data() + t * ne10, data_ptr + t * nb11, (size_t) ne10 * sizeof(float));
-+                    } else {
-+                        memset(tail_x.data() + t * ne10, 0, (size_t) ne10 * sizeof(float));
-+                    }
++                for (int64_t t = 0; t < n_tail; t++) {
++                    memcpy(tail_x.data() + t * ne10, data_ptr + t * nb11, (size_t) ne10 * sizeof(float));
 +                }
-+                ggml_quantize_mat_t<INTER_SIZE, PARAM_TYPE>(tail_x.data(), (void *) (tail_q.data() + (size_t) i12 * 4 * nbw1), 4, ne10);
++                ggml_quantize_mat_t<INTER_SIZE, PARAM_TYPE>(tail_x.data(), (void *) (wdata_tail + i12 * 4 * nbw1), 4, ne10);
 +            }
 +        }
-+        const char * src1_tail = tail_q.empty() ? nullptr : tail_q.data();
++        // the other threads read the block only after the barrier below
++        const char * src1_tail = pad_tail ? wdata_tail : nullptr;
 +
          // disable for NUMA
          const bool disable_chunking = ggml_is_numa();

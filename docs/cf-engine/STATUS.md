@@ -21,7 +21,7 @@ Progress (update after every step):
 | 4 vocabulary shortcut | DONE: exact drafter cluster head (patch v6/v7, `PIGEMMA_MTP_CENTROIDS=1`, drafter file from `pi/fast/make_centroid_gguf.py`). Pi, 50 requests EN/HE/DE/code, two repetitions: draft construction 21.1 -> 16.0 ms per pass (-25 %), verification 148 ms unchanged, accepted drafts 57.4 -> 55.6 %, tokens per pass 2.659 -> 2.608, decode 15.71 -> 15.88 tok/s (+1.1 %; German -4 %), same text 50/50. Sampling audit (desktop): default verification never uses proposal probabilities, both heads commit identical text (6/6 long, 400/400 short = plain sampling with the same seed); rejection mode: digit histograms vs plain p = 0.08-1.0, heads within 2 counts. Verdict: correct, about 1 %, optional switch only. Approximate target head: deferred, nothing approximated | `docs/fast/DECISION_2026-10-06.md` section 4, `results/pi-real/fast3/centroids/`, `results/desktop-fast/sampling/` |
 | 5 model screen | DONE (44 held-out tasks, direct answers, task budgets, nothing cut off): **E2B 23/44** (reference plain 464.9 s, fast profile + assistant 200.7 s, 17.0 tok/s); **E4B 32/44** (668.1 s -> 273.7 s, 3.84 -> 10.37 tok/s, layer skip validated, prompt 28 -> 46 tok/s); **26B-A4B 42/44** (`-nr` plain 929 s cold / ~831 s warm, 3.77 tok/s; + its assistant 699.4 s, 5.08 tok/s, 84 % of drafts accepted). Separately labelled: E2B with thinking 32/44 in 1419 s (24 s to the first visible word; code cut by the 768-token budget). One E2B code answer differed between reference/plain and fast/drafter: attribution run shows the UNPATCHED build with drafter gives the same second text, so patched = reference in the same mode; drafter = plain is upstream behaviour (184 of 186 answers) | `docs/fast/DECISION_2026-10-06.md` sections 5, 5a; `results/pi-real/fast3/{screen,think,attrib}/` |
 | 6 26B gate | DONE: **no-go** for prepacking the 26B as a whole and as a plain-decode measure (one-row pass reads 2.38 GB = 5.0 tok/s ceiling; dense parts already at 10.4-11.4 GB/s unpacked; packed expert kernels gave 4.61 -> 4.63 in Milestone A; expert traffic is per row). **Go for one bounded prototype only**: pack the dense 1.58 GB (attention, dense feed-forward, router, output matrix) and use the assistant; E2B representative operations at 4 rows per pass: 110.8 ms packed vs 255.4 ms unpacked; projection (not measured on the 26B) 5.1 -> ~6.7 tok/s; acceptance bar +20 % on the 44-task screen, identical output in the same mode, no more swap than today. The 26B runs put 1.3 GB of the server's memory and ~0.7 GB more into swap; services stayed active | `docs/fast/DECISION_2026-10-06.md` section 6; `results/pi-real/fast3/profile26/`, `results/pi-real/26b_bytes_per_token.json` |
-| 7 upstream | patches DONE: `pi/fast/upstream/gemma4-shared-kv-layer-skip.patch` (+73/-13, 4 files) and `repack-pad-tail.patch` (+37/-2, per-thread buffer instead of the shared one) against master 51ce9c1, no environment switches, ASCII, both apply to a clean checkout and build; notes `pi/fast/upstream/README.md` (project rules: the operator writes issue/PR text himself, features start with an issue, comment on the open draft PR #29189 first, `Assisted-by:` trailer). Correctness run on master in Docker running (`run_upstream_check.sh`); desktop speed numbers pending | `pi/fast/upstream/` |
+| 7 upstream | DONE, nothing sent: two independent patches against llama.cpp master 51ce9c1 in `pi/fast/upstream/` — `gemma4-shared-kv-layer-skip.patch` (+73/-13, 4 files) and `repack-pad-tail.patch` (+37/-2, one file; third version: one thread prepares the padded block in the operation's work buffer, no shared state) — no environment switches, ASCII, both apply to a clean checkout and build. **Measured on the Pi on master:** layer skip 62.7 -> 171.4 tok/s prompt processing, KV state identical, logits 137/140 bit-identical; padded tail 2/3/7 rows per pass 10.9/13.3/24.6 -> 13.6/20.0/31.4 tok/s (letting every thread prepare its own block loses half of that: measured). Desktop x86: both bit-identical or within the reference's own variation, incl. flash attention off and q8_0 KV cache. Notes with the project's rules (`README.md` there): the operator writes issue/PR text himself, features start with an issue, comment on the open draft PR #29189 first, `Assisted-by:` trailer | `pi/fast/upstream/`, `results/pi-real/fast3/upstream-pi*/`, `results/desktop-fast/upstream-51ce9c1/` |
 | 8 report | DONE: `docs/fast/DECISION_2026-10-06.md` (sections 1-8; section 8 is the short version). Extra bounded sweep for the throughput estimate (section 3b): up to 7 or 15 drafts per pass with or without a confidence gate never beats 3 drafts (best 15.74 vs 15.71 tok/s) and changes the greedy text in 12-18 % of answers. Next justified component: selective packing of the 26B's dense tensors for multi-row verification passes, only if the 26B ships; otherwise get the layer skip upstream | `docs/fast/DECISION_2026-10-06.md`, `results/pi-real/fast3/draftlen/` |
 
 Patch versions: v1 three switches; v2 layer skip together with the Gemma 4 drafter; v3 pad once per call;
@@ -227,24 +227,27 @@ first token), several users at once and copy-heavy output.
 
 ## Running now (keep current)
 
-- **Pi, last open step of brief 3:** `~/pigemma/fast/run_phase_c.sh upstream` (restarted 2026-10-07 07:03 after
-  a script fix; log `~/pigemma/results/fast3/phase_c_upstream.out`, results
-  `~/pigemma/results/fast3/upstream-pi/`): builds llama.cpp master 51ce9c1 three times under
-  `/mnt/pigemma-fast/up/` (clean, + layer skip, + padded tail), runs the correctness scenarios and
-  `llama-bench`. When it prints `UPSTREAM_PI_DONE`: copy `upstream-pi/` to `results/pi-real/fast3/`, replace the
-  three `PI_MASTER_*` markers (`pi/fast/upstream/README.md` twice, `docs/fast/DECISION_2026-10-06.md` once),
-  run `python pi/fast/make_checksums.py`, commit. Everything else of brief 3 is finished.
-  (The first attempt at 00:29 failed at once: `tar | head` under `pipefail` hid the archive's top directory.)
-- Phase B and phase C logs: `results/pi-real/fast3/phase_b.out`, `phase_c.out`. No abort, no throttling,
-  services active throughout. The PC was restarted on 2026-10-07 morning; the Pi jobs were not affected.
+- **Nothing is running.** Brief 3 is finished (2026-10-07 09:15): report `docs/fast/DECISION_2026-10-06.md`
+  (section 8 = decision), `docs/fast/LAYER_SKIP.md`, `pi/fast/README.md`, `pi/fast/upstream/README.md`; all
+  committed on the local branch `fast-profile`, nothing pushed. Open decisions are the operator's: clear the `/goal` hook;
+  which profile ships (E2B fast / E4B fast / 26B + assistant); whether to open the upstream issue; whether to
+  fund the one bounded 26B prototype (dense tensors packed + assistant).
+- Pi state: services active, no job of ours running, about 0.7 GB in swap since the 26B screen. Trees under
+  `/mnt/pigemma-fast/`: `llama-fast-v6` (= v7, measured), `llama-fast-v7-fresh`, `llama-ref-check`, `up/{ref,ls,pt}`
+  (llama.cpp master, clean / layer skip / padded tail). Binaries on the stick: `fast/bin-v7`, `bin-v7-fresh`.
+  Logs: `results/pi-real/fast3/phase_b.out`, `phase_c*.out`.
+- To repeat a step: `~/pigemma/fast/run_phase_b.sh <steps>`, `~/pigemma/fast/run_phase_c.sh <steps>`,
+  `~/pigemma/fast/upstream/run_upstream_pi_pt2.sh <tag>` (re-patches `up/pt` with the current
+  `repack-pad-tail.patch`). Analysis: `python pi/fast/analyze_phase_b.py`, `pi/fast/analyze_op_profile.py`,
+  `pi/fast/analyze_sampling.py`; checksums: `python pi/fast/make_checksums.py`.
 - After a reboot of the Pi: `~/pigemma/fast/mount_work.sh` (mounts the stick and the ext4 work image).
   Never overwrite a script on the Pi while it is running (bash reads it incrementally; a build died that way).
 - Ports 18190/18191 on the Pi belong to another local service. The 26B at this board's memory limit pushes
-  memory into swap (about 0.7 GB still there on 2026-10-07 07:00); do not run it more often than needed.
+  memory into swap; do not run it more often than needed.
 - Models for desktop tests: `a local models directory outside this repository\` (E2B, E4B, drafters, drafters with cluster tensors);
   Docker volumes `pigemma-fastcheck-build6` (x86 build of patch v7 + E2B) and `pigemma-upstream-51ce9c1`
   (master, three builds). The scratch clone of llama.cpp master with the three worktrees was in the session
-  scratchpad and can be recreated with `pi/fast/upstream/port_to_master.py`.
+  scratchpad of 2026-10-06 and can be recreated with `pi/fast/upstream/port_to_master.py`.
   `results/.cpu.lock` still names `cf-engine-root` (Codex, 2026-10-06 09:36) — stale.
 
 ### Verified-ceiling run 12:26–13:15 — FINAL (raw + `summary.json`: `results/pi-real/verified-ceiling/`)

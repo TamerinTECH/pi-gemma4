@@ -1,0 +1,37 @@
+[health 08:33:24] active active active active  temp=54.3'C throttled=0x0
+9d97c28c3feae0fa3034533a6d7196570f8187059752a825cea07c100bb2ec9a
+build pt OK 12 s
+=== compare clean master vs padded tail (pt3)
+SUMMARY float=140 bit_identical=126 argmax_different=0 over_tolerance=0 worst_max_abs=5.722e-06 (s5.unified.seq1.last) worst_kl=4.639e-13 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+[health 08:36:15] active active active active  temp=70.3'C throttled=0x0
+=== small batches (llama-bench -p 420 -n 0 -b N), clean master vs padded tail, two alternated rounds
+ref r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       2 |           pp420 |         10.95 ± 0.03 |
+ref r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       3 |           pp420 |         13.28 ± 0.05 |
+ref r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       4 |           pp420 |         27.30 ± 0.12 |
+ref r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       5 |           pp420 |         25.14 ± 0.09 |
+ref r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       6 |           pp420 |         25.03 ± 0.04 |
+ref r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       7 |           pp420 |         24.60 ± 0.18 |
+ref r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       8 |           pp420 |         37.07 ± 0.10 |
+pt r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       2 |           pp420 |         13.65 ± 0.08 |
+pt r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       3 |           pp420 |         20.00 ± 0.12 |
+pt r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       4 |           pp420 |         27.27 ± 0.09 |
+pt r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       5 |           pp420 |         25.22 ± 0.08 |
+pt r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       6 |           pp420 |         27.58 ± 0.01 |
+pt r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       7 |           pp420 |         31.46 ± 0.01 |
+pt r1 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       8 |           pp420 |         37.18 ± 0.07 |
+ref r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       2 |           pp420 |         10.89 ± 0.04 |
+ref r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       3 |           pp420 |         13.18 ± 0.07 |
+ref r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       4 |           pp420 |         27.29 ± 0.01 |
+ref r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       5 |           pp420 |         25.06 ± 0.13 |
+ref r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       6 |           pp420 |         24.65 ± 0.02 |
+ref r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       7 |           pp420 |         24.54 ± 0.06 |
+ref r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       8 |           pp420 |         37.10 ± 0.12 |
+pt r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       2 |           pp420 |         13.60 ± 0.14 |
+pt r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       3 |           pp420 |         20.03 ± 0.10 |
+pt r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       4 |           pp420 |         27.12 ± 0.29 |
+pt r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       5 |           pp420 |         25.00 ± 0.02 |
+pt r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       6 |           pp420 |         27.49 ± 0.01 |
+pt r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       7 |           pp420 |         31.15 ± 0.11 |
+pt r2 | gemma4 E2B Q4_0                |   3.10 GiB |     4.63 B | CPU        |       4 |       8 |           pp420 |         36.93 ± 0.01 |
+[health 09:03:37] active active active active  temp=70.8'C throttled=0x0
+=== UPSTREAM_PI_PT2_DONE 2026-10-07T09:03:37+02:00
