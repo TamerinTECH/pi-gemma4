@@ -1,101 +1,477 @@
-ec2233976871872b5561c2a860e733b3e04238a04ef41898d392378604db24ce *e2b-profile/profile_norepack.json
-347de63e0f6ca5b980aa5f9449d37930b05ff268f8ccf7bb3155505b26d4140d *e2b-profile/profile_repack.json
-84c853cb8f1379c2c202c3f4b2dbe6693238f6d9a8668cadd3c1ab8b34f6d078 *e2b-profile/requests_norepack.jsonl
-3991b20d85f7db7c42bdf903af6cbaf931b07cdc3bd1d2403c08dc7f01c8aeac *e2b-profile/requests_repack.jsonl
-894f5be2d943c738ffa95024321e4a5347e4b87e851da925a58c2284dd3eeb78 *e2b-profile/stderr_norepack.txt
-1d1d747534d4cae2dca4c103e4c64250e9ace8656fce5cf386c8759c2cb71fcb *e2b-profile/stderr_repack.txt
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 *e2b-profile/stdout_norepack.txt
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 *e2b-profile/stdout_repack.txt
-6ab4c72f213b5c4d64cf72a1801834ace93e0f0e003c796225a529dda74ac3b1 *fast/A_ref.md
-7c16ffabba33d888f3845a1e26f2ecb8bfe3e149d81f0a6435a0962cbaa3d517 *fast/B_pad.md
-14cfbce61eadc81055e57c9ab0b1fdfeacdb45b91c1cf692ede103d392529f4b *fast/C_chunk128.md
-e6b04677050d5e2a1f193ffac8dd6c61fb2be90e26f908dc3e1d97e8b0aba435 *fast/C_chunk256.md
-0d716673422c0cfb07ae0c4dc2a8ee08b395741a44f2069a67dcd8b6169e366d *fast/C_chunk64.md
-3b3ea8f6767197d79cfe710ff07d9414a04783f7b7086e1c9e2e85e23499015f *fast/D_strip.md
-6e77c4df2fc1dc1f71b1c851e1d2aad54797e238f8a9ddbef287ad4102541378 *fast/D_strip_only.md
-8fc450e833ced41179a87ea86970bed4e13c8dad9a92c6652cd1b45888e6d0a4 *fast/E_fast.md
-a4dd8141e90fce624981cd5e76f95af5054ea43e651c8761950513d92bdaba90 *fast/E_ref.md
-baf5f9e562eea6e15fd85bc7f86e8ccf4dcb90b2f107e77d45310a69789cbd0c *fast/F_fast/ab.json
-8e559cb26eaf8647736cf6fffff478ce878566735257d5ffe97e80db8093b42e *fast/F_fast/server_0_base.log
-668bee2d3815d7c324061a0eaad7e87ea98dfcf33e2d83d57288bdf4c86af87f *fast/F_fast/server_1_b64.log
-17b019f59cf1e52b60ea3ee40c2666cdb4f79c8730caced78645e3c7e9bbc91e *fast/F_ref/ab.json
-d005b6e5df22d28765a772fc5d38a3f8ed8ddfb60ba546e0439cd0e866241596 *fast/F_ref/server_0_base.log
-ef5b02e24a6ccb65f2b8a4a7e21391b1efd212021441cd5176aa3e4c7a2178a5 *fast/G_fast_mtp/ab.json
-8ad132c515760efea36871d8f2faf095b5415a51c1823a85ebdf6d317fb93b01 *fast/G_fast_mtp/server_0_mtp3.log
-f4d1314c7cb647d48db44d3c4e0cb0bd6883e85f712b9dc00a7399b2fe2390ed *fast/G_ref_mtp/ab.json
-df17898bb22b7cb4ecee10b40181311bdc9cf8e3e9b6e82b37fb29a9e0f707a3 *fast/G_ref_mtp/server_0_mtp3.log
-dc07fff89dc936546738bf23f194e9100e9a9bc50ed67a5abae9efde4640b73d *fast/H_fast_mtp/ab.json
-c4538ea1153dc0599c4d286b1ee42137b799b421beaf060ca4b23ec0ff34369f *fast/H_fast_mtp/server_0_base.log
-0fe2030267a6ba5e290cd5ae3345c21d9dd77de3a799fff93383da32ec9f9b30 *fast/H_fast_mtp/server_1_mtp3.log
-aeeb87c7712fa9634b9709a9247abc334698de137377a299a26a2292e0372a6c *fast/H_fast_mtp/server_2_mtp2.log
-0e7b54096784886d7ef174966eeff1990cedf1cedc9d2919dbd2af3a442882d7 *fast/H_ref_mtp/ab.json
-3e5902ac1dde7f165127a458420b008952045124843e42167def4b0cb29b2542 *fast/H_ref_mtp/server_0_base.log
-92dc79bceb08537cb2509cbf9e37f0ac743e351264fa047b8dda81511cac7422 *fast/H_ref_mtp/server_1_mtp3.log
-27ad32fabdaeccda5d7ce38627b316a2b366094909cbffb6903b6fe9096624fe *fast/I_par_fast/run.json
-fda54437590d0358e589d5f3d8f6b79954f8dca7f1bd920bfec5ee1d703c6fad *fast/I_par_fast/sample_output.txt
-34e2d16795c64c60adefed183de5ab98acdc48cc8d8ec475e29233db23136d69 *fast/I_par_fast/server.log
-1d0e02fe175adf63bff4ba5742c74896cae2211157e39560f4bb930da5e7406b *fast/I_par_ref/run.json
-fda54437590d0358e589d5f3d8f6b79954f8dca7f1bd920bfec5ee1d703c6fad *fast/I_par_ref/sample_output.txt
-ce119411083728797e8d7286fef94bf2b906024dbc42961bb21d2f4239f5d44b *fast/I_par_ref/server.log
-17e22e3d091d81ad918fec2450aa471105e720370608fd00b215eaa9ccc0bccb *fast/P_pad2.md
-9bdc04a9454230dd0b2204138fb629ab01b3edf6038674de91af6ebde11467f2 *fast/Q2_fast_mtp/ab.json
-a8893c6353b9e5c5fab27e64a3bce1c0ea0a62e10a7066e74e4f24e1dc1b678a *fast/Q2_fast_mtp/server_0_mtp3.log
-0a833e05f3536989a0575b4c249a0c65df86ffcb6a465eb7755d7a5a4f518d0e *fast/Q2_ref_plain/ab.json
-adffe78e4690e70560cc497becc19976ee27c7766a9ef3da230bc6ff2000c798 *fast/Q2_ref_plain/server_0_base.log
-33dfdca0dd28ca506cbf258d402d8884f7fd70467f90911c0ac5d39fec453df6 *fast/Q_fast_mtp/ab.json
-d7ba48658dc0f148011776bfcf4a1cf973075e7bdbb66552e7073ee0125e4d8c *fast/Q_fast_mtp/server_0_mtp3.log
-42c4876dc8de6e1a83ec098ed11530795d36c477b5643051ff369164b5004612 *fast/Q_ref_plain/ab.json
-05a5e77a9b56f1af65b8ba7a0b91592244590a28287dde240addc0a326fe4396 *fast/Q_ref_plain/server_0_base.log
-f016c7f8ac84cf3c82f60d9bb7175f3073b8a8a9423942ecda943dbf6b2f41cc *fast/run.out
-e9705e1f60f5a01a05e206f18e06146a8d58cffe1a53ba723361b721e80b41d0 *fast/run2.out
-319a7902a7e98fdf961a10e3ba5010db167fa906e94cd3a7c89d02a03518e0c3 *fast/run_qa44.out
-fef25d7bdcf989c3c96b4bf1270009eb533f5eb1478cc125b108229e5ae90b46 *fast/run_qa44b.out
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 *speed-ceiling/bench_e2b_ik.err
-2bb796337f7d3adff272c56ab9f5ae3635a5334695a175f6478b0bd4445c0209 *speed-ceiling/bench_e2b_ik.md
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 *speed-ceiling/bench_e2b_ik_rtr.err
-919386e9897f78df3f9588a0d9caecdc9851f69d58ccb027405ea81134ad9201 *speed-ceiling/bench_e2b_ik_rtr.md
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 *speed-ceiling/bench_e2b_ours.err
-e51c4ceeecd1b6a158aeb60f9d2e6f67eee750554c6bf9c4cd2e246f537ef66b *speed-ceiling/bench_e2b_ours.md
-e1478c24d7ab32cce2dd6a3df639bec11a1a3431e64c6743ee59116f5b8be092 *speed-ceiling/e2b_fast.out
-47d74ec2d2272a2efbdb80152d77dbebf81c9d329add991cb2efb173cfb4650d *speed-ceiling/e2b_mtp_ab/server_0_base.log
-af615cf4d236bcbc92d4b538212116e4f05be1768054e1c993648a3ef2e39d8c *speed-ceiling/e2b_mtp_ab/server_1_mtp3.log
-b1e5191b037b8e3921aa1e2fa3fe6ab8dda844ab849779f4c9741df919561ae1 *speed-ceiling/e2b_mtp_ab/server_2_base.log
-e6d01c3d31cf28dd7d05188dff2a2be98bacbc1ea792dedb5b76f33749c4322b *speed-ceiling/e2b_mtp_ab/server_3_mtp3.log
-28c2f7afb6aba78c7180665b076ec7769fcc2ba4f65ce26c25ce63f28ffac553 *speed-ceiling/e2b_mtp_ab/server_4_mtp6.log
-589f3606218d6d3b291efa8164361095fe677259b52850e3b0bb168af1e53cce *speed-ceiling/par_26b_ik/run.json
-5a3d86ca917b52ddf5808a16213983ef3d309eec37489f59eefcc3246dd7a48e *speed-ceiling/par_26b_ik/server.log
-87736ace684e22cd88f95c3339e9cf66471ca23c53cd9203250ce8a269af080b *speed-ceiling/par_26b_ours/run.json
-80d3fa546454f88e5f1dd7eb3a1e2c6120916a9e2a2ba77fbd6dc050e207f11d *speed-ceiling/par_26b_ours/sample_output.txt
-c2fd6dc1ccb5df35d762260dcd0bfb21328be9892221907ff3b3482eb0b0bd72 *speed-ceiling/par_26b_ours/server.log
-c45f023f4f7f8f6b3e090cbd8b74a137800b94b95868b7778966ed360ffd3fea *speed-ceiling/par_e2b_ik/run.json
-1d47eda448baa233b4b6dd1f0df46d62f251a84e2149bd0c5d8c64e1d177709f *speed-ceiling/par_e2b_ik/sample_output.txt
-ab5f62e627a81203fea8cdb2e9564e46c5eab96f8cf04a02af7df1b290003e49 *speed-ceiling/par_e2b_ik/server.log
-a29c482439898f22ff0b406d90f071a6f6dcbdff719ba8e60b898a5d2b0f0d99 *speed-ceiling/par_e2b_ours/run.json
-fda54437590d0358e589d5f3d8f6b79954f8dca7f1bd920bfec5ee1d703c6fad *speed-ceiling/par_e2b_ours/sample_output.txt
-2191db5d0fc76328a7b55db29c25e767dff608d949ea015870ddd67aba09c257 *speed-ceiling/par_e2b_ours/server.log
-1b6b552cd9e9e6c3cf5c33d0ea6768509567558e21f01dfc40abdc302c25f87a *speed-ceiling/speed_ceiling.out
-1190840965fd4b18e1c568c11cad1c4fc38f24ed7c201026e1f93397f0068f1f *speed-ceiling/speed_ceiling3.out
-0461c57e32c871c2fb40c7091f04d235b357e9debc16389f1895bacef84ee3a1 *verified-ceiling/batch_tail.out
-568b36f0aca1bec58d717a054eeacbe4914193023dd452e48d2da62840672f4f *verified-ceiling/bench_e2b_batch.md
-5220cd9e09b6d75ac499e5f193e3b9e54370a98baa37d6d0d93ae83eaf576bd6 *verified-ceiling/bench_e2b_batch_tail.md
-83d8b27366584a4e6fc95286f88edde799173709e89f9f26d98294dfc1074b38 *verified-ceiling/bench_e2b_q2.md
-10d3058407209c4a7a86302a829656f4b58141ed63521b32c8f30c57c61c0856 *verified-ceiling/bench_e2b_q2_batch.md
-6faab029499042fb1727288b0faeda73ab703c7fe478f660c48677ed03117a73 *verified-ceiling/e2b_q2_mtp/ab.json
-38a681c9dbaacb50037c29f220c01e52ba4e2f26adb9e5f453848fea964f3a86 *verified-ceiling/e2b_q2_mtp/server_0_base.log
-556b9c7c1915bb493bda4b7ace6450805d95ec2e96773b0bc43a88ecd6cb2c60 *verified-ceiling/e2b_q2_mtp/server_1_mtp3.log
-b0ad5ef69c65403b7e125403203c5bd0807fb93adcff48a99f34d0c656d6508c *verified-ceiling/e2b_q4_copy/ab.json
-274c9de5a18b343b9512653b91427955e04044472c9b329f6d5e2ec6b1ea9495 *verified-ceiling/e2b_q4_copy/server_0_base.log
-58f93238d308305d812e6dc1870c4ac9bfd75a47a36bbb61c9c0404e730f08d8 *verified-ceiling/e2b_q4_copy/server_1_ngram.log
-928e5594fbb240acbf70f7f729ae8a8a31f0cd49ccfb099248ed127815d3506a *verified-ceiling/e2b_q4_copy/server_2_ngram_s.log
-2063c7f5a6a59c61aad0f8b0c04fbf6df578077c28da5c9be9fa2b82a239dd44 *verified-ceiling/e2b_q4_copy/server_3_mtp3.log
-d0577391ada021ebec49c93b9db0d58ce5a1cc8850943ba554a9617fbad648c5 *verified-ceiling/e2b_q4_copy/server_4_both.log
-9a1f5f53bd50007b613a556043b20264fbce58db233176664f68e52fd18e836e *verified-ceiling/e2b_q4_mtp/ab.json
-e8fe512715beb6b128e9b5093b96bdc42e1e83cee86c278ae33914f0a4888575 *verified-ceiling/e2b_q4_mtp/server_0_base.log
-757fc31132880dd10bf06a73f53cad075b8660d462f5d35a899c7709248be5ba *verified-ceiling/e2b_q4_mtp/server_1_mtp3.log
-02a4c24799db3ab1da09a25d1a284839b0ab78be1fd0704c0e36f1a84f080aa1 *verified-ceiling/e2b_q4_mtp/server_2_mtp2.log
-0438f262ef56ca19176fdb3547653d1d36b7f2b8e307cd251267af4ae303d015 *verified-ceiling/e2b_q4_mtp/server_3_mtp4.log
-262c9ff5005d2acf9fd199066203a7506a6ddc220ad6a95f9f7c455a74b491ee *verified-ceiling/e2b_q4_mtp/server_4_synth3.log
-0f97fd4b9096aa4385584fcd7a16d9c8fdbbe0cd0837d22ba1300a33d168f28a *verified-ceiling/e2b_q4_mtp/server_5_synth7.log
-5238d08521fb88bd66b15300e65ad4bd2fcc0a2625affc292cc99aa2ec99c9f6 *verified-ceiling/e2b_q4_mtp/server_6_synth15.log
-5f7bbcb24cc2a8eaab87b3506e1e5c8ded03bd7bfa4b3d316933893bb58a8e8f *verified-ceiling/run.out
-63effc91a423ddbfdce9c437a5ee03f4fa86670d7305677f7a8e456d138dd9ce *verified-ceiling/summary.json
+# sha256  bytes  path   (raw results of 2026-10-05/06; Pi copies: ~/pigemma/results/ on context-friend-1)
+16d12305d896087bdfde6e4df99819994cf75fa14e6af91c0d2f997765796d63        6531  results/desktop-fast/reasoning-check/ab.json
+22b225550b68bbf5e516ea9c4099cb642fd5f133dbd178c3721cc3622f0a0480        2675  results/desktop-fast/reasoning-check/server_0_off.log
+8977aa80af945f14b4274935b4a3465b320b01e9cf3735200f11c075faa88cf9        3092  results/desktop-fast/reasoning-check/server_1_on.log
+1f635d03686d0fa1309c4d226faa2aa361556c74c26eac873ad4f57da88866cf        3092  results/desktop-fast/reasoning-check/server_2_auto.log
+63035a37bd67694d28e68d8d008273d1fe8dc1eaff13fe793c88ece65e1d33a5        2884  results/desktop-fast/reasoning-check/server_3_budget0.log
+8a773c950e0d1d82ce3986547277535c66935eeedd72a767deee15cac0689428     1143247  results/desktop-fast/sampling/digits/ab.json
+bd715df9ee292fd764cd94fa28f74dbf1e455f84ec359d4b26334c6c418a7d0b      326986  results/desktop-fast/sampling/digits/server_0_plain.log
+ecd06bf8262b43191cc4812be2f978cb0439b68ed11a364742410c3b68b061bc      381240  results/desktop-fast/sampling/digits/server_1_match_dense.log
+4af00dd745f348f8a6e3a1794126ab6ab65e79dbd952431ec40a4a603ec8a751      381250  results/desktop-fast/sampling/digits/server_2_match_cent.log
+ec88e475638ac66adca8c108854b9ba6f793e486b7e9fb77d241cf658020c988      381226  results/desktop-fast/sampling/digits/server_3_prob_dense.log
+ec99009e6bc80999ec06eed5e7c57ce7685212212a73e6d22c26ada1a0ef3343      381236  results/desktop-fast/sampling/digits/server_4_prob_cent.log
+64724c29b9889c3e4070fe28e68ba4ff1072ea5d24f016591d0c5b79864d8402       38542  results/desktop-fast/sampling/seeded/ab.json
+03a91eec57ee86ec7e4f3678a5077232e65d86ffda0fef47b00a816b023ab7a1        6714  results/desktop-fast/sampling/seeded/server_0_plain.log
+984a8f9ec717eac0fdd76a529c8bd3e23322899617376c346ba02494013821d7        6714  results/desktop-fast/sampling/seeded/server_1_plain_again.log
+eca52cc7edda78cae597dbc2f4dc8bc968ff73b98817aed9489e41e69196aa5e        8831  results/desktop-fast/sampling/seeded/server_2_mtp_dense.log
+d301352fa29dd067dd4200c52ce6c68b30e450712f9f88da4c57184be0db913c        8841  results/desktop-fast/sampling/seeded/server_3_mtp_cent.log
+d3599015925e39f5bb526e993d0afaa71f9f686091ab70c98f987a3c536380b7        8831  results/desktop-fast/sampling/seeded/server_4_prob_dense.log
+055e862ee4dbec8b7f377e45d3129a17e3f42d379310ddf29dbd60cccc78340d        8834  results/desktop-fast/sampling/seeded/server_5_prob_cent.log
+29eb0e647bda5816447d9695fc8cd9309986784571cf9256f5c4005045ea4aab       12713  results/desktop-fast/sampling/seeded_reference_build/ab.json
+768107d8250c0f5d75d02cdbf3bdd6f52263a2a6c6b8791777ec7e1f1c2e5a4f        6714  results/desktop-fast/sampling/seeded_reference_build/server_0_plain.log
+b31cb7b3333f49b4d4aeb89a0f66d57f602afd99795b714a7a0c7ea92d16ed79        8831  results/desktop-fast/sampling/seeded_reference_build/server_1_mtp_dense.log
+e52aaf27e4570aaa4e4f0edc3673379a357ab98187ccb760a5cd052b1e54c4c3        5630  results/desktop-fast/sampling/summary.json
+2244ea9675e7059494821a7675c4d419bcc7ea3a2d6822aca3be8e93cba996de       14947  results/desktop-fast/upstream-51ce9c1/REF_nofa_vs_LS_nofa.json
+ac91e116bf4edf67b04939e7e62b9b77c26cef4d5abb9c45c43584276bfbabf8       14856  results/desktop-fast/upstream-51ce9c1/REF_q8_vs_LS_q8.json
+c7243ce168af47f3e939497a52b124ec72e04cdf0224f4def0e4fc2d029a85fc       14936  results/desktop-fast/upstream-51ce9c1/REF_vs_LS.json
+06c062ffcaf57a3e9bb7ec036de79b975177409cedc79b9febd9926094d0a323       14851  results/desktop-fast/upstream-51ce9c1/REF_vs_PT.json
+6f84c4dbece74d8cb91c59d82c59a12d3ecb799e4f827ffbcf66666c1f770fed         530  results/desktop-fast/upstream-51ce9c1/SHA256SUMS-bin.txt
+09b9bcb9784196e6a2fc0073804ad26a74d89cbf71034555ac8109ae83cafac9         522  results/desktop-fast/upstream-51ce9c1/bench_p512_ls.md
+4bd610ae24774d210fa5a4bfc08a0ef6c2d417c0d15ce23054dc57960611e015         522  results/desktop-fast/upstream-51ce9c1/bench_p512_ref.md
+d6b1e407cb6331667f06ebdf056181f2e7cea3c4b41941f32fdb2e9494ea36ae        1106  results/desktop-fast/upstream-51ce9c1/bench_tail_pt.md
+cdfbc1d94779748185cd6c94e1e75d01013df7e5e71c3a00aa4554cb8323352a        1106  results/desktop-fast/upstream-51ce9c1/bench_tail_ref.md
+5f0e4f789e0003689e67be3b4e3abd5491b542df946ee0884381cf13c1850ecf         508  results/pi-real/26b_bytes_per_token.json
+d2cb4dff9ec38f6036f802943f75ab2dba9382b48f391fc2a0886b322a190e3b         548  results/pi-real/31b-iq3xxs/bench-nr.md
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/31b-iq3xxs/bench-nr.stderr
+c011bdf3b2010b0025786916f0b62dee2afb5fc58f7276f3d9969a5154359861         524  results/pi-real/31b-iq3xxs/bench-repack.md
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/31b-iq3xxs/bench-repack.stderr
+1fc462d1bcb54958f08059c2313feb97d72c41b241cd863aeb3033d7016b5b6b        2445  results/pi-real/31b-iq3xxs/cold.stderr
+5c5037bf730056048be86434f877cf747db5c8a5ea2b33efd34e809ed8cd735e          41  results/pi-real/31b-iq3xxs/cold.stdout
+c1a96cabd6b9b0d678f4cc295e58ae65ffec599a577bdde615c8a1db45261b27        2446  results/pi-real/31b-iq3xxs/gen-en.stderr
+b8a15a023e46dee08d1bf5636258f9bff8b7bbeac70de710a0dab4cec2d9fdce         437  results/pi-real/31b-iq3xxs/gen-en.stdout
+f4bdb32c5719383445700d26b325bae49cad12f25c25d9010949591c340aadee        2447  results/pi-real/31b-iq3xxs/gen-he.stderr
+3246b9d460dad42ef6cc691805554b286b67bb6bf8aa445a8a77895d62dfd27f         364  results/pi-real/31b-iq3xxs/gen-he.stdout
+bd339f3b307bcd77ff6e160fa7e8a70b6f4ea99667c7a0c8550b46b8fc715dac         165  results/pi-real/31b-iq3xxs/prompt-en.txt
+dc099ea6cef86c49e15d86efeea1e83539a8aff75629bd2f4c37ff912f421b64         172  results/pi-real/31b-iq3xxs/prompt-he.txt
+a3a69e5f75417be85a50d4ca798a1a304b4818b22ff492c6cda529021f51bf3e        2083  results/pi-real/31b-iq3xxs/run.log
+b9d8c1c69e6b208884a1e6d08395e947071cb44f9e83c782e750b9c5ba724de6        1413  results/pi-real/31b-iq3xxs/system.log
+489b7f524cd4da55dacd5b851b9f64f0750164274d715fb6bfa6462fcd663bcf         131  results/pi-real/31b-mtp-ab/31b-iq3xxs-base/gen-code_short.txt
+e2301c8d6e3549dec602a30d0f2d6c55069ff366d15625676350482decb8267e         252  results/pi-real/31b-mtp-ab/31b-iq3xxs-base/gen-de_short.txt
+2d90864ee33a0b79f71417373eff79f8b55cfa4acab2bb1cb158f21fa68d9312         271  results/pi-real/31b-mtp-ab/31b-iq3xxs-base/gen-en_short.txt
+fe1c1b319a1125be2e349c8549af064ad2c930cd97068350c1009179d5c7fac0         185  results/pi-real/31b-mtp-ab/31b-iq3xxs-base/gen-he_short.txt
+08795411efe93166fe9b624c2d2302a172ab7af3fb26e052c78353bb8749fffa        3895  results/pi-real/31b-mtp-ab/31b-iq3xxs-base/run.json
+87839ca1b08c056e2636e02330e83f1e938655540db9369e4d884c39f98ce4a3       73812  results/pi-real/31b-mtp-ab/31b-iq3xxs-base/samples.csv
+1431e9ed61d56a08199deca01a5828be5620473ce16901aade7c4b26e4b99d29        5083  results/pi-real/31b-mtp-ab/31b-iq3xxs-base/server.log
+489b7f524cd4da55dacd5b851b9f64f0750164274d715fb6bfa6462fcd663bcf         131  results/pi-real/31b-mtp-ab/31b-iq3xxs-mtp/gen-code_short.txt
+e2301c8d6e3549dec602a30d0f2d6c55069ff366d15625676350482decb8267e         252  results/pi-real/31b-mtp-ab/31b-iq3xxs-mtp/gen-de_short.txt
+2d90864ee33a0b79f71417373eff79f8b55cfa4acab2bb1cb158f21fa68d9312         271  results/pi-real/31b-mtp-ab/31b-iq3xxs-mtp/gen-en_short.txt
+fe1c1b319a1125be2e349c8549af064ad2c930cd97068350c1009179d5c7fac0         185  results/pi-real/31b-mtp-ab/31b-iq3xxs-mtp/gen-he_short.txt
+03f436754a2c6b03558ff1688a984a25e9860537e60ddf826ddd711ecd1cabb6        4061  results/pi-real/31b-mtp-ab/31b-iq3xxs-mtp/run.json
+77b3e5e796277dcfedf52274467c2e3085471179bf33d3d3c822336152c3facf       86533  results/pi-real/31b-mtp-ab/31b-iq3xxs-mtp/samples.csv
+0a0323ec16df2bade9ae703e513f8555119e2fd6470f381edf5b8131f0d15a66        6830  results/pi-real/31b-mtp-ab/31b-iq3xxs-mtp/server.log
+d4a44e03fe25d325b4f0428d33cb9051abcf98dec4c478426190fbea6698bc4b       11997  results/pi-real/README.md
+33726bc2d8a02e117d480a30230ecf21d6546a1b9a9d84517e5cc4afe9520fec        2896  results/pi-real/copy_26b_qat.log
+1e8237eb239aaf991d5578e4e31513b8e795fcb0b3642b930484a9e2f8431b6c        5688  results/pi-real/copy_31b_iq3xxs.log
+ec2233976871872b5561c2a860e733b3e04238a04ef41898d392378604db24ce      449718  results/pi-real/e2b-profile/profile_norepack.json
+347de63e0f6ca5b980aa5f9449d37930b05ff268f8ccf7bb3155505b26d4140d      449778  results/pi-real/e2b-profile/profile_repack.json
+84c853cb8f1379c2c202c3f4b2dbe6693238f6d9a8668cadd3c1ab8b34f6d078        2236  results/pi-real/e2b-profile/requests_norepack.jsonl
+3991b20d85f7db7c42bdf903af6cbaf931b07cdc3bd1d2403c08dc7f01c8aeac        2198  results/pi-real/e2b-profile/requests_repack.jsonl
+894f5be2d943c738ffa95024321e4a5347e4b87e851da925a58c2284dd3eeb78        1906  results/pi-real/e2b-profile/stderr_norepack.txt
+1d1d747534d4cae2dca4c103e4c64250e9ace8656fce5cf386c8759c2cb71fcb        1906  results/pi-real/e2b-profile/stderr_repack.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/e2b-profile/stdout_norepack.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/e2b-profile/stdout_repack.txt
+8188171dd02f35977e830257306d4eb61076f97da0067aff7b40d7160456f174         364  results/pi-real/e2b_bytes_per_token.json
+6ab4c72f213b5c4d64cf72a1801834ace93e0f0e003c796225a529dda74ac3b1         970  results/pi-real/fast/A_ref.md
+7c16ffabba33d888f3845a1e26f2ecb8bfe3e149d81f0a6435a0962cbaa3d517        1242  results/pi-real/fast/B_pad.md
+14cfbce61eadc81055e57c9ab0b1fdfeacdb45b91c1cf692ede103d392529f4b         834  results/pi-real/fast/C_chunk128.md
+e6b04677050d5e2a1f193ffac8dd6c61fb2be90e26f908dc3e1d97e8b0aba435         834  results/pi-real/fast/C_chunk256.md
+0d716673422c0cfb07ae0c4dc2a8ee08b395741a44f2069a67dcd8b6169e366d         834  results/pi-real/fast/C_chunk64.md
+3b3ea8f6767197d79cfe710ff07d9414a04783f7b7086e1c9e2e85e23499015f         970  results/pi-real/fast/D_strip.md
+6e77c4df2fc1dc1f71b1c851e1d2aad54797e238f8a9ddbef287ad4102541378         698  results/pi-real/fast/D_strip_only.md
+8fc450e833ced41179a87ea86970bed4e13c8dad9a92c6652cd1b45888e6d0a4         396  results/pi-real/fast/E_fast.md
+a4dd8141e90fce624981cd5e76f95af5054ea43e651c8761950513d92bdaba90         396  results/pi-real/fast/E_ref.md
+baf5f9e562eea6e15fd85bc7f86e8ccf4dcb90b2f107e77d45310a69789cbd0c        5263  results/pi-real/fast/F_fast/ab.json
+8e559cb26eaf8647736cf6fffff478ce878566735257d5ffe97e80db8093b42e        4193  results/pi-real/fast/F_fast/server_0_base.log
+668bee2d3815d7c324061a0eaad7e87ea98dfcf33e2d83d57288bdf4c86af87f        4193  results/pi-real/fast/F_fast/server_1_b64.log
+17b019f59cf1e52b60ea3ee40c2666cdb4f79c8730caced78645e3c7e9bbc91e        2732  results/pi-real/fast/F_ref/ab.json
+d005b6e5df22d28765a772fc5d38a3f8ed8ddfb60ba546e0439cd0e866241596        4632  results/pi-real/fast/F_ref/server_0_base.log
+ef5b02e24a6ccb65f2b8a4a7e21391b1efd212021441cd5176aa3e4c7a2178a5        3287  results/pi-real/fast/G_fast_mtp/ab.json
+8ad132c515760efea36871d8f2faf095b5415a51c1823a85ebdf6d317fb93b01        5935  results/pi-real/fast/G_fast_mtp/server_0_mtp3.log
+f4d1314c7cb647d48db44d3c4e0cb0bd6883e85f712b9dc00a7399b2fe2390ed        3295  results/pi-real/fast/G_ref_mtp/ab.json
+df17898bb22b7cb4ecee10b40181311bdc9cf8e3e9b6e82b37fb29a9e0f707a3        6372  results/pi-real/fast/G_ref_mtp/server_0_mtp3.log
+dc07fff89dc936546738bf23f194e9100e9a9bc50ed67a5abae9efde4640b73d       20003  results/pi-real/fast/H_fast_mtp/ab.json
+c4538ea1153dc0599c4d286b1ee42137b799b421beaf060ca4b23ec0ff34369f        8010  results/pi-real/fast/H_fast_mtp/server_0_base.log
+0fe2030267a6ba5e290cd5ae3345c21d9dd77de3a799fff93383da32ec9f9b30        9626  results/pi-real/fast/H_fast_mtp/server_1_mtp3.log
+aeeb87c7712fa9634b9709a9247abc334698de137377a299a26a2292e0372a6c        9626  results/pi-real/fast/H_fast_mtp/server_2_mtp2.log
+0e7b54096784886d7ef174966eeff1990cedf1cedc9d2919dbd2af3a442882d7       13148  results/pi-real/fast/H_ref_mtp/ab.json
+3e5902ac1dde7f165127a458420b008952045124843e42167def4b0cb29b2542        8010  results/pi-real/fast/H_ref_mtp/server_0_base.log
+92dc79bceb08537cb2509cbf9e37f0ac743e351264fa047b8dda81511cac7422        9626  results/pi-real/fast/H_ref_mtp/server_1_mtp3.log
+27ad32fabdaeccda5d7ce38627b316a2b366094909cbffb6903b6fe9096624fe        2495  results/pi-real/fast/I_par_fast/run.json
+fda54437590d0358e589d5f3d8f6b79954f8dca7f1bd920bfec5ee1d703c6fad         505  results/pi-real/fast/I_par_fast/sample_output.txt
+34e2d16795c64c60adefed183de5ab98acdc48cc8d8ec475e29233db23136d69       30991  results/pi-real/fast/I_par_fast/server.log
+1d0e02fe175adf63bff4ba5742c74896cae2211157e39560f4bb930da5e7406b        2504  results/pi-real/fast/I_par_ref/run.json
+fda54437590d0358e589d5f3d8f6b79954f8dca7f1bd920bfec5ee1d703c6fad         505  results/pi-real/fast/I_par_ref/sample_output.txt
+ce119411083728797e8d7286fef94bf2b906024dbc42961bb21d2f4239f5d44b       31721  results/pi-real/fast/I_par_ref/server.log
+17e22e3d091d81ad918fec2450aa471105e720370608fd00b215eaa9ccc0bccb        1106  results/pi-real/fast/P_pad2.md
+9bdc04a9454230dd0b2204138fb629ab01b3edf6038674de91af6ebde11467f2       28042  results/pi-real/fast/Q2_fast_mtp/ab.json
+a8893c6353b9e5c5fab27e64a3bce1c0ea0a62e10a7066e74e4f24e1dc1b678a       43376  results/pi-real/fast/Q2_fast_mtp/server_0_mtp3.log
+0a833e05f3536989a0575b4c249a0c65df86ffcb6a465eb7755d7a5a4f518d0e       25124  results/pi-real/fast/Q2_ref_plain/ab.json
+adffe78e4690e70560cc497becc19976ee27c7766a9ef3da230bc6ff2000c798       36250  results/pi-real/fast/Q2_ref_plain/server_0_base.log
+33dfdca0dd28ca506cbf258d402d8884f7fd70467f90911c0ac5d39fec453df6       36167  results/pi-real/fast/Q_fast_mtp/ab.json
+d7ba48658dc0f148011776bfcf4a1cf973075e7bdbb66552e7073ee0125e4d8c       44473  results/pi-real/fast/Q_fast_mtp/server_0_mtp3.log
+42c4876dc8de6e1a83ec098ed11530795d36c477b5643051ff369164b5004612       33115  results/pi-real/fast/Q_ref_plain/ab.json
+05a5e77a9b56f1af65b8ba7a0b91592244590a28287dde240addc0a326fe4396       37362  results/pi-real/fast/Q_ref_plain/server_0_base.log
+f016c7f8ac84cf3c82f60d9bb7175f3073b8a8a9423942ecda943dbf6b2f41cc        7472  results/pi-real/fast/run.out
+e9705e1f60f5a01a05e206f18e06146a8d58cffe1a53ba723361b721e80b41d0       12053  results/pi-real/fast/run2.out
+319a7902a7e98fdf961a10e3ba5010db167fa906e94cd3a7c89d02a03518e0c3         478  results/pi-real/fast/run_qa44.out
+fef25d7bdcf989c3c96b4bf1270009eb533f5eb1478cc125b108229e5ae90b46         480  results/pi-real/fast/run_qa44b.out
+6ef71c6411d0e77ab88ad1e35ef3fa96c139d93384ecc43477765cd62ed4d372        7156  results/pi-real/fast3/ablation/mtp2_none/ab.json
+01aa6931ac3a65f7080afecc0dd8e735d48e4ca6b521194c70dbf68d5cff2763        9193  results/pi-real/fast3/ablation/mtp2_none/server_0_c.log
+7da5d31e3fda463b703d97c304f8161bb61e5dba52caf44a6587d8a4f62cbf4d        7205  results/pi-real/fast3/ablation/mtp2_pad/ab.json
+e7b592d6253d11e40c2ed9ae2055fc078ef0c6218352974f114b3cfe71405475        9193  results/pi-real/fast3/ablation/mtp2_pad/server_0_c.log
+62f42836e9422edf31c86b77ae6d688a40ab123e1055346e148ca21ecd0bda68        7276  results/pi-real/fast3/ablation/mtp3_all/ab.json
+b08092e15a4530835ed980aa52afe0aa5b3f68415539bbea366008da324c92ad        8756  results/pi-real/fast3/ablation/mtp3_all/server_0_c.log
+648fb26d310cc81f766e5be953fe2b099ffb5f832f190185db9cd24761d4e63b        7169  results/pi-real/fast3/ablation/mtp3_chunk/ab.json
+5e63542471720e68bea93489dcd6efbc3ca22e6264b92c127e33f19555b2368f        9193  results/pi-real/fast3/ablation/mtp3_chunk/server_0_c.log
+6e9431008a7b4c2aa1390baaa3af6e62e16fc2e46eaaffa4cfe4f75bbee18344        7114  results/pi-real/fast3/ablation/mtp3_none/ab.json
+a813d369274637af851e54aa1541df83b533a30231dc933a4d92d61eb1fac1e1        9193  results/pi-real/fast3/ablation/mtp3_none/server_0_c.log
+f2facd7da75a1931a34c74f4d474c2ce075a47049e2e3efdd4b3afb67e903d18        7169  results/pi-real/fast3/ablation/mtp3_pad/ab.json
+f2d9552cec90dd4834a78544a40b445c3786622452065f3a250a997b291a6fd4        9193  results/pi-real/fast3/ablation/mtp3_pad/server_0_c.log
+9c2e0f957c21d0aa02507dace098128a80b794cdd611b15c9788175fec565967        7181  results/pi-real/fast3/ablation/mtp3_strip/ab.json
+6c0de4354449f4091853a867a266ba97d4ea2e8c3c5b443497b5bf6d451019fc        8756  results/pi-real/fast3/ablation/mtp3_strip/server_0_c.log
+e75bc5aca2e10663c939d623a7df01daee393ba8151ed7e09f206170122c71d0        6530  results/pi-real/fast3/ablation/plain_all/ab.json
+bb1fb5a2b230808eebcc38f12ec347ea664166e2ac349cbd3b114f5838cc20c7        6622  results/pi-real/fast3/ablation/plain_all/server_0_c.log
+c00378cdddfc00cef4ceaae4636e9dc5cf1704fa31b77ff5ed59ef590e450652        6436  results/pi-real/fast3/ablation/plain_chunk/ab.json
+21765db3267bb47047a838b44265f4dd2e2722d790b3d1e6e51b30bfe7da9b44        7061  results/pi-real/fast3/ablation/plain_chunk/server_0_c.log
+94900eacf3d03b7b1b6f3ef9a3bbc37acd2daf351d7264668fd1faa5481ed37d        6376  results/pi-real/fast3/ablation/plain_none/ab.json
+8472ddeacc3c76a6f701aace88a601e08711f6f7ef766f5a3bb983a86947a633        7061  results/pi-real/fast3/ablation/plain_none/server_0_c.log
+28c332e8257699b503f5b01ee9608e2434673d6039ae317c9d4e461b1ae8e344        6430  results/pi-real/fast3/ablation/plain_pad/ab.json
+b9ce0728a92b907b7af9cc52f8830176c4c91181ab32d2e404240e32b02c9e6e        7061  results/pi-real/fast3/ablation/plain_pad/server_0_c.log
+015f38b1e515b2e0b397327b5704ab318bc6e1abfcb40e9d2f88234a5ad02fbb        6438  results/pi-real/fast3/ablation/plain_strip/ab.json
+7d46fc9f02e70ba214a938527148e41271709d1be1a66eb1d172d6cabdf593e7        6622  results/pi-real/fast3/ablation/plain_strip/server_0_c.log
+80e9d26608cb7a15c877a5ff27a6e2dddb61805fc6a3db0326f3e41109fd96f8       18265  results/pi-real/fast3/attrib/fast/ab.json
+fbfebfad906330bd4706a69ae95d15369e4954e7179b1be7b1c7b5b69cf9ca55        3394  results/pi-real/fast3/attrib/fast/server_0_plain_none.log
+d8c47ead1b407de38011a34d5c3bf132fde2dcb24a047b257f6181cf10caa650        3394  results/pi-real/fast3/attrib/fast/server_1_plain_all.log
+72daae80eaec36e87d3155e136887df70ccf75adf80a27cca3c123dd8507fa07        4459  results/pi-real/fast3/attrib/fast/server_2_mtp_none.log
+d0ea6f4893d1da108d2d23977d93a08044920b36423293b3d0e7ec97a30b5aa5        4459  results/pi-real/fast3/attrib/fast/server_3_mtp_strip.log
+f1a521310dfd50e6013eaec1bd5e4bfaafc8a426b2f92f04bed27e44a01a3427        4459  results/pi-real/fast3/attrib/fast/server_4_mtp_pad.log
+72bd0518c2fde3a5ed0dab03737939fa99e075b9afbc65dac351b73ed863b6d0        4459  results/pi-real/fast3/attrib/fast/server_5_mtp_chunk.log
+ce0df21833275051fcb79b89c7fdbb81cc08a18b6021514f046d6395b3c4465a        4459  results/pi-real/fast3/attrib/fast/server_6_mtp_all.log
+f763c42462bdc5b587df58a824cfd191703ea128c60860e52c50f294437bb777        7242  results/pi-real/fast3/attrib/ref/ab.json
+6d4c76d9a053e932b0673f54abbd667b88a448600a303dd179a61d9502cd03ca        3394  results/pi-real/fast3/attrib/ref/server_0_plain.log
+afd9353b06e86d9508066224b628f853eacefa04f3ec1089542573cf1b478dbd        4459  results/pi-real/fast3/attrib/ref/server_1_mtp.log
+6cc5cbc2d4287af083318112e7fc70d5788692146bc4521aba660694a095dc70        3394  results/pi-real/fast3/attrib/ref/server_2_plain_again.log
+a8fdd0aeec5138cf67f5ea25f7d3133932088ebad819c82794bd7f4be61646ed         522  results/pi-real/fast3/bench_e4b_fast.md
+b7e55918e81c69a9f34fae3d1e36c65759287217d856ee442d062784514cf4a8         522  results/pi-real/fast3/bench_e4b_ref.md
+58cbe5ba819ba2d63e43530255f19a5d5ff7b2e897896cd989481ab06b94b7a3       52027  results/pi-real/fast3/centroids/r1_cent32/ab.json
+c7436a411969ad4437c26d8a5874c8132f77c0bd7e8f5df1704f1ea121d1c8aa       57929  results/pi-real/fast3/centroids/r1_cent32/server_0_c.log
+709e642992012426da60fbb9aace2a7338ab813f643ab0052f3f7db900179aa5       52026  results/pi-real/fast3/centroids/r1_cent64/ab.json
+d2ea6cd7d717723abb053ef4fe9d2392f3ceb2554bdbdd274e93da9117588d11       57932  results/pi-real/fast3/centroids/r1_cent64/server_0_c.log
+3be787e4bd848c6e5e0322b9c2aa8183b519f961fc535f9b3311572257facf5c       51921  results/pi-real/fast3/centroids/r1_dense/ab.json
+30985db0343b5f13f09bde82e7326e421cca04b7362ff68812ffdb326fe19b24       58122  results/pi-real/fast3/centroids/r1_dense/server_0_c.log
+c13c6a6536810bd3ec38865df945f114365200aa81b8eff5ca25f63ebe1bed5e       52016  results/pi-real/fast3/centroids/r2_cent32/ab.json
+b6dfee076d9ab2db65d2014e0321d5a059b0cc7fdbe8af8e290ba237c6178b5a       57929  results/pi-real/fast3/centroids/r2_cent32/server_0_c.log
+2476c3136f405c8d7f1234a6d09da43d5a59b946ade2f99779a4036ceb292946       51927  results/pi-real/fast3/centroids/r2_dense/ab.json
+ceae5eb9ad9d21df44f8153c1a102283dc69c750ca973ed1e08a4f3c485158b9       58019  results/pi-real/fast3/centroids/r2_dense/server_0_c.log
+c90ab9b826327237042fc72ca0f9fc046a9f20bb4e2f0214ee17077a700325df       51196  results/pi-real/fast3/draftlen/n15_p90/ab.json
+71cb2a5af3104203d3da296a3324161d3c34681c895668a3edf30a0c9f02af2e       56485  results/pi-real/fast3/draftlen/n15_p90/server_0_c.log
+999d3d5c13131a777edc280c4082ae3328347210035f30431c04f14020c9ffde       52070  results/pi-real/fast3/draftlen/n7_p00/ab.json
+464b59727383ff631cee1cc3a71d714f0519a291badf9037750116966ef6f8b1       58320  results/pi-real/fast3/draftlen/n7_p00/server_0_c.log
+85d3eb38535b828cd3f252a05a3759450c05771d496100758d34cbcc08af81fe       51753  results/pi-real/fast3/draftlen/n7_p70/ab.json
+d1f8331bcaeab23ca57b1442bceba5bd21a56bb18cb1404077a61d1ef6b30d25       57343  results/pi-real/fast3/draftlen/n7_p70/server_0_c.log
+378017d8fdc095de4d4c86eee0a4b8b4204929edfd2ad32c7b4f0126d2e91266       51240  results/pi-real/fast3/draftlen/n7_p90/ab.json
+02f294d523a833b05c5d6314095cc1fa34b8a9f7a1830f5a0f701de538626a3a       56284  results/pi-real/fast3/draftlen/n7_p90/server_0_c.log
+20726cc52d4a58ac3880cc081a492c0c3b13f4f63659a2327a30d27a76d8097b       11059  results/pi-real/fast3/matched/r1_fast_mtp/ab.json
+4309469e98e74a4b7fb5b3eb96bb387e9207e4200a359f2e902c8c8bb70b0477       12015  results/pi-real/fast3/matched/r1_fast_mtp/server_0_c.log
+19eabf028f73fa7afd6ff6a9deffd4dab5a8f54d704af38107cf6730b2298b52       10137  results/pi-real/fast3/matched/r1_fast_plain/ab.json
+170172a448d7f8da10bb941175a4e0ed2a87f2300435e60e02b8a4ff78c2157f        9782  results/pi-real/fast3/matched/r1_fast_plain/server_0_c.log
+ec0dc4865844e9ae7d1b1518c28577da5eb24faf7644fb6aefa4680bb0a260b7       10904  results/pi-real/fast3/matched/r1_ref_mtp/ab.json
+b34759c7dcb6a57332c87d0aba1332338a74d573727bba5413faeff731845e79       12456  results/pi-real/fast3/matched/r1_ref_mtp/server_0_c.log
+6ec9075f65ec74981ff9055aa2e945c63f4b9e2ec95dfec131bb157d3a3e763d        9982  results/pi-real/fast3/matched/r1_ref_plain/ab.json
+3b0eb77935314ef123a0ee697c085fa2c0bccd08afe2be932a8e0ea74d43a8e9       10223  results/pi-real/fast3/matched/r1_ref_plain/server_0_c.log
+1ac7e1b80275aced7e1856f1a139ba2e8ff41e76d9387c0897cd3a1c15d06649       11060  results/pi-real/fast3/matched/r2_fast_mtp/ab.json
+2df41c79c2819efb3aab556e885d5e259b57ed20293e8cd0935d8c52ec2f1eb7       12015  results/pi-real/fast3/matched/r2_fast_mtp/server_0_c.log
+7dc9090883e52a087a485d31b20fa49fa4ecf5c244295b7ff09af4010dbeac12       10135  results/pi-real/fast3/matched/r2_fast_plain/ab.json
+d8fdd5ea9dccc1d2ba99441fe25f77a78929ad76d4ccbd25e6a6d5493e3981fe        9782  results/pi-real/fast3/matched/r2_fast_plain/server_0_c.log
+c7a35cf20b0b896c626fd8dc7d4ffd72087c946922207a4ec999812d57145126       10899  results/pi-real/fast3/matched/r2_ref_mtp/ab.json
+4d0128462cffbc77e0619665b447d74e6079ac56d559038a1839a9b0201a2f89       12456  results/pi-real/fast3/matched/r2_ref_mtp/server_0_c.log
+236503e2aa706066aed3de5e907fa79ad61c99649dd2aefd046f94fe7cac51e4        9984  results/pi-real/fast3/matched/r2_ref_plain/ab.json
+0b24234622ac4973c1f52863435ecc1fd1499506e5513c07b8205a9c448f85fe       10223  results/pi-real/fast3/matched/r2_ref_plain/server_0_c.log
+2a5f2428fb79fdc35f9557aeff329f53a0f8c4235a988892b1f0885113c6ff6f       11056  results/pi-real/fast3/matched/r3_fast_mtp/ab.json
+f0dd1ef39c8b3ad8b76a742ec38d15bccc32bfd0a2d5ee1c4ea3b8a12ffcd6f0       12015  results/pi-real/fast3/matched/r3_fast_mtp/server_0_c.log
+5fc3643bf314b996a0fe9aa2cdf9f542811034e5342d1f51cd7f12d47d584365       10133  results/pi-real/fast3/matched/r3_fast_plain/ab.json
+683341d8e082455b0e1ef59cb1546a2cb1d7434f3a8d1aaa6f7bd3a971e5cc2c        9782  results/pi-real/fast3/matched/r3_fast_plain/server_0_c.log
+4c7a66deaa7063bc7eb853c57685496d3acec5e2543a2c4cb15f63aa8db7ce08       10899  results/pi-real/fast3/matched/r3_ref_mtp/ab.json
+35f1b7465e4f009c2d4696b259e85e7d30d09c9701fb2b2a606a347e927bf64d       12456  results/pi-real/fast3/matched/r3_ref_mtp/server_0_c.log
+75be60c23a34c38cd670e6e671bca9f5a49101ef225423c825d51be475eb70b6        9983  results/pi-real/fast3/matched/r3_ref_plain/ab.json
+533481c9e8fb04861f3f0e840b3ee87244df6924fc5580c726e67276ab452495       10223  results/pi-real/fast3/matched/r3_ref_plain/server_0_c.log
+d5f361e139f6680d76b45ffc3312116fb4cfa82156f7d3bf53adb91868766b1b        8465  results/pi-real/fast3/phase_b.out
+25ff27607668a39d473d23bcdea5813ddddbf9396dd824bf9f21c4d1959e1c26        5061  results/pi-real/fast3/phase_c.out
+b90a92c961fd454a02f0d0650526e466c86883a3f8b4192fba8814fe38a0feab        3606  results/pi-real/fast3/profile26/groups_26b_norepack_b4.json
+e2d35128ed3b3e07806e195721d6c2d21edbf5fc5af99f04cf9c7be7d33d2d5f        3094  results/pi-real/fast3/profile26/groups_e2b_norepack_b4.json
+4d253ea1405073af84c6536ad37921e96c8a27268d594c3154913efac7f10da9        3088  results/pi-real/fast3/profile26/groups_e2b_repack_b4.json
+d0119a147ccf3a9b0db96c9db510f2d961f907a6914f12bc75bc279b9d630f34      832602  results/pi-real/fast3/profile26/profile_26b_norepack_b4.json
+f4424fb62f02fa40b43f1659f0a20d38454bd4fb509a8588d4e6479b9af1dc0e      451963  results/pi-real/fast3/profile26/profile_e2b_norepack_b4.json
+bdc9ed99ba00d654e94448346ce9d6485db1123aa70bc9089ad5ddc41f9e546c      451601  results/pi-real/fast3/profile26/profile_e2b_repack_b4.json
+6dd28ad473df2629a1bfc2017cf9de13516b92bc4d357a37072b574c0668f7da         288  results/pi-real/fast3/profile26/prompts.json
+abdff3a822ec249d9c347b64c4aa9616f293dfffd0390a4d306955d4a07c3080         538  results/pi-real/fast3/profile26/prompts_b4.json
+ca37b0373ab5d72f19db2cfe6e27b9deea0647c0cdb2dc3f4a86b729caf63b7e        1145  results/pi-real/fast3/profile26/requests_26b_norepack_b4.jsonl
+71502ba7740961c8cae304fb87a5b0944dccfbd07198542ef6df619cce221e54        1082  results/pi-real/fast3/profile26/requests_e2b_norepack_b4.jsonl
+f84f6bc2963cca995c020dd2d9094e23d3d9da8f68bc0b7e7114252c248d1ae7        1015  results/pi-real/fast3/profile26/requests_e2b_repack_b4.jsonl
+c9be761326af37226a4f637cdba9b123eb87a1b7a97966ab9c95b0d174cce536        1957  results/pi-real/fast3/profile26/stderr_26b_norepack_b4.txt
+af838eaed992147996891e11f18faa1136c8133f602364f61c2403858098f3b9        1903  results/pi-real/fast3/profile26/stderr_e2b_norepack_b4.txt
+d08f29e211701ae669f4fc275021e456fafcbc4d2c0772d2fbea6e16b79ba830        1902  results/pi-real/fast3/profile26/stderr_e2b_repack_b4.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/fast3/profile26/stdout_26b_norepack_b4.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/fast3/profile26/stdout_e2b_norepack_b4.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/fast3/profile26/stdout_e2b_repack_b4.txt
+6dd7c263e3a251c849a9604b12d7c1a88622881c503f846c9c0692f2c89abdd1       36403  results/pi-real/fast3/screen/26b_ref_mtp/ab.json
+5b51deff78aeb8d1cb7034ba383dab9941c33d6dd72600bac453b0d5a9b4c62a       51281  results/pi-real/fast3/screen/26b_ref_mtp/server_0_c.log
+26e75427122f748dba3fb20c0482028043200b7ce8376bfc814aea2420ee06ef       33544  results/pi-real/fast3/screen/26b_ref_plain/ab.json
+749f1636585567ff9bd0cd1c680e2a50f6986cb3e9f81e5275d1a1eaca54a3a2       46023  results/pi-real/fast3/screen/26b_ref_plain/server_0_c.log
+1ce4b92813a9a59f5f3c6fbaa2b1dc1c97b22c3f9e38d7e91512c41c7e64daf4       45606  results/pi-real/fast3/screen/e2b_fast_mtp/ab.json
+d429c57551e2600735bb99cba6d74a5a33b6670205aeadf888ce2e8088e3be61       51856  results/pi-real/fast3/screen/e2b_fast_mtp/server_0_c.log
+40c030054a9c7f2b336ddc899ab41174324df6eff684026f09c5161de8472d89       38019  results/pi-real/fast3/screen/e2b_ref_plain/ab.json
+b3d3a8250400086142480c895b771af262fa61d3531e7c54c7de45a8753dd14e       43385  results/pi-real/fast3/screen/e2b_ref_plain/server_0_c.log
+3ad089950bd5485b4679fec9485dada7388459caa5443bd5135f590fbd14332f       41862  results/pi-real/fast3/screen/e4b_fast_mtp/ab.json
+0b113c2bc5960e5bc9c3616a9fb2d55d92405a2bfc0790499431632568f58220       50484  results/pi-real/fast3/screen/e4b_fast_mtp/server_0_c.log
+d0b28dabc3bb688ee7780cc3200dd3200342be97e0e3c7dd6b0ca5e488e1aab8       34387  results/pi-real/fast3/screen/e4b_ref_plain/ab.json
+160564b82681eda957b33a5469d131f655fc42a28a0a398bdc964ec8736a8595       43099  results/pi-real/fast3/screen/e4b_ref_plain/server_0_c.log
+4793835828f7c581355b0fa067bf2126768753d2a7ff3ef3697d3aca35b9f946       83688  results/pi-real/fast3/summary.json
+46aac5500882e842a778cc2f4269bf88adaaf8bedf0838420ec15169835d188f      100374  results/pi-real/fast3/think/e2b_fast_mtp/ab.json
+24b2a78727b1eb9c14d95ea2a48dfa48b247270c885930c89d588667a95dca72       89701  results/pi-real/fast3/think/e2b_fast_mtp/server_0_c.log
+ab453583a6575c206dd7d709fc0f0327a76a739cbcdfe214ae32adc7303a8355       14913  results/pi-real/fastcheck-e2b-v7-fresh/REF_vs_C.json
+e18d0897113d1a6e77907b4d2d87a13b049c06e04f9f0f363cca8850013fbf47       14907  results/pi-real/fastcheck-e2b-v7-fresh/REF_vs_OFF.json
+1a6e4b0232fc0e590c281577240c15f8bfe8f1775fe07ab70d281cd05b7b35df       15243  results/pi-real/fastcheck-e2b-v7-fresh/REF_vs_P.json
+afff456a8be1334dad4088dd94f16c3fbd1cf16e5800bbfa09d864df23226185       15002  results/pi-real/fastcheck-e2b-v7-fresh/REF_vs_S.json
+5bcae715966f3cbc7e7267676d50ff1c0bb637a87271ddee8c3a3556a5b2f7fb       15294  results/pi-real/fastcheck-e2b-v7-fresh/REF_vs_SPC.json
+25b1b0724085e144ef4202f3360a2e3543f9e0441e65df6bd5a90fdec68d5858         438  results/pi-real/fastcheck-e2b-v7-fresh/SHA256SUMS-bin.txt
+9858e8211c3ce9614941a52e449eb6fd71c4cc9d649e9a484c206ffaff108134       14901  results/pi-real/fastcheck-e2b-v7/REF_vs_C.json
+c5aff95367b98191dffa1241078d34074a329f9f2147dd5505b8db60d43932fb       14895  results/pi-real/fastcheck-e2b-v7/REF_vs_OFF.json
+2eb01e50e690faf4d9919e81133a57e3c2dd6efcb9fa231ff5cd96c18379a6f5       15231  results/pi-real/fastcheck-e2b-v7/REF_vs_P.json
+bb0311ca574bc2a9ae4a0ab5dc52dc214c3edd79f52b9a66051a7527f1b48117       14990  results/pi-real/fastcheck-e2b-v7/REF_vs_S.json
+478d9d742459195c908e52e6c984834001a894340baf689b0574503b0e2e9802       15282  results/pi-real/fastcheck-e2b-v7/REF_vs_SPC.json
+25b1b0724085e144ef4202f3360a2e3543f9e0441e65df6bd5a90fdec68d5858         438  results/pi-real/fastcheck-e2b-v7/SHA256SUMS-bin.txt
+9a524521ace517f8bdd224752ccbc57843398d48e080cf616fb838ff534afc95       14895  results/pi-real/fastcheck-e2b/REF_vs_C.json
+c2143fcf242e6be2f034e41f46da24543e7eda652446bc1b053aa1e90d1c1316       14889  results/pi-real/fastcheck-e2b/REF_vs_OFF.json
+7fe1d01f6995e4753f1dd6db5d968565023f1757d4a1540563514c3965505af9       15225  results/pi-real/fastcheck-e2b/REF_vs_P.json
+96eb1b2ab93da7d83d25d84e35e8497f22fbb397c32412ea042bab2843e208d7       14984  results/pi-real/fastcheck-e2b/REF_vs_S.json
+dd69375f2fdabb624bc207cfeee25de9af7aef38c21ab2c3b839b1c077753544       15276  results/pi-real/fastcheck-e2b/REF_vs_SPC.json
+25b1b0724085e144ef4202f3360a2e3543f9e0441e65df6bd5a90fdec68d5858         438  results/pi-real/fastcheck-e2b/SHA256SUMS-bin.txt
+1a1f148cc1438e2c684de7e8a0808466f3642e359993027b8b9e283ab77e5329        7710  results/pi-real/fastcheck-e2b/run.out
+bb646e4a11a0b9a8b536c32eb6721556c045ede7ca33196dd314bae0ca3cfcb5       14901  results/pi-real/fastcheck-e4b-v7/REF_vs_C.json
+56bffd40730f2412f71bc29a2225ec0721673a9726ec76cdc67e893304bcd8c2       14895  results/pi-real/fastcheck-e4b-v7/REF_vs_OFF.json
+404561523677436bf6c2c2bc77fc9d6809a1ca94411ada769908e31177edc1da       15225  results/pi-real/fastcheck-e4b-v7/REF_vs_P.json
+fb72e59c564b0afca7fdad366c6c37da5ff144141c9ae6a8ee58140589248847       14990  results/pi-real/fastcheck-e4b-v7/REF_vs_S.json
+28c93d705af83f88bb3373bfd3ca433016b8077b6c87ce0c21175be2e91dcd0b       15276  results/pi-real/fastcheck-e4b-v7/REF_vs_SPC.json
+9a27b3c90a56caa20174d744eef765286d3fc3d097b5f6668c2b70f3ef658a88         438  results/pi-real/fastcheck-e4b-v7/SHA256SUMS-bin.txt
+45c6464b87717cdce905668e774a52bdbc2cb98427f8c25c2319dad555b158fc        7341  results/pi-real/fastcheck-e4b-v7/phase_a.out
+681643cfa1772480c80390b2ea5016410980d7beb5e53b3fed98e09f9fd6dd62         920  results/pi-real/membw_pi_2026-10-06.json
+e12da29f534c9c4b089c855d40d86a7b880c460f163c497ab7573cef9609ae21         272  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/gen-en_short_canonical.txt
+8d347754806f16c7a053308003c3a0e0983594bef8a22303ec588734875db242         279  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/gen-en_short_legacy_a.txt
+8d347754806f16c7a053308003c3a0e0983594bef8a22303ec588734875db242         279  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/gen-en_short_legacy_b.txt
+4f5f7130a362027482882a7377244424fed5c97f5a5112bc1636536fa97a0037         201  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/gen-he_short_canonical.txt
+3f040b894449df4157501899b8266a6868da272ca12fb12b8fa72f5bb2311be4         187  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/gen-he_short_legacy_a.txt
+3f040b894449df4157501899b8266a6868da272ca12fb12b8fa72f5bb2311be4         187  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/gen-he_short_legacy_b.txt
+7958f7dd6db9de6687a8356ac0d17279e36c11d74719fa0195c5ee5741936e59        1296  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/itl-en_short_canonical.json
+888199519f2a333a2f765b0be246fd4e529bb325e5592acbea892e720f4f9d34        1303  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/itl-en_short_legacy_a.json
+80df3aee53c50157dfe00f64c6c6ed6410c32ae08b6ad34bc09567b638f0fddc        1303  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/itl-en_short_legacy_b.json
+9b253c6ddecf3be84e6902e917aa3ee057398b0e9c2406d3fcc5d247be500067        1293  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/itl-he_short_canonical.json
+3fd44516565b50176e428f3164451fd614fe581bc2b5b894a2329481ecfb706f        1300  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/itl-he_short_legacy_a.json
+d12c4c36ebca52c9f14bbf2fc37866f49ab69c38eceffa86c559018c0a19c3a0        1299  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/itl-he_short_legacy_b.json
+089461077e3b2def317d4a011c8be72862f559baafd248963ef49dba70d45897       15104  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/run.json
+936ffc803d6b6450cdda448d354f30fc26244c5b1a43959a76e65d0be8a88c6e       23654  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/samples.csv
+45807f77c0c4e3fcd709c52a6155f352897c0ab7d3963dbc51b272a0d5d456d8        6815  results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/server.log
+b85e2539379c901bea3c20d2319e2d597de45b5c37f5be0e38bed49525d88e2e        1145  results/pi-real/p1-resident-ref/p1_prompts.json
+f526733cf8391497dcf72107b8db7d41b00100617b64cf24c272209becf49420        1819  results/pi-real/p1-resident-ref/p1_ref.out
+7f6fdae3eafffcbc242d227ae0dd4fd2becbe7949d3b05dacc0b71f645b697c3        1687  results/pi-real/p1-resident-ref/p1_run_resident_ref.sh
+2134878485e82ec437b1f4caa809bbc0db50e526d65e2142ebba8998c026604b        2453  results/pi-real/pi-logs/ab_31b.out
+a3a69e5f75417be85a50d4ca798a1a304b4818b22ff492c6cda529021f51bf3e        2083  results/pi-real/pi-logs/bench_31b.out
+959b62ce3711ff55961ba48472c4fc18fc1059dcf0d0c65d3a3beb740790227e        3384  results/pi-real/pi-logs/build-cmake.log
+1ffe8caf77a08e14d49a6530c57c28b89b911d3de655c91e5969746c32ddd1cf         893  results/pi-real/pi-logs/build_llama.out
+639cc99fa689eb7cf6e49baac890b42f7f2e84b55f3059f413df3277a25b3956         248  results/pi-real/pi-logs/fetch_26b.out
+513d7ef131f86484b4bc98b159b8c721e6d8e9caeb06af68c7c08b1abac835c1         244  results/pi-real/pi-logs/fetch_31b.out
+d2e81804d6979a5099a83b2539a8507b65be79f4495abd5ff3a0b14826e28c7e        3822  results/pi-real/pi-logs/long_en.txt
+54f713b91f018b74c6dda7f135b2d8d4d3075908c8c11aa2f1a655e5b3546472         321  results/pi-real/pi-logs/prompts_short2.json
+4a034cdeb0ef2a1b99c22ed79981ed66ce577e393be58aa3d5ec4e2b568cf9da        5555  results/pi-real/pi-logs/qa_all_prompts.json
+9285a7431d94e7df8ae778e3f23e29df1d5b4e2afa714aa9ecf9a46ef9d230da       15305  results/pi-real/pi-logs/qa_both.out
+e6c81e393dfc689aeb5aeb66675d2ed48ebf2716599d375a7a39c9dc7a54524f        1152  results/pi-real/pi-logs/qat_cold.out
+105003b0d5b14a7556d5e2ab30af61ddc45113b2ccbb8fec2084b533cd362b21          21  results/pi-real/qa/qa-26b-q3km/gen-code-01.txt
+7142e0dfa54069d6501e61c609840747d88f4b01485a8edd8477cae011bfcefc          29  results/pi-real/qa/qa-26b-q3km/gen-code-02.txt
+0deddb985a27f7a4c866d462c95a8a5cfb3826d6db21305237270b6dba52a8e5          35  results/pi-real/qa/qa-26b-q3km/gen-code-03.txt
+c075b9c24a3d0f0cdad3e99683ed2514981e4ff40c6c0056de53e5e56e052227           8  results/pi-real/qa/qa-26b-q3km/gen-de-01.txt
+3751f10a2cd05e46c11ee6c93179e280ef48061823e16f535631fb46a5e191ac          41  results/pi-real/qa/qa-26b-q3km/gen-de-neg-01.txt
+eb7ae132c15dcb6df19486c43973154985d08d75ab83a184fe81b1523eba4486          33  results/pi-real/qa/qa-26b-q3km/gen-en-01.txt
+f5d8d37107025c7bb8c7ca379e7215bfdae11b1cf4541adb2e8c1b5b7c77ae96          59  results/pi-real/qa/qa-26b-q3km/gen-en-02.txt
+4cf856b9aa9c617ad56e52a1eedf6a39c073139ad2bc39621b64bfbba2d3ca47          30  results/pi-real/qa/qa-26b-q3km/gen-en-03.txt
+8441a48fba0ca9444dcabf46e5a0e78f32e96a676aa06ff029b2126151839166          39  results/pi-real/qa/qa-26b-q3km/gen-en-04.txt
+a6beaec2da6bc447e3cd73256261118a2b47fd9746072c18d7741d75b65c41ee          33  results/pi-real/qa/qa-26b-q3km/gen-en-05.txt
+47a7b2e8c75934e5055d9996f15433dd0017548562ed0dcac62b0ef5c1e3b02e          27  results/pi-real/qa/qa-26b-q3km/gen-en-06.txt
+f3551e9c4e50a714ef3c149b9d359f4982bd6b44087a74445f5433662b8be538          42  results/pi-real/qa/qa-26b-q3km/gen-en-07.txt
+376e78eeb512362c38a26bfa86415ae5bb1b29fc54da2591b1b162477b4ba85b          36  results/pi-real/qa/qa-26b-q3km/gen-ext-de-01.txt
+01b2c91efc6bc32d060622a462c7e19cce30b420acd272d65b73f5760ca7f856          31  results/pi-real/qa/qa-26b-q3km/gen-ext-en-01.txt
+5213a119d5261307e5732912837f639de8f010dc0b457f11beeda6710a034679          29  results/pi-real/qa/qa-26b-q3km/gen-ext-en-02.txt
+2494efea440b58c9988741c84f88149e582d2e9dc08f57fb3d964d311c5a5043          39  results/pi-real/qa/qa-26b-q3km/gen-ext-he-01.txt
+f4dd6f2730d115b049f5f72f4bd24c18acf93bb7cdd81084b92b399b14320656          36  results/pi-real/qa/qa-26b-q3km/gen-he-01.txt
+3c8cffc1711f0ca2e55cf027b786b895c4c15160d37193f49999a4019079fb4f          24  results/pi-real/qa/qa-26b-q3km/gen-he-02.txt
+9cc442f53832c34cbbbf49b660d03efcc1038631267b4c54e80fa61a628324b2          45  results/pi-real/qa/qa-26b-q3km/gen-he-03.txt
+581b1b9d91c853ca401c9c8a528ad29f54a42f6e563a07f36170ebc7d3144b7d          36  results/pi-real/qa/qa-26b-q3km/gen-he-04.txt
+be0f1f91a692d9192a5dc09a6a5e5584c0f425ba33b391f29a05be3a6fab3a22          40  results/pi-real/qa/qa-26b-q3km/gen-he-05.txt
+7fd3d027f36c1c4e8b4e6c207cd11512f5f0e4768cbc44ddc2fc18e240fbe666          33  results/pi-real/qa/qa-26b-q3km/gen-he-06.txt
+dacba1dfc44ea3d0f28fee0661533ce52e7ffe09332ce26c54e028ea795e6be6          42  results/pi-real/qa/qa-26b-q3km/gen-ins-en-01.txt
+f1ac20687926a8157bd4d1ef50b98c062dd153f3ea5540f688a0ba0bd2602048          36  results/pi-real/qa/qa-26b-q3km/gen-ins-en-02.txt
+8f37104f80721592730f9b8b14082acd25938d0dba055e17c1674fe3109257d2          63  results/pi-real/qa/qa-26b-q3km/gen-ins-he-01.txt
+761b243bd4988126701ebaaf12d1f8fa501a79f7be4e58c0904841d67924014b          23  results/pi-real/qa/qa-26b-q3km/gen-mix-01.txt
+420cabe0239918e2dcf83a2b1b12aa3fd84e69c1b56cf5f7383aea58613e0d6f          40  results/pi-real/qa/qa-26b-q3km/gen-neg-en-01.txt
+2341d70bab8d10bd1e9d7c77088234ee42e701a27fd413992a5d1d23ac9c0fa1          31  results/pi-real/qa/qa-26b-q3km/gen-neg-en-02.txt
+ea78d28af896233f1fb45a854179c173836b9d5c2d04ba8b19cc37b7e9af7a43          34  results/pi-real/qa/qa-26b-q3km/gen-neg-he-01.txt
+9eaf3d22a08ec0570d49d0870887902d57a5c13ff3b60f7b795fe293e89808f9          37  results/pi-real/qa/qa-26b-q3km/gen-num-01.txt
+aa777da990215a559419ffb878be679e9f31a20c08083656e0ec7377c2f8b455          32  results/pi-real/qa/qa-26b-q3km/gen-num-02.txt
+b0cce85420886912664281e5274c5c05f287481942359e0810566f5d6a1e1f4f          42  results/pi-real/qa/qa-26b-q3km/gen-num-03.txt
+1fcc9c8fbf8fcfe14aa5a2a1ba1cba8aa3a24fd848b06a762d155ff5bbb090cd          33  results/pi-real/qa/qa-26b-q3km/gen-num-hard-01.txt
+e8d0676330efc766a9c478cd3d9dacf9553c53be52699e2bab917ed6a9894bde          30  results/pi-real/qa/qa-26b-q3km/gen-num-hard-02.txt
+7f069f9550da12e841eed68fae078111a321adaf78a8adf2805231301fea4b3e          39  results/pi-real/qa/qa-26b-q3km/gen-num-hard-03.txt
+83efc9bf7285272a6b3f05dc995f89af8be1916bd8f78f24cd12fd422aadaade          30  results/pi-real/qa/qa-26b-q3km/gen-num-hard-04.txt
+7735976ed42566b726c3c593bac044a647f733eb053ccf3daa2c6730b8e80da1       19960  results/pi-real/qa/qa-26b-q3km/run.json
+d2366c6607a9334c39351dc16a924eef0514def29c21403133f936574ddea950       44366  results/pi-real/qa/qa-26b-q3km/samples.csv
+5620765c427d081e8b1f7569718f7cd9852c03c44a70eab13ba27dda06670ae5       35446  results/pi-real/qa/qa-26b-q3km/server.log
+105003b0d5b14a7556d5e2ab30af61ddc45113b2ccbb8fec2084b533cd362b21          21  results/pi-real/qa/qa-26b-qat-q4_0/gen-code-01.txt
+7142e0dfa54069d6501e61c609840747d88f4b01485a8edd8477cae011bfcefc          29  results/pi-real/qa/qa-26b-qat-q4_0/gen-code-02.txt
+1e72a4e6275f4b64369616058458a6b499f7fcc907adeb26003c1beefb573936         186  results/pi-real/qa/qa-26b-qat-q4_0/gen-code-03.txt
+6ecf1a9817e4e6b355b85f1354565c41aad88227303e667b4b1f3813a36dc329          36  results/pi-real/qa/qa-26b-qat-q4_0/gen-de-01.txt
+c3ec4edbf0be215188086c7a17b670dc0d8f74ebf3163fbb480748b194d9a549          50  results/pi-real/qa/qa-26b-qat-q4_0/gen-de-neg-01.txt
+eb7ae132c15dcb6df19486c43973154985d08d75ab83a184fe81b1523eba4486          33  results/pi-real/qa/qa-26b-qat-q4_0/gen-en-01.txt
+ddf864ee800e6beb4c16e51a108b6abf8cb448cf0753e3dadb49e1c61f233c86          35  results/pi-real/qa/qa-26b-qat-q4_0/gen-en-02.txt
+4cf856b9aa9c617ad56e52a1eedf6a39c073139ad2bc39621b64bfbba2d3ca47          30  results/pi-real/qa/qa-26b-qat-q4_0/gen-en-03.txt
+8441a48fba0ca9444dcabf46e5a0e78f32e96a676aa06ff029b2126151839166          39  results/pi-real/qa/qa-26b-qat-q4_0/gen-en-04.txt
+a6beaec2da6bc447e3cd73256261118a2b47fd9746072c18d7741d75b65c41ee          33  results/pi-real/qa/qa-26b-qat-q4_0/gen-en-05.txt
+04d310b1afb4252dc36e42fa672a6a48d0ecad177e6f32705f477ce8095a5a54          36  results/pi-real/qa/qa-26b-qat-q4_0/gen-en-06.txt
+f3551e9c4e50a714ef3c149b9d359f4982bd6b44087a74445f5433662b8be538          42  results/pi-real/qa/qa-26b-qat-q4_0/gen-en-07.txt
+376e78eeb512362c38a26bfa86415ae5bb1b29fc54da2591b1b162477b4ba85b          36  results/pi-real/qa/qa-26b-qat-q4_0/gen-ext-de-01.txt
+01b2c91efc6bc32d060622a462c7e19cce30b420acd272d65b73f5760ca7f856          31  results/pi-real/qa/qa-26b-qat-q4_0/gen-ext-en-01.txt
+26ad1c38d292a2324dda6a734896ed42d73c716eb2bff3033eae42e9788010b2          60  results/pi-real/qa/qa-26b-qat-q4_0/gen-ext-en-02.txt
+aebec1b6ccc2f31f03f118164ee7281b097354a91c73e7a2fb46bd928f9d64a6          33  results/pi-real/qa/qa-26b-qat-q4_0/gen-ext-he-01.txt
+f4dd6f2730d115b049f5f72f4bd24c18acf93bb7cdd81084b92b399b14320656          36  results/pi-real/qa/qa-26b-qat-q4_0/gen-he-01.txt
+0a9803c2da66778aab57cf41d861abc1e3aca0236cf37e30309fbb8568f5227e          35  results/pi-real/qa/qa-26b-qat-q4_0/gen-he-02.txt
+9cc442f53832c34cbbbf49b660d03efcc1038631267b4c54e80fa61a628324b2          45  results/pi-real/qa/qa-26b-qat-q4_0/gen-he-03.txt
+581b1b9d91c853ca401c9c8a528ad29f54a42f6e563a07f36170ebc7d3144b7d          36  results/pi-real/qa/qa-26b-qat-q4_0/gen-he-04.txt
+13825603e9e3ee1b1140e25e23a0e0b3f680a85e0c975a386041fb50f8fd5183          80  results/pi-real/qa/qa-26b-qat-q4_0/gen-he-05.txt
+0c38d7113d3dcca2e5bd9fe7a8d7eecc084235db1507c00506d379e4abe1a346          63  results/pi-real/qa/qa-26b-qat-q4_0/gen-he-06.txt
+dacba1dfc44ea3d0f28fee0661533ce52e7ffe09332ce26c54e028ea795e6be6          42  results/pi-real/qa/qa-26b-qat-q4_0/gen-ins-en-01.txt
+694b983a0945335b7f84d4db8071903e0517faed8bd499a8d7e627867afdd7dd          30  results/pi-real/qa/qa-26b-qat-q4_0/gen-ins-en-02.txt
+3eb2560adaca569c4fdd2b34d67bde72cbf2a29c62c23b6bb20a7eadce52ee89          61  results/pi-real/qa/qa-26b-qat-q4_0/gen-ins-he-01.txt
+aec2c2b4bb2354143b83dc0a1b0fea1350fb3a6212c24bc55f272fb7fe58fe8a          32  results/pi-real/qa/qa-26b-qat-q4_0/gen-mix-01.txt
+420cabe0239918e2dcf83a2b1b12aa3fd84e69c1b56cf5f7383aea58613e0d6f          40  results/pi-real/qa/qa-26b-qat-q4_0/gen-neg-en-01.txt
+2341d70bab8d10bd1e9d7c77088234ee42e701a27fd413992a5d1d23ac9c0fa1          31  results/pi-real/qa/qa-26b-qat-q4_0/gen-neg-en-02.txt
+ea78d28af896233f1fb45a854179c173836b9d5c2d04ba8b19cc37b7e9af7a43          34  results/pi-real/qa/qa-26b-qat-q4_0/gen-neg-he-01.txt
+54b791ef672e4d4307b1885aefcb1b4e73bf6d62e93c398f06b2cec3dd796867          31  results/pi-real/qa/qa-26b-qat-q4_0/gen-num-01.txt
+aa777da990215a559419ffb878be679e9f31a20c08083656e0ec7377c2f8b455          32  results/pi-real/qa/qa-26b-qat-q4_0/gen-num-02.txt
+6bef76dfa00bb060f6e67b34fa02941239b4c3fc417a263192fd21e8fe5c9c2a          51  results/pi-real/qa/qa-26b-qat-q4_0/gen-num-03.txt
+1fcc9c8fbf8fcfe14aa5a2a1ba1cba8aa3a24fd848b06a762d155ff5bbb090cd          33  results/pi-real/qa/qa-26b-qat-q4_0/gen-num-hard-01.txt
+f8fc24c875ba4f945129c3050c7611720100c972e4c3018ea78aed4145997a74          31  results/pi-real/qa/qa-26b-qat-q4_0/gen-num-hard-02.txt
+903b2f6f985ca2209f11b0d781524dc1ca8e6f839a221719e8c5e444a02035e5          51  results/pi-real/qa/qa-26b-qat-q4_0/gen-num-hard-03.txt
+83efc9bf7285272a6b3f05dc995f89af8be1916bd8f78f24cd12fd422aadaade          30  results/pi-real/qa/qa-26b-qat-q4_0/gen-num-hard-04.txt
+0457bf2bf9f25a7ceb2a9b499226d038f057af44316bc40afeb9202672b7bdf8       20422  results/pi-real/qa/qa-26b-qat-q4_0/run.json
+95104c5362ad8b275407ca4ef718e2a1e2ba9c7b2f9ca6e5a96ad6350c71795d       43258  results/pi-real/qa/qa-26b-qat-q4_0/samples.csv
+0f53b9c889a402b73f2c7fb4450eba9eb868b8f643f35b3be58abd41dc85329f       35354  results/pi-real/qa/qa-26b-qat-q4_0/server.log
+384f1c0c77594b3e2dc012261e75e69558d5102ba825772b3d13ed6c23b18419       29568  results/pi-real/qa/qa_scores.json
+abbf6bb37a10428add68f429759699d71c85b797bac01531d45efde5b7054ad3         252  results/pi-real/qat/26b-qat-q4_0-usb-cold/gen-code_short.txt
+4c8ec340d0e74fdb7303a6d8fc8f71eca7aaacfc4eaf7de5986b95a3a1663cf3         350  results/pi-real/qat/26b-qat-q4_0-usb-cold/gen-de_short.txt
+5f12fd3374eb1d395e11075cbb3526450780730e2927e7134d28187349a38a98         340  results/pi-real/qat/26b-qat-q4_0-usb-cold/gen-en_short.txt
+cc06e67255b86a4c451baab8255bdfc75cde516b13e39d928d862a0fdd64c4a0         266  results/pi-real/qat/26b-qat-q4_0-usb-cold/gen-he_short.txt
+cacb40d7b920529558375d89b75881bb3edaa3a535cdde3a84c9d319250cb547         574  results/pi-real/qat/26b-qat-q4_0-usb-cold/gen-long_summary.txt
+ceec5f54cda7ede722f3095ed414b0020538fdb55c259ed0489a526f92145e61        4838  results/pi-real/qat/26b-qat-q4_0-usb-cold/run.json
+2d0ceaa699fbc1b39379cd35ae48295d7aa6f9e628400bfb1b06666ccfa5c9a3       36233  results/pi-real/qat/26b-qat-q4_0-usb-cold/samples.csv
+b9ef29aea8051ac8e739a794e8e538bd05d7c9f4412a24d091f9107db1e109a5        5984  results/pi-real/qat/26b-qat-q4_0-usb-cold/server.log
+8d347754806f16c7a053308003c3a0e0983594bef8a22303ec588734875db242         279  results/pi-real/series-26b/26b-q3km-balloon4/gen-en_short.txt
+3f040b894449df4157501899b8266a6868da272ca12fb12b8fa72f5bb2311be4         187  results/pi-real/series-26b/26b-q3km-balloon4/gen-he_short.txt
+86805e6d499fba7ccec7e11000e36715703f953ca8f94aee2cb62cbbf98e0586        2735  results/pi-real/series-26b/26b-q3km-balloon4/run.json
+e9919d70b8fbe833e95a54e7b71c08790483f599aaca1566bda7554509b2d855       14579  results/pi-real/series-26b/26b-q3km-balloon4/samples.csv
+c90955190a0448d1461fb115f7c5eb4fe2e6d9ce3011a041f120adf277eac097        3121  results/pi-real/series-26b/26b-q3km-balloon4/server.log
+8d347754806f16c7a053308003c3a0e0983594bef8a22303ec588734875db242         279  results/pi-real/series-26b/26b-q3km-balloon6/gen-en_short.txt
+3f040b894449df4157501899b8266a6868da272ca12fb12b8fa72f5bb2311be4         187  results/pi-real/series-26b/26b-q3km-balloon6/gen-he_short.txt
+9fa1faefcbf0282288aab574c4fb311076a021943725bd195a5fb7ebb40e79b5        2726  results/pi-real/series-26b/26b-q3km-balloon6/run.json
+74f5790371e18de72c3716f7d26452f89f06beaac68a9a3ac6b57b6eb93b95fb       27973  results/pi-real/series-26b/26b-q3km-balloon6/samples.csv
+240a49f428353d2358d28f9ab553c5cdb85a8d8ddd83c8ce31677d2a82dfa85e        3121  results/pi-real/series-26b/26b-q3km-balloon6/server.log
+8d347754806f16c7a053308003c3a0e0983594bef8a22303ec588734875db242         279  results/pi-real/series-26b/26b-q3km-balloon8/gen-en_short.txt
+3f040b894449df4157501899b8266a6868da272ca12fb12b8fa72f5bb2311be4         187  results/pi-real/series-26b/26b-q3km-balloon8/gen-he_short.txt
+c5319e9b03fddba6b628a90d1b778e139ecbc440884ff870021f669efd1565af        2732  results/pi-real/series-26b/26b-q3km-balloon8/run.json
+74c389e546afb9be4be503708874b3df1306d8e5b2f4c2d1d98c8f3886766d55       42782  results/pi-real/series-26b/26b-q3km-balloon8/samples.csv
+663132016947294e1134acbd60bc0c509fc1e2a9e12232e967a612a7d1aa7715        3121  results/pi-real/series-26b/26b-q3km-balloon8/server.log
+3d015c36bfe42d113f68f2d39a939d6b6ca4b9bf76a5f62250c63793d7653679         254  results/pi-real/series-26b/26b-q3km-cold/gen-code_short.txt
+0600a227e9aabc3b2355bfecae553a7b15fde26a0472cab42921a60a1ca00d72         345  results/pi-real/series-26b/26b-q3km-cold/gen-de_short.txt
+bfe816db14fc5a969e61b8f0ab6bfdf9c34b2301f4a9e60a653586c18b17c1a5         374  results/pi-real/series-26b/26b-q3km-cold/gen-en_short.txt
+6ceb2feb4f8db5a6580e48d475e8dd619e17442877d79bc690109abe521d57b9         253  results/pi-real/series-26b/26b-q3km-cold/gen-he_short.txt
+46707290c3128a28718834b453eeea0035464c3e14f154c4012f710f4168e476         546  results/pi-real/series-26b/26b-q3km-cold/gen-long_summary.txt
+f26b37f75516dbcd778dcf5905cc75d3315902439d4b0749b67fba38254ffe47        4687  results/pi-real/series-26b/26b-q3km-cold/run.json
+29f4390de6091275c6cfc1063df2fe011410d9a36a09be80ac0329b1b5225671       32633  results/pi-real/series-26b/26b-q3km-cold/samples.csv
+ae592388a44fe35c206fe7a7eb4222bf011c744319c1dded71114a9d3a722bd9        6091  results/pi-real/series-26b/26b-q3km-cold/server.log
+3d015c36bfe42d113f68f2d39a939d6b6ca4b9bf76a5f62250c63793d7653679         254  results/pi-real/series-26b/26b-q3km-warm-base-r1/gen-code_short.txt
+0600a227e9aabc3b2355bfecae553a7b15fde26a0472cab42921a60a1ca00d72         345  results/pi-real/series-26b/26b-q3km-warm-base-r1/gen-de_short.txt
+bfe816db14fc5a969e61b8f0ab6bfdf9c34b2301f4a9e60a653586c18b17c1a5         374  results/pi-real/series-26b/26b-q3km-warm-base-r1/gen-en_short.txt
+6ceb2feb4f8db5a6580e48d475e8dd619e17442877d79bc690109abe521d57b9         253  results/pi-real/series-26b/26b-q3km-warm-base-r1/gen-he_short.txt
+f11463edc3588d88c21165ebaf95b0ffef936799232316c7e1977837c60049d6        3938  results/pi-real/series-26b/26b-q3km-warm-base-r1/run.json
+837f8e404258c01f38314eac3fd302192b1276670304b839b5eb502ca0a698f0        8815  results/pi-real/series-26b/26b-q3km-warm-base-r1/samples.csv
+4dd1ea74e94c8daae73e9f46cbd608136af547fe5585dfcf39d25924f2cbf8f1        5032  results/pi-real/series-26b/26b-q3km-warm-base-r1/server.log
+3d015c36bfe42d113f68f2d39a939d6b6ca4b9bf76a5f62250c63793d7653679         254  results/pi-real/series-26b/26b-q3km-warm-base-r2/gen-code_short.txt
+0600a227e9aabc3b2355bfecae553a7b15fde26a0472cab42921a60a1ca00d72         345  results/pi-real/series-26b/26b-q3km-warm-base-r2/gen-de_short.txt
+bfe816db14fc5a969e61b8f0ab6bfdf9c34b2301f4a9e60a653586c18b17c1a5         374  results/pi-real/series-26b/26b-q3km-warm-base-r2/gen-en_short.txt
+6ceb2feb4f8db5a6580e48d475e8dd619e17442877d79bc690109abe521d57b9         253  results/pi-real/series-26b/26b-q3km-warm-base-r2/gen-he_short.txt
+5156712e200af2db2b9b5828ecbaa987674366dc0bc5f313974108482b8f92d5        3942  results/pi-real/series-26b/26b-q3km-warm-base-r2/run.json
+a2f76e9050bb06b13285c3f71cf8352be1366cf87492d13421c2fdd3be975d80        8882  results/pi-real/series-26b/26b-q3km-warm-base-r2/samples.csv
+70a130f8aa8464649ed8398a66dd74a53a0750717b12b925790947ddcc5059ab        5032  results/pi-real/series-26b/26b-q3km-warm-base-r2/server.log
+3d015c36bfe42d113f68f2d39a939d6b6ca4b9bf76a5f62250c63793d7653679         254  results/pi-real/series-26b/26b-q3km-warm-mtp-r1/gen-code_short.txt
+7faa1f4963aaa5eba55681e5b4d91f50a0688dd42efa87359315422c051aa667         342  results/pi-real/series-26b/26b-q3km-warm-mtp-r1/gen-de_short.txt
+502ba1672be6fb52edc327a83c5856e71d0077c862645dfb1fd842ceaf9e7133         374  results/pi-real/series-26b/26b-q3km-warm-mtp-r1/gen-en_short.txt
+994925ea292aa251bc24aa6ec1b5f66b7e4e7584d50345f6d8de8c54ab58927c         270  results/pi-real/series-26b/26b-q3km-warm-mtp-r1/gen-he_short.txt
+b867e95241f27f220bbe36add358e3b1604b8d3760590a31fe167bcca55113c8        4068  results/pi-real/series-26b/26b-q3km-warm-mtp-r1/run.json
+b12ddd995518d7933bc76f0c6de97934d978e71bf7e8d0766d0b4b72c959b1aa        9744  results/pi-real/series-26b/26b-q3km-warm-mtp-r1/samples.csv
+185274bf20b603dc5582bd7b77caaba316c0fb28dd156380bb673c2529727555        6752  results/pi-real/series-26b/26b-q3km-warm-mtp-r1/server.log
+3d015c36bfe42d113f68f2d39a939d6b6ca4b9bf76a5f62250c63793d7653679         254  results/pi-real/series-26b/26b-q3km-warm-mtp-r2/gen-code_short.txt
+7faa1f4963aaa5eba55681e5b4d91f50a0688dd42efa87359315422c051aa667         342  results/pi-real/series-26b/26b-q3km-warm-mtp-r2/gen-de_short.txt
+502ba1672be6fb52edc327a83c5856e71d0077c862645dfb1fd842ceaf9e7133         374  results/pi-real/series-26b/26b-q3km-warm-mtp-r2/gen-en_short.txt
+994925ea292aa251bc24aa6ec1b5f66b7e4e7584d50345f6d8de8c54ab58927c         270  results/pi-real/series-26b/26b-q3km-warm-mtp-r2/gen-he_short.txt
+4c85f4219d8251a8f423594b6c4caf265b55d8571ff0420b252eb3b9f32e303c        4071  results/pi-real/series-26b/26b-q3km-warm-mtp-r2/run.json
+2ccc836a90fac092efeed55ac5a2a73e0b331ac7f951c9f7c7b8a9f4603ca01d        9744  results/pi-real/series-26b/26b-q3km-warm-mtp-r2/samples.csv
+527412462ffdb227e8791c82c516926eca883767c351bb0c0fb6650fcdc53d40        6752  results/pi-real/series-26b/26b-q3km-warm-mtp-r2/server.log
+32eff550566be507e995602702b0702f14654fdb82f132560ef6d02701ca4a88        6402  results/pi-real/series-26b/series_26b.out
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/speed-ceiling/bench_e2b_ik.err
+2bb796337f7d3adff272c56ab9f5ae3635a5334695a175f6478b0bd4445c0209         498  results/pi-real/speed-ceiling/bench_e2b_ik.md
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/speed-ceiling/bench_e2b_ik_rtr.err
+919386e9897f78df3f9588a0d9caecdc9851f69d58ccb027405ea81134ad9201         522  results/pi-real/speed-ceiling/bench_e2b_ik_rtr.md
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855           0  results/pi-real/speed-ceiling/bench_e2b_ours.err
+e51c4ceeecd1b6a158aeb60f9d2e6f67eee750554c6bf9c4cd2e246f537ef66b         522  results/pi-real/speed-ceiling/bench_e2b_ours.md
+e1478c24d7ab32cce2dd6a3df639bec11a1a3431e64c6743ee59116f5b8be092        4621  results/pi-real/speed-ceiling/e2b_fast.out
+47d74ec2d2272a2efbdb80152d77dbebf81c9d329add991cb2efb173cfb4650d        8010  results/pi-real/speed-ceiling/e2b_mtp_ab/server_0_base.log
+af615cf4d236bcbc92d4b538212116e4f05be1768054e1c993648a3ef2e39d8c        9626  results/pi-real/speed-ceiling/e2b_mtp_ab/server_1_mtp3.log
+b1e5191b037b8e3921aa1e2fa3fe6ab8dda844ab849779f4c9741df919561ae1        8010  results/pi-real/speed-ceiling/e2b_mtp_ab/server_2_base.log
+e6d01c3d31cf28dd7d05188dff2a2be98bacbc1ea792dedb5b76f33749c4322b        9626  results/pi-real/speed-ceiling/e2b_mtp_ab/server_3_mtp3.log
+28c2f7afb6aba78c7180665b076ec7769fcc2ba4f65ce26c25ce63f28ffac553        6126  results/pi-real/speed-ceiling/e2b_mtp_ab/server_4_mtp6.log
+589f3606218d6d3b291efa8164361095fe677259b52850e3b0bb168af1e53cce         396  results/pi-real/speed-ceiling/par_26b_ik/run.json
+5a3d86ca917b52ddf5808a16213983ef3d309eec37489f59eefcc3246dd7a48e       14882  results/pi-real/speed-ceiling/par_26b_ik/server.log
+87736ace684e22cd88f95c3339e9cf66471ca23c53cd9203250ce8a269af080b        1450  results/pi-real/speed-ceiling/par_26b_ours/run.json
+80d3fa546454f88e5f1dd7eb3a1e2c6120916a9e2a2ba77fbd6dc050e207f11d         337  results/pi-real/speed-ceiling/par_26b_ours/sample_output.txt
+c2fd6dc1ccb5df35d762260dcd0bfb21328be9892221907ff3b3482eb0b0bd72       15666  results/pi-real/speed-ceiling/par_26b_ours/server.log
+c45f023f4f7f8f6b3e090cbd8b74a137800b94b95868b7778966ed360ffd3fea        2175  results/pi-real/speed-ceiling/par_e2b_ik/run.json
+1d47eda448baa233b4b6dd1f0df46d62f251a84e2149bd0c5d8c64e1d177709f         514  results/pi-real/speed-ceiling/par_e2b_ik/sample_output.txt
+ab5f62e627a81203fea8cdb2e9564e46c5eab96f8cf04a02af7df1b290003e49       88686  results/pi-real/speed-ceiling/par_e2b_ik/server.log
+a29c482439898f22ff0b406d90f071a6f6dcbdff719ba8e60b898a5d2b0f0d99        2164  results/pi-real/speed-ceiling/par_e2b_ours/run.json
+fda54437590d0358e589d5f3d8f6b79954f8dca7f1bd920bfec5ee1d703c6fad         505  results/pi-real/speed-ceiling/par_e2b_ours/sample_output.txt
+2191db5d0fc76328a7b55db29c25e767dff608d949ea015870ddd67aba09c257       28856  results/pi-real/speed-ceiling/par_e2b_ours/server.log
+1b6b552cd9e9e6c3cf5c33d0ea6768509567558e21f01dfc40abdc302c25f87a        5517  results/pi-real/speed-ceiling/speed_ceiling.out
+1190840965fd4b18e1c568c11cad1c4fc38f24ed7c201026e1f93397f0068f1f        3631  results/pi-real/speed-ceiling/speed_ceiling3.out
+0461c57e32c871c2fb40c7091f04d235b357e9debc16389f1895bacef84ee3a1        1464  results/pi-real/verified-ceiling/batch_tail.out
+568b36f0aca1bec58d717a054eeacbe4914193023dd452e48d2da62840672f4f        1514  results/pi-real/verified-ceiling/bench_e2b_batch.md
+5220cd9e09b6d75ac499e5f193e3b9e54370a98baa37d6d0d93ae83eaf576bd6        1242  results/pi-real/verified-ceiling/bench_e2b_batch_tail.md
+83d8b27366584a4e6fc95286f88edde799173709e89f9f26d98294dfc1074b38         522  results/pi-real/verified-ceiling/bench_e2b_q2.md
+10d3058407209c4a7a86302a829656f4b58141ed63521b32c8f30c57c61c0856         698  results/pi-real/verified-ceiling/bench_e2b_q2_batch.md
+6faab029499042fb1727288b0faeda73ab703c7fe478f660c48677ed03117a73       12875  results/pi-real/verified-ceiling/e2b_q2_mtp/ab.json
+38a681c9dbaacb50037c29f220c01e52ba4e2f26adb9e5f453848fea964f3a86        7279  results/pi-real/verified-ceiling/e2b_q2_mtp/server_0_base.log
+556b9c7c1915bb493bda4b7ace6450805d95ec2e96773b0bc43a88ecd6cb2c60        9419  results/pi-real/verified-ceiling/e2b_q2_mtp/server_1_mtp3.log
+b0ad5ef69c65403b7e125403203c5bd0807fb93adcff48a99f34d0c656d6508c       30797  results/pi-real/verified-ceiling/e2b_q4_copy/ab.json
+274c9de5a18b343b9512653b91427955e04044472c9b329f6d5e2ec6b1ea9495        8722  results/pi-real/verified-ceiling/e2b_q4_copy/server_0_base.log
+58f93238d308305d812e6dc1870c4ac9bfd75a47a36bbb61c9c0404e730f08d8        7871  results/pi-real/verified-ceiling/e2b_q4_copy/server_1_ngram.log
+928e5594fbb240acbf70f7f729ae8a8a31f0cd49ccfb099248ed127815d3506a        7371  results/pi-real/verified-ceiling/e2b_q4_copy/server_2_ngram_s.log
+2063c7f5a6a59c61aad0f8b0c04fbf6df578077c28da5c9be9fa2b82a239dd44        7851  results/pi-real/verified-ceiling/e2b_q4_copy/server_3_mtp3.log
+d0577391ada021ebec49c93b9db0d58ce5a1cc8850943ba554a9617fbad648c5        7842  results/pi-real/verified-ceiling/e2b_q4_copy/server_4_both.log
+9a1f5f53bd50007b613a556043b20264fbce58db233176664f68e52fd18e836e       47754  results/pi-real/verified-ceiling/e2b_q4_mtp/ab.json
+e8fe512715beb6b128e9b5093b96bdc42e1e83cee86c278ae33914f0a4888575        8010  results/pi-real/verified-ceiling/e2b_q4_mtp/server_0_base.log
+757fc31132880dd10bf06a73f53cad075b8660d462f5d35a899c7709248be5ba        9626  results/pi-real/verified-ceiling/e2b_q4_mtp/server_1_mtp3.log
+02a4c24799db3ab1da09a25d1a284839b0ab78be1fd0704c0e36f1a84f080aa1       10045  results/pi-real/verified-ceiling/e2b_q4_mtp/server_2_mtp2.log
+0438f262ef56ca19176fdb3547653d1d36b7f2b8e307cd251267af4ae303d015        9731  results/pi-real/verified-ceiling/e2b_q4_mtp/server_3_mtp4.log
+262c9ff5005d2acf9fd199066203a7506a6ddc220ad6a95f9f7c455a74b491ee        9748  results/pi-real/verified-ceiling/e2b_q4_mtp/server_4_synth3.log
+0f97fd4b9096aa4385584fcd7a16d9c8fdbbe0cd0837d22ba1300a33d168f28a        9744  results/pi-real/verified-ceiling/e2b_q4_mtp/server_5_synth7.log
+5238d08521fb88bd66b15300e65ad4bd2fcc0a2625affc292cc99aa2ec99c9f6        9762  results/pi-real/verified-ceiling/e2b_q4_mtp/server_6_synth15.log
+5f7bbcb24cc2a8eaab87b3506e1e5c8ded03bd7bfa4b3d316933893bb58a8e8f       16562  results/pi-real/verified-ceiling/run.out
+63effc91a423ddbfdce9c437a5ee03f4fa86670d7305677f7a8e456d138dd9ce       17694  results/pi-real/verified-ceiling/summary.json
+126efb89854eec04fe3219afde551b26c097c68dbcbe86072ac2a893cc5a67cf       20790  results/pi-real/x4-resident-bottleneck/audit_prior_runs.json
+897e540a0b4443df6108433723c6dec6387629256dee817a45818e241e24e5d6       24769  results/pi-real/x4-resident-bottleneck/existing_evidence.json

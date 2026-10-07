@@ -1,0 +1,132 @@
+{
+ "label": "26b-q3km-warm-base-r1",
+ "started": "2026-10-05T10:52:41+0200",
+ "host": "context-friend-1",
+ "kernel": "6.18.50+rpt-rpi-2712",
+ "page_size": 16384,
+ "model": {
+  "path": "/home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+  "bytes": 12728497888,
+  "sha256_first_MiB": "c13f3b670eb7b8ad"
+ },
+ "threads": 4,
+ "ctx": 4096,
+ "n_predict": 96,
+ "extra": "",
+ "balloon_gib": 0.0,
+ "meminfo_start_kB": {
+  "MemTotal": 16607552,
+  "MemAvailable": 15796672,
+  "Cached": 13777680,
+  "SwapFree": 2097136
+ },
+ "throttled_start": "throttled=0x0",
+ "temp_start_c": 66.1,
+ "requests": [
+  {
+   "id": "en_short",
+   "lang": "en",
+   "wall_s": 24.9,
+   "prompt_n": 52,
+   "prompt_tok_s": 9.214029139012766,
+   "gen_n": 62,
+   "gen_tok_s": 3.171046948181818,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 12983328,
+    "Pss_Anon": 557360,
+    "Pss_File": 12422802,
+    "Swap": 0
+   },
+   "mem_available_kB": 15238320,
+   "temp_c": 70.5,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>A mixture-of-experts model only activates a small subset of its total parameters for each token processed. This sparse activation significantly reduces the number of floating-point operations required compared to"
+  },
+  {
+   "id": "he_short",
+   "lang": "he",
+   "wall_s": 26.0,
+   "prompt_n": 54,
+   "prompt_tok_s": 9.04342047617963,
+   "gen_n": 64,
+   "gen_tok_s": 3.149956373104233,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13028656,
+    "Pss_Anon": 602688,
+    "Pss_File": 12422797,
+    "Swap": 0
+   },
+   "mem_available_kB": 15202640,
+   "temp_c": 71.05,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>היתרון המרכזי הוא מחיר נמוך וזול מאוד.\nהוא חסכוני מאוד בצריכת חשמל וגודלו קטן.\nהוא מושלם לפרויקטים של למידה ואוטומציה ביתית."
+  },
+  {
+   "id": "de_short",
+   "lang": "de",
+   "wall_s": 26.4,
+   "prompt_n": 46,
+   "prompt_tok_s": 9.02726154488629,
+   "gen_n": 69,
+   "gen_tok_s": 3.200861445958091,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13064448,
+    "Pss_Anon": 638480,
+    "Pss_File": 12422802,
+    "Swap": 0
+   },
+   "mem_available_kB": 15160560,
+   "temp_c": 73.25,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>Ein Raspberry Pi ist aufgrund seines geringen Preises sehr kostengünstig für Schulen einzusetzen. Er bietet eine ideale Plattform, um Schülern spielerisch Programmieren und Informatik näherzubringen. Zudem ist da"
+  },
+  {
+   "id": "code_short",
+   "lang": "code",
+   "wall_s": 35.0,
+   "prompt_n": 48,
+   "prompt_tok_s": 9.088320296642774,
+   "gen_n": 96,
+   "gen_tok_s": 3.1927124959372732,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13089584,
+    "Pss_Anon": 663616,
+    "Pss_File": 12422802,
+    "Swap": 0
+   },
+   "mem_available_kB": 15142752,
+   "temp_c": 73.8,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>```python\ndef is_prime(n):\n    if n < 2:\n        return False\n    if n == 2 or n == 3:\n        return True\n    if n % 2 == 0 or n % 3 == 0:\n        return False\n    i = 5\n    while i * i <= n:\n        if n % i =="
+  }
+ ],
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+ "load_s": 4.0,
+ "load_read_bytes": 0,
+ "load_majflt": 0,
+ "after_load_smaps_kB": {
+  "Rss": 12944416,
+  "Pss_Anon": 518576,
+  "Pss_File": 12422674,
+  "Swap": 0
+ },
+ "throttled_end": "throttled=0x0",
+ "temp_end_c": 68.3,
+ "finished": "2026-10-05T10:54:38+0200"
+}

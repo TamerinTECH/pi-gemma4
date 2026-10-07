@@ -1,0 +1,19 @@
+{
+  "tool": "membw",
+  "version": "1.0.0",
+  "host": "aarch64",
+  "sysname": "Linux",
+  "release": "6.18.50+rpt-rpi-2712",
+  "page_size": 16384,
+  "nproc_online": 4,
+  "size_mb": 1024,
+  "reps": 5,
+  "units": "GB/s = 1e9 bytes/s, best of reps",
+  "bytes_counted": {"read": 1073741824, "copy": 1073741824, "triad": 1073741760},
+  "results": [
+    {"threads": 1, "read_gbps": 14.061, "copy_gbps": 9.062, "triad_gbps": 12.101, "read_s": 0.076364, "copy_s": 0.118492, "triad_s": 0.088732},
+    {"threads": 2, "read_gbps": 13.527, "copy_gbps": 8.061, "triad_gbps": 9.855, "read_s": 0.079379, "copy_s": 0.133206, "triad_s": 0.108954},
+    {"threads": 3, "read_gbps": 13.058, "copy_gbps": 7.681, "triad_gbps": 8.514, "read_s": 0.082229, "copy_s": 0.139797, "triad_s": 0.126112},
+    {"threads": 4, "read_gbps": 12.477, "copy_gbps": 7.143, "triad_gbps": 7.915, "read_s": 0.086059, "copy_s": 0.150325, "triad_s": 0.135656}
+  ]
+}

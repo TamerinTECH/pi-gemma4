@@ -1,0 +1,132 @@
+{
+ "label": "31b-iq3xxs-mtp",
+ "started": "2026-10-05T15:45:17+0200",
+ "host": "context-friend-1",
+ "kernel": "6.18.50+rpt-rpi-2712",
+ "page_size": 16384,
+ "model": {
+  "path": "/mnt/usb/pigemma/models/31b-iq3xxs/gemma-4-31B-it-UD-IQ3_XXS-00001-of-00004.gguf",
+  "bytes": 3492946560,
+  "sha256_first_MiB": "5f277ef379abe947"
+ },
+ "threads": 4,
+ "ctx": 4096,
+ "n_predict": 48,
+ "extra": "-md /mnt/usb/pigemma/models/31b-iq3xxs/mtp-gemma-4-31B-it-Q4_0.gguf --spec-type draft-mtp",
+ "balloon_gib": 0.0,
+ "meminfo_start_kB": {
+  "MemTotal": 16607552,
+  "MemAvailable": 15883088,
+  "Cached": 13534176,
+  "SwapFree": 1724656
+ },
+ "throttled_start": "throttled=0x0",
+ "temp_start_c": 73.25,
+ "requests": [
+  {
+   "id": "en_short",
+   "lang": "en",
+   "wall_s": 261.6,
+   "prompt_n": 52,
+   "prompt_tok_s": 0.6161094079503754,
+   "gen_n": 48,
+   "gen_tok_s": 0.2652486496431099,
+   "draft_n": 75,
+   "draft_n_accepted": 21,
+   "read_bytes": 1163264,
+   "majflt": 72,
+   "smaps_kB": {
+    "Rss": 13724352,
+    "Pss_Anon": 1910576,
+    "Pss_File": 11812228,
+    "Swap": 23184
+   },
+   "mem_available_kB": 14011120,
+   "temp_c": 78.2,
+   "read_MB_per_request_token": 0.012,
+   "output_head": "<|channel>thought\n<channel|>A mixture-of-experts model only activates a small subset of its parameters for each token. This significantly reduces the number of floating-point operations required per forward pass. Consequently, it achieves t"
+  },
+  {
+   "id": "he_short",
+   "lang": "he",
+   "wall_s": 277.5,
+   "prompt_n": 54,
+   "prompt_tok_s": 0.6156392339496125,
+   "gen_n": 48,
+   "gen_tok_s": 0.24771442595528567,
+   "draft_n": 80,
+   "draft_n_accepted": 19,
+   "read_bytes": 9043968,
+   "majflt": 68,
+   "smaps_kB": {
+    "Rss": 13854064,
+    "Pss_Anon": 2040352,
+    "Pss_File": 11812164,
+    "Swap": 22416
+   },
+   "mem_available_kB": 13910928,
+   "temp_c": 78.75,
+   "read_MB_per_request_token": 0.089,
+   "output_head": "<|channel>thought\n<channel|>הוא זול מאוד וצורך מעט אנרגיה.\nהוא קטן וקל להטמעה בפרויקטים של אלקטרוניקה.\nהוא מאפשר לל"
+  },
+  {
+   "id": "de_short",
+   "lang": "de",
+   "wall_s": 244.9,
+   "prompt_n": 46,
+   "prompt_tok_s": 0.6164839278753473,
+   "gen_n": 48,
+   "gen_tok_s": 0.2760878006199639,
+   "draft_n": 72,
+   "draft_n_accepted": 22,
+   "read_bytes": 851968,
+   "majflt": 52,
+   "smaps_kB": {
+    "Rss": 13959104,
+    "Pss_Anon": 2145392,
+    "Pss_File": 11812164,
+    "Swap": 39936
+   },
+   "mem_available_kB": 13805344,
+   "temp_c": 79.3,
+   "read_MB_per_request_token": 0.009,
+   "output_head": "<|channel>thought\n<channel|>Ein Raspberry Pi ist kostengünstig und bietet einen einfachen Einstieg in die Welt der Informatik. Er ermöglicht Schülern das praktische Erlernen von Programmierung und Hardware-Steuerung. Durch seine Flexibilitä"
+  },
+  {
+   "id": "code_short",
+   "lang": "code",
+   "wall_s": 192.0,
+   "prompt_n": 48,
+   "prompt_tok_s": 0.6162917177814309,
+   "gen_n": 48,
+   "gen_tok_s": 0.4120193513742406,
+   "draft_n": 48,
+   "draft_n_accepted": 30,
+   "read_bytes": 589824,
+   "majflt": 36,
+   "smaps_kB": {
+    "Rss": 14076800,
+    "Pss_Anon": 2263088,
+    "Pss_File": 11812164,
+    "Swap": 39360
+   },
+   "mem_available_kB": 13676944,
+   "temp_c": 78.2,
+   "read_MB_per_request_token": 0.006,
+   "output_head": "<|channel>thought\n<channel|>```python\ndef is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n"
+  }
+ ],
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/31b-iq3xxs/gemma-4-31B-it-UD-IQ3_XXS-00001-of-00004.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080 -md /mnt/usb/pigemma/models/31b-iq3xxs/mtp-gemma-4-31B-it-Q4_0.gguf --spec-type draft-mtp",
+ "load_s": 16.1,
+ "load_read_bytes": 294455808,
+ "load_majflt": 105,
+ "after_load_smaps_kB": {
+  "Rss": 13610144,
+  "Pss_Anon": 1796112,
+  "Pss_File": 11812484,
+  "Swap": 5216
+ },
+ "throttled_end": "throttled=0x80000",
+ "temp_end_c": 74.9,
+ "finished": "2026-10-05T16:01:50+0200"
+}

@@ -1,0 +1,155 @@
+{
+ "label": "26b-qat-q4_0-usb-cold",
+ "started": "2026-10-05T13:49:42+0200",
+ "host": "context-friend-1",
+ "kernel": "6.18.50+rpt-rpi-2712",
+ "page_size": 16384,
+ "model": {
+  "path": "/mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00001-of-00005.gguf",
+  "bytes": 3407775616,
+  "sha256_first_MiB": "8aca95927c663898"
+ },
+ "threads": 4,
+ "ctx": 4096,
+ "n_predict": 96,
+ "extra": "",
+ "balloon_gib": 0.0,
+ "meminfo_start_kB": {
+  "MemTotal": 16607552,
+  "MemAvailable": 15811264,
+  "Cached": 5330528,
+  "SwapFree": 1755168
+ },
+ "throttled_start": "throttled=0x0",
+ "temp_start_c": 49.6,
+ "requests": [
+  {
+   "id": "en_short",
+   "lang": "en",
+   "wall_s": 79.7,
+   "prompt_n": 52,
+   "prompt_tok_s": 0.9511581044999362,
+   "gen_n": 60,
+   "gen_tok_s": 2.3555286413119165,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 2422849536,
+   "majflt": 4732,
+   "smaps_kB": {
+    "Rss": 13071888,
+    "Pss_Anon": 500592,
+    "Pss_File": 12569780,
+    "Swap": 56544
+   },
+   "mem_available_kB": 15402672,
+   "temp_c": 58.4,
+   "read_MB_per_request_token": 21.633,
+   "output_head": "<|channel>thought\n<channel|>A mixture-of-experts model only activates a small subset of its total parameters for each input. This sparse activation significantly reduces the number of computations required per token. Consequently, the model"
+  },
+  {
+   "id": "he_short",
+   "lang": "he",
+   "wall_s": 28.2,
+   "prompt_n": 54,
+   "prompt_tok_s": 5.119029765641338,
+   "gen_n": 66,
+   "gen_tok_s": 3.6779877581855462,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 325632000,
+   "majflt": 1284,
+   "smaps_kB": {
+    "Rss": 13508928,
+    "Pss_Anon": 549248,
+    "Pss_File": 12958164,
+    "Swap": 52784
+   },
+   "mem_available_kB": 15364336,
+   "temp_c": 62.8,
+   "read_MB_per_request_token": 2.714,
+   "output_head": "<|channel>thought\n<channel|>היתרון המרכזי הוא הגודל הקטן והחיסכון במקום.\nהוא צורך מעט מאוד חשמל ופועל בצורה שקטה.\nבנוסף, הוא זול מאוד ומתאים לפרויקטים של למידה."
+  },
+  {
+   "id": "de_short",
+   "lang": "de",
+   "wall_s": 20.4,
+   "prompt_n": 46,
+   "prompt_tok_s": 9.334243219128867,
+   "gen_n": 65,
+   "gen_tok_s": 4.143291596575984,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 50331648,
+   "majflt": 354,
+   "smaps_kB": {
+    "Rss": 13605504,
+    "Pss_Anon": 587392,
+    "Pss_File": 13016596,
+    "Swap": 50880
+   },
+   "mem_available_kB": 15328608,
+   "temp_c": 65.0,
+   "read_MB_per_request_token": 0.453,
+   "output_head": "<|channel>thought\n<channel|>Ein Raspberry Pi ist aufgrund seines geringen Preises sehr erschwinglich für Bildungseinrichtungen. Er eignet sich hervorragend, um Schülern die Grundlagen der Informatik und Programmierung spielerisch zu vermitt"
+  },
+  {
+   "id": "code_short",
+   "lang": "code",
+   "wall_s": 38.5,
+   "prompt_n": 48,
+   "prompt_tok_s": 4.630710932790151,
+   "gen_n": 96,
+   "gen_tok_s": 3.379108876346348,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 409190400,
+   "majflt": 2245,
+   "smaps_kB": {
+    "Rss": 14295664,
+    "Pss_Anon": 604224,
+    "Pss_File": 13689890,
+    "Swap": 58304
+   },
+   "mem_available_kB": 15253328,
+   "temp_c": 65.55,
+   "read_MB_per_request_token": 2.842,
+   "output_head": "<|channel>thought\n<channel|>```python\ndef is_prime(n):\n    if n <= 1:\n        return False\n    if n <= 3:\n        return True\n    if n % 2 == 0 or n % 3 == 0:\n        return False\n    i = 5\n    while i * i <= n:\n        if n % i == 0 or n %"
+  },
+  {
+   "id": "long_summary",
+   "lang": "en",
+   "wall_s": 114.3,
+   "prompt_n": 821,
+   "prompt_tok_s": 10.204988511619206,
+   "gen_n": 96,
+   "gen_tok_s": 2.8122348081077497,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 273563648,
+   "majflt": 5099,
+   "smaps_kB": {
+    "Rss": 14792240,
+    "Pss_Anon": 944944,
+    "Pss_File": 13845780,
+    "Swap": 47808
+   },
+   "mem_available_kB": 14980704,
+   "temp_c": 68.85,
+   "read_MB_per_request_token": 0.298,
+   "output_head": "<|channel>_thought\n<channel|>A Mixture-of-Experts (MoE) transformer uses a router to send each token to only a small subset of available \"experts,\" significantly reducing the number of parameters activated per token compared to dense models"
+  }
+ ],
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00001-of-00005.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+ "load_s": 125.1,
+ "load_read_bytes": 15673972224,
+ "load_majflt": 1670,
+ "after_load_smaps_kB": {
+  "Rss": 13095536,
+  "Pss_Anon": 514928,
+  "Pss_File": 12579092,
+  "Swap": 3440
+ },
+ "throttled_end": "throttled=0x0",
+ "temp_end_c": 66.65,
+ "finished": "2026-10-05T13:56:29+0200"
+}

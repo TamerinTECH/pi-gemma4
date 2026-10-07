@@ -1,0 +1,17 @@
+=== base 2026-10-05T15:31:27+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 0.6168874920236151, "gen_n": 48, "gen_tok_s": 0.5082685671210494, "draft_n": null, "draft_n_accepted": null, "read_bytes": 1671168, "majflt": 85, "wall_s": 176.8}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 0.6156138903424534, "gen_n": 48, "gen_tok_s": 0.5088884679430852, "draft_n": null, "draft_n_accepted": null, "read_bytes": 655360, "majflt": 40, "wall_s": 180.1}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 0.6154266702265085, "gen_n": 48, "gen_tok_s": 0.5081579625244315, "draft_n": null, "draft_n_accepted": null, "read_bytes": 950272, "majflt": 58, "wall_s": 167.3}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 0.6169311906953203, "gen_n": 48, "gen_tok_s": 0.5076495880239975, "draft_n": null, "draft_n_accepted": null, "read_bytes": 442368, "majflt": 27, "wall_s": 170.4}
+RUN_DONE /home/pi/pigemma/results/31b-iq3xxs-base/run.json
+=== mtp 2026-10-05T15:45:17+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 0.6161094079503754, "gen_n": 48, "gen_tok_s": 0.2652486496431099, "draft_n": 75, "draft_n_accepted": 21, "read_bytes": 1163264, "majflt": 72, "wall_s": 261.6}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 0.6156392339496125, "gen_n": 48, "gen_tok_s": 0.24771442595528567, "draft_n": 80, "draft_n_accepted": 19, "read_bytes": 9043968, "majflt": 68, "wall_s": 277.5}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 0.6164839278753473, "gen_n": 48, "gen_tok_s": 0.2760878006199639, "draft_n": 72, "draft_n_accepted": 22, "read_bytes": 851968, "majflt": 52, "wall_s": 244.9}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 0.6162917177814309, "gen_n": 48, "gen_tok_s": 0.4120193513742406, "draft_n": 48, "draft_n_accepted": 30, "read_bytes": 589824, "majflt": 36, "wall_s": 192.0}
+RUN_DONE /home/pi/pigemma/results/31b-iq3xxs-mtp/run.json
+4.37.717.881 I slot print_timing: id  0 | task 0 | draft acceptance = 0.28000 (   21 accepted /    75 generated), mean len =  1.84
+9.15.272.851 I slot print_timing: id  0 | task 29 | draft acceptance = 0.23750 (   19 accepted /    80 generated), mean len =  1.70
+13.20.235.358 I slot print_timing: id  0 | task 60 | draft acceptance = 0.30556 (   22 accepted /    72 generated), mean len =  1.88
+16.32.298.618 I slot print_timing: id  0 | task 88 | draft acceptance = 0.62500 (   30 accepted /    48 generated), mean len =  2.88
+=== AB_31B_DONE 2026-10-05T16:01:50+02:00

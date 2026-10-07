@@ -1,0 +1,956 @@
+{
+ "stage": "X4-resident-bottleneck-pi",
+ "kind": "analysis of existing raw results (no new Pi measurement)",
+ "per_token_bytes": {
+  "ud_q3_k_m": {
+   "file": "gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+   "file_bytes": 12728497888,
+   "source": "results/maps/map26_ud_q3_k_m.json",
+   "tag": "computed",
+   "bytes_per_decoded_token": 3044428856,
+   "expert_bytes_per_token": 644549568,
+   "nonexpert_bytes_per_token": 2399879288,
+   "by_kind": {
+    "attn": 1179566080,
+    "output_head(token_embd)": 605552640,
+    "ffn_dense": 568719360,
+    "expert_gate_up": 368986112,
+    "expert_down": 275562496,
+    "router": 43591680,
+    "norm": 2448504,
+    "other": 1024,
+    "expert_scale": 960
+   },
+   "by_type": {
+    "Q8_0": 1765136384,
+    "Q6_K": 605552640,
+    "IQ3_XXS": 352135168,
+    "IQ4_NL": 258711552,
+    "F32": 46042168,
+    "IQ4_XS": 16850944
+   },
+   "weights_per_token_by_type": {
+    "Q8_0": 1661304832,
+    "IQ3_XXS": 919863296,
+    "Q6_K": 738197504,
+    "IQ4_NL": 459931648,
+    "IQ4_XS": 31719424,
+    "F32": 11510542
+   },
+   "weights_per_token": 3822527246,
+   "expert_layer_types": [
+    [
+     "IQ3_XXS",
+     "IQ4_NL"
+    ],
+    [
+     "IQ4_XS",
+     "Q8_0"
+    ]
+   ],
+   "expert_bytes_per_layer_min_max": [
+    21063712,
+    33701920
+   ],
+   "kv_bytes_per_context_token_f16": 225280,
+   "note": "prefill reads the output head once per request (logits only for the last prompt token) and each weight row once per micro-batch; decode reads everything listed here for every token"
+  },
+  "qat_q4_0": {
+   "file": "gemma-4-26B_q4_0-it (5 split parts on the USB stick)",
+   "file_bytes": 14439364160,
+   "source": "results/maps/map26_qat_q4_0_split5.json",
+   "tag": "computed",
+   "bytes_per_decoded_token": 2380055608,
+   "expert_bytes_per_token": 802898880,
+   "nonexpert_bytes_per_token": 1577156728,
+   "by_kind": {
+    "expert(gate_up+down+scale)": 802898880,
+    "attn": 624476160,
+    "output_head(token_embd)": 605552640,
+    "ffn_dense": 301086720,
+    "router": 43591680,
+    "norm": 2448504,
+    "other": 1024
+   },
+   "by_type": {
+    "Q4_0": 1728460800,
+    "Q6_K": 605552640,
+    "F32": 46042168
+   },
+   "weights_per_token_by_type": {
+    "Q4_0": 3072819200,
+    "Q6_K": 738197504,
+    "F32": 11510542
+   },
+   "weights_per_token": 3822527246,
+   "expert_types": [
+    "Q4_0"
+   ]
+  }
+ },
+ "zero_read_audit": {
+  "tag": "measured (process /proc/<pid>/io read_bytes and major faults per request)",
+  "qat_q4_0_usb_cold_run_1350": {
+   "requests": 5,
+   "zero_read_requests": 0,
+   "decoded_tokens_total": 383,
+   "decoded_tokens_in_zero_read_requests": 0,
+   "prefill_tokens_in_zero_read_requests": 0,
+   "longest_single_generation_with_zero_reads": 0,
+   "read_bytes_min_max": [
+    50331648,
+    2422849536
+   ],
+   "nonzero_requests": [
+    {
+     "run": "26b-qat-q4_0-usb-cold",
+     "id": "en_short",
+     "read_bytes": 2422849536,
+     "majflt": 4732,
+     "gen_tok_s": 2.3555286413119165
+    },
+    {
+     "run": "26b-qat-q4_0-usb-cold",
+     "id": "he_short",
+     "read_bytes": 325632000,
+     "majflt": 1284,
+     "gen_tok_s": 3.6779877581855462
+    },
+    {
+     "run": "26b-qat-q4_0-usb-cold",
+     "id": "de_short",
+     "read_bytes": 50331648,
+     "majflt": 354,
+     "gen_tok_s": 4.143291596575984
+    },
+    {
+     "run": "26b-qat-q4_0-usb-cold",
+     "id": "code_short",
+     "read_bytes": 409190400,
+     "majflt": 2245,
+     "gen_tok_s": 3.379108876346348
+    },
+    {
+     "run": "26b-qat-q4_0-usb-cold",
+     "id": "long_summary",
+     "read_bytes": 273563648,
+     "majflt": 5099,
+     "gen_tok_s": 2.8122348081077497
+    }
+   ]
+  },
+  "ud_q3_k_m_morning_base_runs": {
+   "requests": 13,
+   "zero_read_requests": 13,
+   "decoded_tokens_total": 969,
+   "decoded_tokens_in_zero_read_requests": 969,
+   "prefill_tokens_in_zero_read_requests": 1421,
+   "longest_single_generation_with_zero_reads": 96,
+   "read_bytes_min_max": [
+    0,
+    0
+   ],
+   "nonzero_requests": []
+  },
+  "ud_q3_k_m_morning_mtp_runs": {
+   "requests": 8,
+   "zero_read_requests": 8,
+   "decoded_tokens_total": 586,
+   "decoded_tokens_in_zero_read_requests": 586,
+   "prefill_tokens_in_zero_read_requests": 400,
+   "longest_single_generation_with_zero_reads": 96,
+   "read_bytes_min_max": [
+    0,
+    0
+   ],
+   "nonzero_requests": []
+  },
+  "ud_q3_k_m_p1_reference_1854": {
+   "requests": 6,
+   "zero_read_requests": 2,
+   "decoded_tokens_total": 288,
+   "decoded_tokens_in_zero_read_requests": 96,
+   "prefill_tokens_in_zero_read_requests": 106,
+   "longest_single_generation_with_zero_reads": 48,
+   "read_bytes_min_max": [
+    0,
+    42860544
+   ],
+   "nonzero_requests": [
+    {
+     "run": "p1-resident-ref-26b-q3km",
+     "id": "en_short_legacy_a",
+     "read_bytes": 42860544,
+     "majflt": 3193,
+     "gen_tok_s": 2.981454654263223
+    },
+    {
+     "run": "p1-resident-ref-26b-q3km",
+     "id": "he_short_legacy_a",
+     "read_bytes": 17498112,
+     "majflt": 1368,
+     "gen_tok_s": 2.97902991123505
+    },
+    {
+     "run": "p1-resident-ref-26b-q3km",
+     "id": "en_short_canonical",
+     "read_bytes": 1884160,
+     "majflt": 148,
+     "gen_tok_s": 2.9708665448822087
+    },
+    {
+     "run": "p1-resident-ref-26b-q3km",
+     "id": "he_short_canonical",
+     "read_bytes": 1900544,
+     "majflt": 137,
+     "gen_tok_s": 3.0144792493510537
+    }
+   ]
+  },
+  "ud_q3_k_m_x2_ours_nr": {
+   "requests": 16,
+   "zero_read_requests": 16,
+   "decoded_tokens_total": 969,
+   "decoded_tokens_in_zero_read_requests": 969,
+   "prefill_tokens_in_zero_read_requests": 4413,
+   "longest_single_generation_with_zero_reads": 80,
+   "read_bytes_min_max": [
+    0,
+    0
+   ],
+   "nonzero_requests": []
+  },
+  "ud_q3_k_m_x2_ours_default_repack": {
+   "requests": 2,
+   "zero_read_requests": 0,
+   "decoded_tokens_total": 138,
+   "decoded_tokens_in_zero_read_requests": 0,
+   "prefill_tokens_in_zero_read_requests": 0,
+   "longest_single_generation_with_zero_reads": 0,
+   "read_bytes_min_max": [
+    1365426176,
+    2337394688
+   ],
+   "nonzero_requests": [
+    {
+     "run": "tune2-oursrepack-t4",
+     "id": "tun-01",
+     "read_bytes": 1365426176,
+     "majflt": 8295,
+     "gen_tok_s": 2.20667945611623
+    },
+    {
+     "run": "tune2-oursrepack-t4",
+     "id": "tun-06",
+     "read_bytes": 2337394688,
+     "majflt": 41323,
+     "gen_tok_s": 2.408152308866323
+    }
+   ]
+  },
+  "ud_q3_k_m_x2_ik": {
+   "requests": 20,
+   "zero_read_requests": 19,
+   "decoded_tokens_total": 1229,
+   "decoded_tokens_in_zero_read_requests": 1165,
+   "prefill_tokens_in_zero_read_requests": 4963,
+   "longest_single_generation_with_zero_reads": 80,
+   "read_bytes_min_max": [
+    0,
+    262144
+   ],
+   "nonzero_requests": [
+    {
+     "run": "eval-r1-2-ik",
+     "id": "ho-13",
+     "read_bytes": 262144,
+     "majflt": 10,
+     "gen_tok_s": 2.833464329406875
+    }
+   ]
+  },
+  "ud_q3_k_m_nr_no_mtp_zero_read_total": {
+   "requests": 29,
+   "decoded_tokens": 1938,
+   "prefill_tokens": 5834,
+   "longest_single_generation": 96,
+   "note": "warm-up requests of the X2 driver are not counted"
+  }
+ },
+ "effective_bandwidth": {
+  "tag": "derived = measured decode tok/s x computed bytes per decoded token (decimal GB/s); KV-cache and activation traffic not included",
+  "ud_q3_k_m": [
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "a7b94df -nr -t 4",
+    "where": "morning series 10:46-10:58 (13 requests, all zero-read)",
+    "context": "short prompts (46-54 tok)",
+    "n": 12,
+    "decode_tok_s_min": 3.149956373104233,
+    "decode_tok_s_max": 3.270343129226215,
+    "decode_tok_s_mean": 3.1990031505482954,
+    "effective_GB_s_min": 9.59,
+    "effective_GB_s_max": 9.96,
+    "effective_GB_s_mean": 9.74
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "a7b94df -nr -t 4",
+    "where": "morning series, 821-token prompt",
+    "context": "821-917 tok",
+    "n": 1,
+    "decode_tok_s_min": 2.5016272426890733,
+    "decode_tok_s_max": 2.5016272426890733,
+    "decode_tok_s_mean": 2.5016272426890733,
+    "effective_GB_s_min": 7.62,
+    "effective_GB_s_max": 7.62,
+    "effective_GB_s_mean": 7.62
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "a7b94df -nr -t 4",
+    "where": "P1 reference rerun 18:54 (6 requests, 2 zero-read)",
+    "context": "short prompts (39-54 tok)",
+    "n": 6,
+    "decode_tok_s_min": 2.9399316909999187,
+    "decode_tok_s_max": 3.0144792493510537,
+    "decode_tok_s_mean": 2.9788868697841875,
+    "effective_GB_s_min": 8.95,
+    "effective_GB_s_max": 9.18,
+    "effective_GB_s_mean": 9.07
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "a7b94df -nr -t 4",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "short prompts (30-40 tok)",
+    "n": 10,
+    "decode_tok_s_min": 3.0702,
+    "decode_tok_s_max": 3.1968,
+    "decode_tok_s_mean": 3.10853,
+    "effective_GB_s_min": 9.35,
+    "effective_GB_s_max": 9.73,
+    "effective_GB_s_mean": 9.46
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "a7b94df -nr -t 4",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "long prompt (687-884 tok)",
+    "n": 4,
+    "decode_tok_s_min": 2.3998,
+    "decode_tok_s_max": 2.511,
+    "decode_tok_s_mean": 2.4411,
+    "effective_GB_s_min": 7.31,
+    "effective_GB_s_max": 7.64,
+    "effective_GB_s_mean": 7.43
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "a7b94df -nr -t 3",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "short prompts (30-40 tok)",
+    "n": 1,
+    "decode_tok_s_min": 3.1798,
+    "decode_tok_s_max": 3.1798,
+    "decode_tok_s_mean": 3.1798,
+    "effective_GB_s_min": 9.68,
+    "effective_GB_s_max": 9.68,
+    "effective_GB_s_mean": 9.68
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "a7b94df -nr -t 3",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "long prompt (687-884 tok)",
+    "n": 1,
+    "decode_tok_s_min": 2.6179,
+    "decode_tok_s_max": 2.6179,
+    "decode_tok_s_mean": 2.6179,
+    "effective_GB_s_min": 7.97,
+    "effective_GB_s_max": 7.97,
+    "effective_GB_s_mean": 7.97
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "ik_llama.cpp 3d27f5bb -t 4 --swa-compress",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "short prompts (30-40 tok)",
+    "n": 10,
+    "decode_tok_s_min": 3.0129,
+    "decode_tok_s_max": 3.102,
+    "decode_tok_s_mean": 3.04238,
+    "effective_GB_s_min": 9.17,
+    "effective_GB_s_max": 9.44,
+    "effective_GB_s_mean": 9.26
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "ik_llama.cpp 3d27f5bb -t 4 --swa-compress",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "long prompt (687-884 tok)",
+    "n": 3,
+    "decode_tok_s_min": 2.7612,
+    "decode_tok_s_max": 2.7903,
+    "decode_tok_s_mean": 2.7719,
+    "effective_GB_s_min": 8.41,
+    "effective_GB_s_max": 8.49,
+    "effective_GB_s_mean": 8.44
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "ik_llama.cpp 3d27f5bb -t 3 --swa-compress",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "short prompts (30-40 tok)",
+    "n": 1,
+    "decode_tok_s_min": 3.132,
+    "decode_tok_s_max": 3.132,
+    "decode_tok_s_mean": 3.132,
+    "effective_GB_s_min": 9.54,
+    "effective_GB_s_max": 9.54,
+    "effective_GB_s_mean": 9.54
+   },
+   {
+    "file": "UD-Q3_K_M",
+    "engine": "ik_llama.cpp 3d27f5bb -t 3 --swa-compress",
+    "where": "X2 raw (eval + tune), client-side rate, zero-read",
+    "context": "long prompt (687-884 tok)",
+    "n": 1,
+    "decode_tok_s_min": 2.865,
+    "decode_tok_s_max": 2.865,
+    "decode_tok_s_mean": 2.865,
+    "effective_GB_s_min": 8.72,
+    "effective_GB_s_max": 8.72,
+    "effective_GB_s_mean": 8.72
+   }
+  ],
+  "qat_q4_0": [
+   {
+    "file": "QAT Q4_0",
+    "engine": "a7b94df -nr -t 4",
+    "id": "en_short",
+    "prompt_n": 52,
+    "decode_tok_s": 2.3555286413119165,
+    "prompt_tok_s": 0.9511581044999362,
+    "read_bytes_in_request": 2422849536,
+    "majflt": 4732,
+    "file_pages_resident_GB": 12.87,
+    "effective_GB_s": 5.61,
+    "resident": false
+   },
+   {
+    "file": "QAT Q4_0",
+    "engine": "a7b94df -nr -t 4",
+    "id": "he_short",
+    "prompt_n": 54,
+    "decode_tok_s": 3.6779877581855462,
+    "prompt_tok_s": 5.119029765641338,
+    "read_bytes_in_request": 325632000,
+    "majflt": 1284,
+    "file_pages_resident_GB": 13.27,
+    "effective_GB_s": 8.75,
+    "resident": false
+   },
+   {
+    "file": "QAT Q4_0",
+    "engine": "a7b94df -nr -t 4",
+    "id": "de_short",
+    "prompt_n": 46,
+    "decode_tok_s": 4.143291596575984,
+    "prompt_tok_s": 9.334243219128867,
+    "read_bytes_in_request": 50331648,
+    "majflt": 354,
+    "file_pages_resident_GB": 13.33,
+    "effective_GB_s": 9.86,
+    "resident": false
+   },
+   {
+    "file": "QAT Q4_0",
+    "engine": "a7b94df -nr -t 4",
+    "id": "code_short",
+    "prompt_n": 48,
+    "decode_tok_s": 3.379108876346348,
+    "prompt_tok_s": 4.630710932790151,
+    "read_bytes_in_request": 409190400,
+    "majflt": 2245,
+    "file_pages_resident_GB": 14.02,
+    "effective_GB_s": 8.04,
+    "resident": false
+   },
+   {
+    "file": "QAT Q4_0",
+    "engine": "a7b94df -nr -t 4",
+    "id": "long_summary",
+    "prompt_n": 821,
+    "decode_tok_s": 2.8122348081077497,
+    "prompt_tok_s": 10.204988511619206,
+    "read_bytes_in_request": 273563648,
+    "majflt": 5099,
+    "file_pages_resident_GB": 14.18,
+    "effective_GB_s": 6.69,
+    "resident": false
+   }
+  ]
+ },
+ "thread_scaling_existing": {
+  "tag": "measured (X2 tuning blocks, one block per config, resident, zero reads)",
+  "rows": [
+   {
+    "engine": "ours",
+    "configs": [
+     "t4",
+     "t3"
+    ],
+    "prompt": "tun-01",
+    "prompt_n": 30,
+    "decode_tok_s_4t": 3.0925,
+    "decode_tok_s_3t": 3.1798,
+    "decode_3t_over_4t": 1.028,
+    "prefill_tok_s_4t": 8.482939395053316,
+    "prefill_tok_s_3t": 7.050026754851535,
+    "prefill_3t_over_4t": 0.831,
+    "n_blocks_4t": 1,
+    "n_blocks_3t": 1,
+    "cpu_s_4t": 84.84,
+    "cpu_s_3t": 65.95,
+    "total_s_4t": 21.9605,
+    "total_s_3t": 22.1836
+   },
+   {
+    "engine": "ours",
+    "configs": [
+     "t4",
+     "t3"
+    ],
+    "prompt": "tun-06",
+    "prompt_n": 687,
+    "decode_tok_s_4t": 2.511,
+    "decode_tok_s_3t": 2.6179,
+    "decode_3t_over_4t": 1.043,
+    "prefill_tok_s_4t": 9.394336719146185,
+    "prefill_tok_s_3t": 7.3393297330947505,
+    "prefill_3t_over_4t": 0.781,
+    "n_blocks_4t": 1,
+    "n_blocks_3t": 1,
+    "cpu_s_4t": 406.54,
+    "cpu_s_3t": 368.68,
+    "total_s_4t": 104.5962,
+    "total_s_3t": 123.787
+   },
+   {
+    "engine": "ik",
+    "configs": [
+     "t4-swac",
+     "t3-swac"
+    ],
+    "prompt": "tun-01",
+    "prompt_n": 30,
+    "decode_tok_s_4t": 3.102,
+    "decode_tok_s_3t": 3.132,
+    "decode_3t_over_4t": 1.01,
+    "prefill_tok_s_4t": 13.801790644318196,
+    "prefill_tok_s_3t": 11.289557197224426,
+    "prefill_3t_over_4t": 0.818,
+    "n_blocks_4t": 1,
+    "n_blocks_3t": 1,
+    "cpu_s_4t": 58.71,
+    "cpu_s_3t": 46.05,
+    "total_s_4t": 15.0841,
+    "total_s_3t": 15.4281
+   },
+   {
+    "engine": "ik",
+    "configs": [
+     "t4-swac",
+     "t3-swac"
+    ],
+    "prompt": "tun-06",
+    "prompt_n": 687,
+    "decode_tok_s_4t": 2.7903,
+    "decode_tok_s_3t": 2.865,
+    "decode_3t_over_4t": 1.027,
+    "prefill_tok_s_4t": 26.253933934172636,
+    "prefill_tok_s_3t": 21.081147412178684,
+    "prefill_3t_over_4t": 0.803,
+    "n_blocks_4t": 1,
+    "n_blocks_3t": 1,
+    "cpu_s_4t": 211.06,
+    "cpu_s_3t": 179.22,
+    "total_s_4t": 54.4852,
+    "total_s_3t": 60.1681
+   },
+   {
+    "engine": "ik",
+    "configs": [
+     "t4",
+     "t3"
+    ],
+    "prompt": "tun-01",
+    "prompt_n": 30,
+    "decode_tok_s_4t": 3.0444,
+    "decode_tok_s_3t": 3.1385,
+    "decode_3t_over_4t": 1.031,
+    "prefill_tok_s_4t": 15.239620167706939,
+    "prefill_tok_s_3t": 12.31450759825643,
+    "prefill_3t_over_4t": 0.808,
+    "n_blocks_4t": 1,
+    "n_blocks_3t": 1,
+    "cpu_s_4t": 81.04,
+    "cpu_s_3t": 66.17,
+    "total_s_4t": 21.0224,
+    "total_s_3t": 22.1967
+   },
+   {
+    "engine": "ik",
+    "configs": [
+     "t4",
+     "t3"
+    ],
+    "prompt": "tun-06",
+    "prompt_n": 687,
+    "decode_tok_s_4t": 2.8187,
+    "decode_tok_s_3t": 2.884,
+    "decode_3t_over_4t": 1.023,
+    "prefill_tok_s_4t": 26.42965892467451,
+    "prefill_tok_s_3t": 21.286338056421624,
+    "prefill_3t_over_4t": 0.805,
+    "n_blocks_4t": 1,
+    "n_blocks_3t": 1,
+    "cpu_s_4t": 210.36,
+    "cpu_s_3t": 178.04,
+    "total_s_4t": 54.026,
+    "total_s_3t": 59.6722
+   }
+  ],
+  "missing": "1 and 2 threads were never run on the Pi"
+ },
+ "itl_vs_context": {
+  "ours_t4": {
+   "tag": "derived (least squares over 810 inter-token gaps of our -nr -t 4 blocks)",
+   "itl_at_zero_context_s": 0.315,
+   "slope_s_per_context_token": 0.0001092,
+   "slope_ms_per_1000_context_tokens": 109.2,
+   "r2": 0.775,
+   "context_range_tokens": [
+    31,
+    947
+   ],
+   "kv_bytes_per_context_token_f16": 225280,
+   "implied_extra_bytes_per_decoded_token_at_1000_ctx": 225280000,
+   "implied_decode_tok_s_at_context": {
+    "0": 3.175,
+    "100": 3.069,
+    "500": 2.706,
+    "1000": 2.358,
+    "2000": 1.875,
+    "4000": 1.33
+   },
+   "note": "tok/s at contexts above the measured range is an extrapolation, not a measurement"
+  },
+  "ik_t4_swa_compress": {
+   "itl_at_zero_context_s": 0.3265,
+   "slope_ms_per_1000_context_tokens": 38.7,
+   "r2": 0.381,
+   "n_gaps": 808
+  },
+  "per_request": [
+   {
+    "block": "eval-r1-1-ours",
+    "id": "ho-01",
+    "prompt_n": 33,
+    "n_gaps": 46,
+    "itl_mean_s": 0.3128,
+    "itl_median_s": 0.3066
+   },
+   {
+    "block": "eval-r1-1-ours",
+    "id": "ho-03",
+    "prompt_n": 40,
+    "n_gaps": 63,
+    "itl_mean_s": 0.3203,
+    "itl_median_s": 0.3131
+   },
+   {
+    "block": "eval-r1-1-ours",
+    "id": "ho-05",
+    "prompt_n": 36,
+    "n_gaps": 53,
+    "itl_mean_s": 0.3187,
+    "itl_median_s": 0.3123
+   },
+   {
+    "block": "eval-r1-1-ours",
+    "id": "ho-13",
+    "prompt_n": 884,
+    "n_gaps": 63,
+    "itl_mean_s": 0.4167,
+    "itl_median_s": 0.4083
+   },
+   {
+    "block": "eval-r2-2-ours",
+    "id": "ho-01",
+    "prompt_n": 33,
+    "n_gaps": 46,
+    "itl_mean_s": 0.3253,
+    "itl_median_s": 0.3128
+   },
+   {
+    "block": "eval-r2-2-ours",
+    "id": "ho-03",
+    "prompt_n": 40,
+    "n_gaps": 63,
+    "itl_mean_s": 0.3242,
+    "itl_median_s": 0.3152
+   },
+   {
+    "block": "eval-r2-2-ours",
+    "id": "ho-05",
+    "prompt_n": 36,
+    "n_gaps": 53,
+    "itl_mean_s": 0.3257,
+    "itl_median_s": 0.3141
+   },
+   {
+    "block": "eval-r2-2-ours",
+    "id": "ho-13",
+    "prompt_n": 884,
+    "n_gaps": 63,
+    "itl_mean_s": 0.4135,
+    "itl_median_s": 0.4036
+   },
+   {
+    "block": "eval-r3-1-ours",
+    "id": "ho-01",
+    "prompt_n": 33,
+    "n_gaps": 46,
+    "itl_mean_s": 0.3211,
+    "itl_median_s": 0.3139
+   },
+   {
+    "block": "eval-r3-1-ours",
+    "id": "ho-03",
+    "prompt_n": 40,
+    "n_gaps": 63,
+    "itl_mean_s": 0.3234,
+    "itl_median_s": 0.314
+   },
+   {
+    "block": "eval-r3-1-ours",
+    "id": "ho-05",
+    "prompt_n": 36,
+    "n_gaps": 53,
+    "itl_mean_s": 0.3225,
+    "itl_median_s": 0.3159
+   },
+   {
+    "block": "eval-r3-1-ours",
+    "id": "ho-13",
+    "prompt_n": 884,
+    "n_gaps": 63,
+    "itl_mean_s": 0.4107,
+    "itl_median_s": 0.4008
+   },
+   {
+    "block": "tune-ours-t4",
+    "id": "tun-01",
+    "prompt_n": 30,
+    "n_gaps": 56,
+    "itl_mean_s": 0.3234,
+    "itl_median_s": 0.3141
+   },
+   {
+    "block": "tune-ours-t4",
+    "id": "tun-06",
+    "prompt_n": 687,
+    "n_gaps": 79,
+    "itl_mean_s": 0.3983,
+    "itl_median_s": 0.3906
+   }
+  ]
+ },
+ "thermal": {
+  "tag": "measured (X2 raw: 1 Hz samples of thermal_zone0, scaling_cur_freq, vcgencmd get_throttled)",
+  "per_prompt_ours_t4": [
+   {
+    "prompt": "ho-01",
+    "n": 3,
+    "temp_max_c": [
+     67.75,
+     70.5,
+     69.4
+    ],
+    "decode_tok_s_client": [
+     3.1968,
+     3.0739,
+     3.1146
+    ],
+    "freq_min_khz": [
+     2400000,
+     2400000,
+     2400000
+    ]
+   },
+   {
+    "prompt": "ho-03",
+    "n": 3,
+    "temp_max_c": [
+     69.4,
+     72.7,
+     72.15
+    ],
+    "decode_tok_s_client": [
+     3.1217,
+     3.0847,
+     3.0923
+    ],
+    "freq_min_khz": [
+     2400000,
+     2400000,
+     2400000
+    ]
+   },
+   {
+    "prompt": "ho-05",
+    "n": 3,
+    "temp_max_c": [
+     71.05,
+     72.7,
+     73.25
+    ],
+    "decode_tok_s_client": [
+     3.1375,
+     3.0702,
+     3.1011
+    ],
+    "freq_min_khz": [
+     2400000,
+     2400000,
+     2400000
+    ]
+   },
+   {
+    "prompt": "ho-13",
+    "n": 3,
+    "temp_max_c": [
+     76.0,
+     77.65,
+     77.1
+    ],
+    "decode_tok_s_client": [
+     2.3998,
+     2.4185,
+     2.4351
+    ],
+    "freq_min_khz": [
+     2400000,
+     2400000,
+     2400000
+    ]
+   },
+   {
+    "prompt": "tun-01",
+    "n": 1,
+    "temp_max_c": [
+     64.45
+    ],
+    "decode_tok_s_client": [
+     3.0925
+    ],
+    "freq_min_khz": [
+     2400000
+    ]
+   },
+   {
+    "prompt": "tun-06",
+    "n": 1,
+    "temp_max_c": [
+     73.25
+    ],
+    "decode_tok_s_client": [
+     2.511
+    ],
+    "freq_min_khz": [
+     2400000
+    ]
+   }
+  ],
+  "temp_max_over_all_x2_requests_c": 77.65,
+  "freq_min_over_all_x2_requests_khz": 1600000,
+  "throttled_values": [
+   "throttled=0x80000"
+  ],
+  "morning_series_throttled": "0x0 at the start and end of every run; temp 46-74 C",
+  "note": "0x80000 = sticky 'soft temperature limit has occurred' bit; no live bit (0x1-0x8) in any sample"
+ },
+ "cross_file": {
+  "bytes_per_token_ratio_ud_over_qat": 1.279,
+  "weights_per_token_ud": 3822527246,
+  "weights_per_token_qat": 3822527246,
+  "decode_ratio_qat_over_ud_measured": [
+   1.267,
+   1.315
+  ],
+  "qat_decode_used": {
+   "tok_s": 4.143291596575984,
+   "caveat": "least-disturbed QAT request (de_short); it still read 50.3 MB from the USB stick (354 major faults) - an upper bound on the damage is 0.72 s of 15.7 s"
+  },
+  "prefill_ratio_qat_over_ud_measured_821_tok_prompt": 1.106,
+  "prefill_caveat": "the QAT 821-token request read 0.27 GB from the stick during the request",
+  "prediction_if_bandwidth_bound": "decode ratio = byte ratio",
+  "prediction_if_kernel_bound": "decode ratio = prefill (compute) ratio"
+ },
+ "repack_existing": [
+  {
+   "source": "results/comparisons/ik_llama_pi/raw/tune2/tune2-oursrepack-t4/block.json",
+   "block": "tune2-oursrepack-t4",
+   "engine": "ours-repack",
+   "config": "t4",
+   "started": "2026-10-05T23:07:04+0200",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -c 4096 -np 1 -b 2048 -ub 512 --cache-ram 0 -t 4 --host 127.0.0.1 --port 18092",
+   "id": "tun-01",
+   "prompt_n": 30,
+   "prompt_tok_s": 2.2797903048877566,
+   "gen_n": 58,
+   "gen_tok_s": 2.20667945611623,
+   "decode_tok_s_client": 2.2116,
+   "ttft_s": 13.16,
+   "itl_median_s": 0.4144,
+   "itl_max_s": 0.7944,
+   "read_bytes": 1365426176,
+   "majflt": 8295,
+   "cpu_s": 83.59,
+   "total_s": 38.9911,
+   "temp_max_c": 65.55,
+   "freq_min_khz": 1600000,
+   "throttled_after": "throttled=0x80000",
+   "RssAnon_max_kB": 7066704,
+   "MemAvailable_min_kB": 8732192
+  },
+  {
+   "source": "results/comparisons/ik_llama_pi/raw/tune2/tune2-oursrepack-t4/block.json",
+   "block": "tune2-oursrepack-t4",
+   "engine": "ours-repack",
+   "config": "t4",
+   "started": "2026-10-05T23:07:04+0200",
+   "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -c 4096 -np 1 -b 2048 -ub 512 --cache-ram 0 -t 4 --host 127.0.0.1 --port 18092",
+   "id": "tun-06",
+   "prompt_n": 687,
+   "prompt_tok_s": 7.6541106718892,
+   "gen_n": 80,
+   "gen_tok_s": 2.408152308866323,
+   "decode_tok_s_client": 2.4082,
+   "ttft_s": 89.7605,
+   "itl_median_s": 0.4033,
+   "itl_max_s": 0.5608,
+   "read_bytes": 2337394688,
+   "majflt": 41323,
+   "cpu_s": 368.32,
+   "total_s": 122.5692,
+   "temp_max_c": 71.05,
+   "freq_min_khz": 2400000,
+   "throttled_after": "throttled=0x80000",
+   "RssAnon_max_kB": 7210576,
+   "MemAvailable_min_kB": 8512384
+  }
+ ]
+}

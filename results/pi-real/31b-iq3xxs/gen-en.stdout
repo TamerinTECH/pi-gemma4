@@ -1,0 +1,5 @@
+<start_of_turn>user
+In three short sentences: why is a mixture-of-experts model faster to run than a dense model of the same size?<end_of_turn>
+<start_of_turn>model<|channel>thought
+<channel|>A mixture-of-experts model only activates a small subset of its parameters for each token. This significantly reduces the number of floating-point operations required per forward pass. Consequently, it achieves the performance of a large model
+

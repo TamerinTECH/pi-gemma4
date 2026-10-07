@@ -1,0 +1,2 @@
+<|channel>thought
+<channel|>Ein Raspberry Pi ist aufgrund seines geringen Preises sehr erschwinglich für Bildungseinrichtungen. Er eignet sich hervorragend, um Schülern die Grundlagen der Informatik und Programmierung spielerisch zu vermitteln. Zudem ermöglicht das kleine Gerät den Aufbau eigener Computer und technischer Projekte im Unterricht.

@@ -1,0 +1,2 @@
+<|channel>thought
+<channel|>A mixture-of-experts model only activates a small subset of its total parameters for each token processed. This sparse activation significantly reduces the number of floating-point operations required compared to a dense model. Consequently, the model

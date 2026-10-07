@@ -1,0 +1,2 @@
+<|channel>thought
+<channel|>A mixture-of-experts model only activates a small fraction of its total parameters for any given input. This selective activation significantly reduces the number of floating-point operations required per token. Consequently, the model achieves much higher computational efficiency than a dense model that must process every parameter every time.

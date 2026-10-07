@@ -1,0 +1,2 @@
+<|channel>of_thought
+<channel|>חם

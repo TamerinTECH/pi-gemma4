@@ -1,0 +1,58 @@
+=== attribution of the one differing answer 2026-10-07T00:03:34+02:00
+AB_DONE /home/pi/pigemma/results/fast3/attrib/ref/ab.json
+AB_DONE /home/pi/pigemma/results/fast3/attrib/fast/ab.json
+=== ATTRIB_DONE 2026-10-07T00:09:34+02:00
+=== profile26 2026-10-07T00:09:34+02:00
+[health 00:09:34] active active active active  temp=61.5'C throttled=0x0 memavail=15808368kB swapfree=1355680kB pswpin 32008 pswpout 197934 
+e2b_repack_b4 rc=0
+/home/pi/pigemma/results/fast3/profile26/stderr_e2b_repack_b4.txt:PIGEMMA_SUMMARY {"mode":"run","exit_code":0,"n_prompt":102,"n_gen":22,"n_records":0,"n_chunks":2,"t_load_ms":2184.521,"t_p_eval_ms":2907.297,"t_eval_ms":2858.471,"tok_s_prompt":35.084,"tok_s_gen":7.696,"callback_ms":0.0,"t_prefill_wal
+[health 00:09:44] active active active active  temp=67.0'C throttled=0x0 memavail=15642608kB swapfree=1355680kB pswpin 32008 pswpout 197934 
+e2b_norepack_b4 rc=0
+/home/pi/pigemma/results/fast3/profile26/stderr_e2b_norepack_b4.txt:PIGEMMA_SUMMARY {"mode":"run","exit_code":0,"n_prompt":102,"n_gen":25,"n_records":0,"n_chunks":2,"t_load_ms":1096.927,"t_p_eval_ms":6667.028,"t_eval_ms":3598.313,"tok_s_prompt":15.299,"tok_s_gen":6.948,"callback_ms":0.0,"t_prefill_w
+[health 00:09:57] active active active active  temp=68.6'C throttled=0x0 memavail=15772496kB swapfree=1355680kB pswpin 32008 pswpout 197934 
+26b_norepack_b4 rc=0
+/home/pi/pigemma/results/fast3/profile26/stderr_26b_norepack_b4.txt:PIGEMMA_SUMMARY {"mode":"run","exit_code":0,"n_prompt":110,"n_gen":26,"n_records":0,"n_chunks":2,"t_load_ms":132892.607,"t_p_eval_ms":162177.27,"t_eval_ms":22530.875,"tok_s_prompt":0.678,"tok_s_gen":1.154,"callback_ms":0.0,"t_prefil
+[health 00:14:36] active active active active  temp=58.2'C throttled=0x0 memavail=15812736kB swapfree=1349280kB pswpin 38918 pswpout 205429 
+=== PROFILE26_DONE 2026-10-07T00:14:36+02:00
+=== fresh build of patch v7 from the pinned source + patch file 2026-10-07T00:14:36+02:00
+ 2.7G
+-rwxr-xr-x 1 pi pi  9894608 Oct  7 00:21 llama-bench
+-rwxr-xr-x 1 pi pi  9816608 Oct  7 00:21 llama-completion
+-rwxr-xr-x 1 pi pi 16153624 Oct  7 00:21 llama-server
+-rwxr-xr-x 1 pi pi    23343 Oct  7 00:21 pigemma-fast-v7.patch
+-rwxr-xr-x 1 pi pi      328 Oct  7 00:21 SHA256SUMS
+FAST_BUILD_DONE
+--- binaries: in-place upgraded tree (bin-v7) vs fresh tree (bin-v7-fresh)
+ae5111952a89f947e97f08d5d12e43d9b100acd60b1cf205f3237c06f1317341  bin-v7/llama-server
+36fad6268cd103a6865b50cd69ec4deaf916b2600100e275a34b8d2e11e6d67c  bin-v7-fresh/llama-server
+3b8a4c0bb3cd3c80db47a00ebd6f81aeb6684c3d0d0c6049654c19e161c9fd45  bin-v7/llama-bench
+6aac16f64514d67c39368d72c0d562dcca30d91323f2856527a56dac58d16ef7  bin-v7-fresh/llama-bench
+SOURCES_IDENTICAL: upgraded tree == fresh tree
+=== compare REF vs OFF --require-kv-equal --tol-kl 0 --tol-abs 0
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs S --require-kv-equal
+SUMMARY float=140 bit_identical=137 argmax_different=0 over_tolerance=0 worst_max_abs=5.821e-01 (s3.n513.511+2.last) worst_kl=2.865e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs P 
+SUMMARY float=140 bit_identical=126 argmax_different=0 over_tolerance=0 worst_max_abs=5.722e-06 (s5.unified.seq1.last) worst_kl=4.639e-13 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs C --require-kv-equal
+SUMMARY float=140 bit_identical=140 argmax_different=0 over_tolerance=0 worst_max_abs=0.000e+00 () worst_kl=0.000e+00 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== compare REF vs SPC 
+SUMMARY float=140 bit_identical=123 argmax_different=0 over_tolerance=0 worst_max_abs=5.821e-01 (s3.n513.511+2.last) worst_kl=2.865e-04 | kv=32 kv_different=0 | token_seqs=3 different=0 | missing=0 | PASS
+=== FASTCHECK_DONE 2026-10-07T00:29:12+02:00
+=== upstream-style patches on master 2026-10-07T00:29:12+02:00
+[health 00:29:12] active active active active  temp=65.3'C throttled=0x0 free= 2.3G
+01b7c4d3d5b85eb2714ed83c6d678ca90cb0a48ede54191b790301737d547a10
+cmake ref FAILED
+CMake Error: The source directory "/mnt/pigemma-fast/up/ref" does not appear to contain CMakeLists.txt.
+Specify --help for usage, or press the help button on the CMake GUI.
+=== draft length sweep 2026-10-07T00:29:20+02:00
+--- draftlen/n7_p00 00:29:20 temp=62.8C throttled=0x0 active active active active 
+AB_DONE /home/pi/pigemma/results/fast3/draftlen/n7_p00/ab.json
+--- draftlen/n7_p70 00:34:22 temp=62.2C throttled=0x0 active active active active 
+AB_DONE /home/pi/pigemma/results/fast3/draftlen/n7_p70/ab.json
+--- draftlen/n7_p90 00:38:42 temp=62.2C throttled=0x0 active active active active 
+AB_DONE /home/pi/pigemma/results/fast3/draftlen/n7_p90/ab.json
+--- draftlen/n15_p90 00:43:07 temp=60.6C throttled=0x0 active active active active 
+AB_DONE /home/pi/pigemma/results/fast3/draftlen/n15_p90/ab.json
+=== DRAFTLEN_DONE 2026-10-07T00:47:40+02:00
+=== PHASE_C_DONE 2026-10-07T00:47:40+02:00

@@ -1,0 +1,25 @@
+[09:14:42] model=models/gemma-4-31B-it-UD-IQ3_XXS.gguf size=11837782976 threads=4 ngen=48
+[09:14:42] free_root=3292839936 memavail=15851440 kB
+[09:14:43] cold load + 8 tokens (-nr)
+[09:17:20] cold rc=0 wall_s=157 peak_rss_kB=12583920
+load time =  138054.62 ms
+prompt eval time =    3519.36 ms /     2 tokens ( 1759.68 ms per token,     0.57 tokens per second)
+eval time =   13045.73 ms /     7 runs   ( 1863.68 ms per token,     0.54 tokens per second)
+[09:17:20] llama-bench --repack 0
+| model                          |       size |     params | backend    | threads | rpk |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --: | --------------: | -------------------: |
+| gemma4 31B IQ3_XXS - 3.0625 bpw |  11.01 GiB |    30.70 B | CPU        |       4 |   0 |            pp64 |          0.63 ± 0.00 |
+| gemma4 31B IQ3_XXS - 3.0625 bpw |  11.01 GiB |    30.70 B | CPU        |       4 |   0 |            tg32 |          0.53 ± 0.00 |
+
+build: a7b94df (1)
+[09:24:31] llama-bench --repack 1 (default)
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| gemma4 31B IQ3_XXS - 3.0625 bpw |  11.01 GiB |    30.70 B | CPU        |       4 |            pp64 |          0.63 ± 0.00 |
+| gemma4 31B IQ3_XXS - 3.0625 bpw |  11.01 GiB |    30.70 B | CPU        |       4 |            tg32 |          0.53 ± 0.00 |
+
+build: a7b94df (1)
+[09:34:38] gen en: prompt eval time =   81473.92 ms /    51 tokens ( 1597.53 ms per token,     0.63 tokens per second) eval time =   88385.89 ms /    47 runs   ( 1880.55 ms per token,     0.53 tokens per second) 
+[09:37:38] gen he: prompt eval time =   84575.29 ms /    53 tokens ( 1595.76 ms per token,     0.63 tokens per second) eval time =   88756.11 ms /    47 runs   ( 1888.43 ms per token,     0.53 tokens per second) 
+[09:37:38] free_root=3292450816
+[09:37:38] BENCH_DONE

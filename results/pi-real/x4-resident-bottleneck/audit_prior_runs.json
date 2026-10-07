@@ -1,0 +1,844 @@
+[
+ {
+  "label": "26b-qat-q4_0-usb-cold",
+  "run_json": "results/pi-real/qat/26b-qat-q4_0-usb-cold/run.json",
+  "started": "2026-10-05T13:49:42+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/26b-qat-q4_0/gemma-4-26B_q4_0-it-00001-of-00005.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 96,
+  "extra": "",
+  "balloon_gib": 0.0,
+  "load_s": 125.1,
+  "load_read_bytes": 15673972224,
+  "load_majflt": 1670,
+  "mem_available_start_kB": 15811264,
+  "after_load_smaps_kB": {
+   "Rss": 13095536,
+   "Pss_Anon": 514928,
+   "Pss_File": 12579092,
+   "Swap": 3440
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   49.6,
+   66.65
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 0.9511581044999362,
+    "gen_n": 60,
+    "gen_tok_s": 2.3555286413119165,
+    "read_bytes": 2422849536,
+    "majflt": 4732,
+    "pss_anon_kB": 500592,
+    "pss_file_kB": 12569780,
+    "temp_c": 58.4,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 5.119029765641338,
+    "gen_n": 66,
+    "gen_tok_s": 3.6779877581855462,
+    "read_bytes": 325632000,
+    "majflt": 1284,
+    "pss_anon_kB": 549248,
+    "pss_file_kB": 12958164,
+    "temp_c": 62.8,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "de_short",
+    "prompt_n": 46,
+    "prompt_tok_s": 9.334243219128867,
+    "gen_n": 65,
+    "gen_tok_s": 4.143291596575984,
+    "read_bytes": 50331648,
+    "majflt": 354,
+    "pss_anon_kB": 587392,
+    "pss_file_kB": 13016596,
+    "temp_c": 65.0,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "code_short",
+    "prompt_n": 48,
+    "prompt_tok_s": 4.630710932790151,
+    "gen_n": 96,
+    "gen_tok_s": 3.379108876346348,
+    "read_bytes": 409190400,
+    "majflt": 2245,
+    "pss_anon_kB": 604224,
+    "pss_file_kB": 13689890,
+    "temp_c": 65.55,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "long_summary",
+    "prompt_n": 821,
+    "prompt_tok_s": 10.204988511619206,
+    "gen_n": 96,
+    "gen_tok_s": 2.8122348081077497,
+    "read_bytes": 273563648,
+    "majflt": 5099,
+    "pss_anon_kB": 944944,
+    "pss_file_kB": 13845780,
+    "temp_c": 68.85,
+    "draft_n": null,
+    "zero_storage_reads": false
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-balloon4",
+  "run_json": "results/pi-real/series-26b/26b-q3km-balloon4/run.json",
+  "started": "2026-10-05T11:00:53+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 48,
+  "extra": "",
+  "balloon_gib": 4.0,
+  "load_s": 68.2,
+  "load_read_bytes": 3140665344,
+  "load_majflt": 22682,
+  "mem_available_start_kB": 15764432,
+  "after_load_smaps_kB": {
+   "Rss": 11499520,
+   "Pss_Anon": 424128,
+   "Pss_File": 11074039,
+   "Swap": 94448
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   69.95,
+   62.25
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 1.552918984485354,
+    "gen_n": 48,
+    "gen_tok_s": 2.0673492232727044,
+    "read_bytes": 1705742336,
+    "majflt": 39631,
+    "pss_anon_kB": 461232,
+    "pss_file_kB": 11016755,
+    "temp_c": 65.55,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 2.9868574951482922,
+    "gen_n": 48,
+    "gen_tok_s": 2.6252980760642695,
+    "read_bytes": 697450496,
+    "majflt": 15203,
+    "pss_anon_kB": 511040,
+    "pss_file_kB": 11002968,
+    "temp_c": 68.85,
+    "draft_n": null,
+    "zero_storage_reads": false
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-balloon6",
+  "run_json": "results/pi-real/series-26b/26b-q3km-balloon6/run.json",
+  "started": "2026-10-05T11:03:37+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 48,
+  "extra": "",
+  "balloon_gib": 6.0,
+  "load_s": 132.1,
+  "load_read_bytes": 6965501952,
+  "load_majflt": 17065,
+  "mem_available_start_kB": 15866400,
+  "after_load_smaps_kB": {
+   "Rss": 9375824,
+   "Pss_Anon": 507744,
+   "Pss_File": 8866549,
+   "Swap": 10832
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   61.7,
+   58.4
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 0.808907603415687,
+    "gen_n": 48,
+    "gen_tok_s": 1.0109624683195013,
+    "read_bytes": 5081653248,
+    "majflt": 52928,
+    "pss_anon_kB": 252736,
+    "pss_file_kB": 9051573,
+    "temp_c": 60.6,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 1.0940397685887082,
+    "gen_n": 48,
+    "gen_tok_s": 1.5497566008337755,
+    "read_bytes": 3586990080,
+    "majflt": 36044,
+    "pss_anon_kB": 187056,
+    "pss_file_kB": 9098136,
+    "temp_c": 62.8,
+    "draft_n": null,
+    "zero_storage_reads": false
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-balloon8",
+  "run_json": "results/pi-real/series-26b/26b-q3km-balloon8/run.json",
+  "started": "2026-10-05T11:09:03+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 48,
+  "extra": "",
+  "balloon_gib": 8.0,
+  "load_s": 170.2,
+  "load_read_bytes": 11305750528,
+  "load_majflt": 14565,
+  "mem_available_start_kB": 15868192,
+  "after_load_smaps_kB": {
+   "Rss": 7259264,
+   "Pss_Anon": 466640,
+   "Pss_File": 6791054,
+   "Swap": 51920
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   58.4,
+   56.2
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 0.5110438743352548,
+    "gen_n": 48,
+    "gen_tok_s": 0.5451429893822848,
+    "read_bytes": 10796273664,
+    "majflt": 83210,
+    "pss_anon_kB": 220992,
+    "pss_file_kB": 7001054,
+    "temp_c": 54.55,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 0.7323565740001429,
+    "gen_n": 48,
+    "gen_tok_s": 0.7935223320061306,
+    "read_bytes": 7539400704,
+    "majflt": 62216,
+    "pss_anon_kB": 120640,
+    "pss_file_kB": 7007960,
+    "temp_c": 57.85,
+    "draft_n": null,
+    "zero_storage_reads": false
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-cold",
+  "run_json": "results/pi-real/series-26b/26b-q3km-cold/run.json",
+  "started": "2026-10-05T10:46:15+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 96,
+  "extra": "",
+  "balloon_gib": 0.0,
+  "load_s": 148.1,
+  "load_read_bytes": 12728500224,
+  "load_majflt": 0,
+  "mem_available_start_kB": 15810016,
+  "after_load_smaps_kB": {
+   "Rss": 12944416,
+   "Pss_Anon": 518576,
+   "Pss_File": 12422674,
+   "Swap": 0
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   46.3,
+   66.1
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 9.345421516251509,
+    "gen_n": 62,
+    "gen_tok_s": 3.270343129226215,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 557360,
+    "pss_file_kB": 12422805,
+    "temp_c": 58.95,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 9.350608871823066,
+    "gen_n": 64,
+    "gen_tok_s": 3.2055974004742147,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 602688,
+    "pss_file_kB": 12422802,
+    "temp_c": 63.35,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "de_short",
+    "prompt_n": 46,
+    "prompt_tok_s": 9.277491172769675,
+    "gen_n": 69,
+    "gen_tok_s": 3.2561682121175237,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 638480,
+    "pss_file_kB": 12422801,
+    "temp_c": 65.0,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "code_short",
+    "prompt_n": 48,
+    "prompt_tok_s": 9.074504517874411,
+    "gen_n": 96,
+    "gen_tok_s": 3.243146216427846,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 663616,
+    "pss_file_kB": 12422802,
+    "temp_c": 66.1,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "long_summary",
+    "prompt_n": 821,
+    "prompt_tok_s": 9.224461645362616,
+    "gen_n": 96,
+    "gen_tok_s": 2.5016272426890733,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 993824,
+    "pss_file_kB": 12422802,
+    "temp_c": 71.6,
+    "draft_n": null,
+    "zero_storage_reads": true
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-warm-base-r1",
+  "run_json": "results/pi-real/series-26b/26b-q3km-warm-base-r1/run.json",
+  "started": "2026-10-05T10:52:41+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 96,
+  "extra": "",
+  "balloon_gib": 0.0,
+  "load_s": 4.0,
+  "load_read_bytes": 0,
+  "load_majflt": 0,
+  "mem_available_start_kB": 15796672,
+  "after_load_smaps_kB": {
+   "Rss": 12944416,
+   "Pss_Anon": 518576,
+   "Pss_File": 12422674,
+   "Swap": 0
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   66.1,
+   68.3
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 9.214029139012766,
+    "gen_n": 62,
+    "gen_tok_s": 3.171046948181818,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 557360,
+    "pss_file_kB": 12422802,
+    "temp_c": 70.5,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 9.04342047617963,
+    "gen_n": 64,
+    "gen_tok_s": 3.149956373104233,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 602688,
+    "pss_file_kB": 12422797,
+    "temp_c": 71.05,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "de_short",
+    "prompt_n": 46,
+    "prompt_tok_s": 9.02726154488629,
+    "gen_n": 69,
+    "gen_tok_s": 3.200861445958091,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 638480,
+    "pss_file_kB": 12422802,
+    "temp_c": 73.25,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "code_short",
+    "prompt_n": 48,
+    "prompt_tok_s": 9.088320296642774,
+    "gen_n": 96,
+    "gen_tok_s": 3.1927124959372732,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 663616,
+    "pss_file_kB": 12422802,
+    "temp_c": 73.8,
+    "draft_n": null,
+    "zero_storage_reads": true
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-warm-base-r2",
+  "run_json": "results/pi-real/series-26b/26b-q3km-warm-base-r2/run.json",
+  "started": "2026-10-05T10:56:47+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 96,
+  "extra": "",
+  "balloon_gib": 0.0,
+  "load_s": 4.0,
+  "load_read_bytes": 0,
+  "load_majflt": 0,
+  "mem_available_start_kB": 15761328,
+  "after_load_smaps_kB": {
+   "Rss": 12944400,
+   "Pss_Anon": 518560,
+   "Pss_File": 12422672,
+   "Swap": 0
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   68.85,
+   69.4
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 9.210789447907052,
+    "gen_n": 62,
+    "gen_tok_s": 3.1913558412510783,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 557344,
+    "pss_file_kB": 12422802,
+    "temp_c": 72.7,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 9.057152139525764,
+    "gen_n": 64,
+    "gen_tok_s": 3.1726835771372794,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 602672,
+    "pss_file_kB": 12422799,
+    "temp_c": 72.7,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "de_short",
+    "prompt_n": 46,
+    "prompt_tok_s": 9.06403405081731,
+    "gen_n": 69,
+    "gen_tok_s": 3.1753553572867825,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 638464,
+    "pss_file_kB": 12422802,
+    "temp_c": 72.15,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "code_short",
+    "prompt_n": 48,
+    "prompt_tok_s": 8.997515561015716,
+    "gen_n": 96,
+    "gen_tok_s": 3.1588108094771905,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 663600,
+    "pss_file_kB": 12422802,
+    "temp_c": 73.8,
+    "draft_n": null,
+    "zero_storage_reads": true
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-warm-mtp-r1",
+  "run_json": "results/pi-real/series-26b/26b-q3km-warm-mtp-r1/run.json",
+  "started": "2026-10-05T10:54:38+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080 -md models/mtp-gemma-4-26B-A4B-it-Q4_0.gguf --spec-type draft-mtp",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 96,
+  "extra": "-md models/mtp-gemma-4-26B-A4B-it-Q4_0.gguf --spec-type draft-mtp",
+  "balloon_gib": 0.0,
+  "load_s": 7.0,
+  "load_read_bytes": 0,
+  "load_majflt": 0,
+  "mem_available_start_kB": 15788512,
+  "after_load_smaps_kB": {
+   "Rss": 13288288,
+   "Pss_Anon": 631184,
+   "Pss_File": 12653922,
+   "Swap": 0
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   69.4,
+   68.3
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 9.10968108583194,
+    "gen_n": 63,
+    "gen_tok_s": 3.1112932165527827,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 696176,
+    "pss_file_kB": 12654047,
+    "temp_c": 72.7,
+    "draft_n": 69,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 9.21257714680344,
+    "gen_n": 67,
+    "gen_tok_s": 2.248534006930527,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 731952,
+    "pss_file_kB": 12654050,
+    "temp_c": 73.8,
+    "draft_n": 102,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "de_short",
+    "prompt_n": 46,
+    "prompt_tok_s": 9.087414207895542,
+    "gen_n": 67,
+    "gen_tok_s": 2.393439885892391,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 765568,
+    "pss_file_kB": 12654050,
+    "temp_c": 74.9,
+    "draft_n": 96,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "code_short",
+    "prompt_n": 48,
+    "prompt_tok_s": 9.069895448669776,
+    "gen_n": 96,
+    "gen_tok_s": 4.247148643228248,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 798880,
+    "pss_file_kB": 12654050,
+    "temp_c": 73.25,
+    "draft_n": 77,
+    "zero_storage_reads": true
+   }
+  ]
+ },
+ {
+  "label": "26b-q3km-warm-mtp-r2",
+  "run_json": "results/pi-real/series-26b/26b-q3km-warm-mtp-r2/run.json",
+  "started": "2026-10-05T10:58:44+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080 -md models/mtp-gemma-4-26B-A4B-it-Q4_0.gguf --spec-type draft-mtp",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 96,
+  "extra": "-md models/mtp-gemma-4-26B-A4B-it-Q4_0.gguf --spec-type draft-mtp",
+  "balloon_gib": 0.0,
+  "load_s": 7.1,
+  "load_read_bytes": 0,
+  "load_majflt": 0,
+  "mem_available_start_kB": 15799376,
+  "after_load_smaps_kB": {
+   "Rss": 13288288,
+   "Pss_Anon": 631184,
+   "Pss_File": 12653919,
+   "Swap": 0
+  },
+  "throttled": [
+   "throttled=0x0",
+   "throttled=0x0"
+  ],
+  "temp_c": [
+   69.95,
+   71.05
+  ],
+  "requests": [
+   {
+    "id": "en_short",
+    "prompt_n": 52,
+    "prompt_tok_s": 9.18927773867426,
+    "gen_n": 63,
+    "gen_tok_s": 3.0994571300836657,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 696176,
+    "pss_file_kB": 12654047,
+    "temp_c": 73.25,
+    "draft_n": 69,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "he_short",
+    "prompt_n": 54,
+    "prompt_tok_s": 9.06286760207768,
+    "gen_n": 67,
+    "gen_tok_s": 2.2530830112590996,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 731952,
+    "pss_file_kB": 12654047,
+    "temp_c": 75.45,
+    "draft_n": 102,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "de_short",
+    "prompt_n": 46,
+    "prompt_tok_s": 9.053314575915191,
+    "gen_n": 67,
+    "gen_tok_s": 2.39035591349244,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 765568,
+    "pss_file_kB": 12654047,
+    "temp_c": 74.9,
+    "draft_n": 96,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "code_short",
+    "prompt_n": 48,
+    "prompt_tok_s": 9.00330421264604,
+    "gen_n": 96,
+    "gen_tok_s": 4.2507036368707105,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 798880,
+    "pss_file_kB": 12654047,
+    "temp_c": 74.9,
+    "draft_n": 77,
+    "zero_storage_reads": true
+   }
+  ]
+ },
+ {
+  "label": "p1-resident-ref-26b-q3km",
+  "run_json": "results/pi-real/p1-resident-ref/p1-resident-ref-26b-q3km/run.json",
+  "started": "2026-10-05T18:54:22+0200",
+  "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+  "threads": 4,
+  "ctx": 4096,
+  "n_predict": 48,
+  "extra": "",
+  "balloon_gib": 0.0,
+  "load_s": 150.1,
+  "load_read_bytes": 12803088384,
+  "load_majflt": 4213,
+  "mem_available_start_kB": 15903072,
+  "after_load_smaps_kB": {
+   "Rss": 12886880,
+   "Pss_Anon": 518576,
+   "Pss_File": 12366751,
+   "Swap": 0
+  },
+  "throttled": [
+   "throttled=0x80000",
+   "throttled=0x80000"
+  ],
+  "temp_c": [
+   48.5,
+   64.45
+  ],
+  "requests": [
+   {
+    "id": "en_short_legacy_a",
+    "prompt_n": 52,
+    "prompt_tok_s": 7.827791006410058,
+    "gen_n": 48,
+    "gen_tok_s": 2.981454654263223,
+    "read_bytes": 42860544,
+    "majflt": 3193,
+    "pss_anon_kB": 557376,
+    "pss_file_kB": 12408639,
+    "temp_c": 61.7,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "he_short_legacy_a",
+    "prompt_n": 54,
+    "prompt_tok_s": 8.453348707991749,
+    "gen_n": 48,
+    "gen_tok_s": 2.97902991123505,
+    "read_bytes": 17498112,
+    "majflt": 1368,
+    "pss_anon_kB": 599648,
+    "pss_file_kB": 12394239,
+    "temp_c": 62.8,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "en_short_canonical",
+    "prompt_n": 39,
+    "prompt_tok_s": 8.452420350567385,
+    "gen_n": 48,
+    "gen_tok_s": 2.9708665448822087,
+    "read_bytes": 1884160,
+    "majflt": 148,
+    "pss_anon_kB": 631936,
+    "pss_file_kB": 12396079,
+    "temp_c": 63.9,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "he_short_canonical",
+    "prompt_n": 41,
+    "prompt_tok_s": 8.644994158303337,
+    "gen_n": 48,
+    "gen_tok_s": 3.0144792493510537,
+    "read_bytes": 1900544,
+    "majflt": 137,
+    "pss_anon_kB": 650928,
+    "pss_file_kB": 12397919,
+    "temp_c": 67.2,
+    "draft_n": null,
+    "zero_storage_reads": false
+   },
+   {
+    "id": "en_short_legacy_b",
+    "prompt_n": 52,
+    "prompt_tok_s": 8.990058551214029,
+    "gen_n": 48,
+    "gen_tok_s": 2.987559167973671,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 655968,
+    "pss_file_kB": 12397919,
+    "temp_c": 68.3,
+    "draft_n": null,
+    "zero_storage_reads": true
+   },
+   {
+    "id": "he_short_legacy_b",
+    "prompt_n": 54,
+    "prompt_tok_s": 8.90510717791217,
+    "gen_n": 48,
+    "gen_tok_s": 2.9399316909999187,
+    "read_bytes": 0,
+    "majflt": 0,
+    "pss_anon_kB": 655520,
+    "pss_file_kB": 12397919,
+    "temp_c": 68.3,
+    "draft_n": null,
+    "zero_storage_reads": true
+   }
+  ]
+ }
+]

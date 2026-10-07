@@ -1,0 +1,18 @@
+pre: MemAvailable_kB=15915424 root_free=2145873920 throttled=0x80000 temp=48.8'C
+pre: contextfriend-box active
+pre: contextfriend-gpu-tunnel active
+pre: hailort active
+pre: whisper-bench@base active
+{"id": "en_short_legacy_a", "prompt_n": 52, "prompt_tok_s": 7.827791006410058, "gen_n": 48, "gen_tok_s": 2.981454654263223, "draft_n": null, "draft_n_accepted": null, "read_bytes": 42860544, "majflt": 3193, "wall_s": 22.4}
+{"id": "he_short_legacy_a", "prompt_n": 54, "prompt_tok_s": 8.453348707991749, "gen_n": 48, "gen_tok_s": 2.97902991123505, "draft_n": null, "draft_n_accepted": null, "read_bytes": 17498112, "majflt": 1368, "wall_s": 22.2}
+{"id": "en_short_canonical", "prompt_n": 39, "prompt_tok_s": 8.452420350567385, "gen_n": 48, "gen_tok_s": 2.9708665448822087, "draft_n": null, "draft_n_accepted": null, "read_bytes": 1884160, "majflt": 148, "wall_s": 20.4}
+{"id": "he_short_canonical", "prompt_n": 41, "prompt_tok_s": 8.644994158303337, "gen_n": 48, "gen_tok_s": 3.0144792493510537, "draft_n": null, "draft_n_accepted": null, "read_bytes": 1900544, "majflt": 137, "wall_s": 20.3}
+{"id": "en_short_legacy_b", "prompt_n": 52, "prompt_tok_s": 8.990058551214029, "gen_n": 48, "gen_tok_s": 2.987559167973671, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 21.5}
+{"id": "he_short_legacy_b", "prompt_n": 54, "prompt_tok_s": 8.90510717791217, "gen_n": 48, "gen_tok_s": 2.9399316909999187, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 22.1}
+RUN_DONE /home/pi/pigemma/results/p1-resident-ref-26b-q3km/run.json
+post: contextfriend-box active
+post: contextfriend-gpu-tunnel active
+post: hailort active
+post: whisper-bench@base active
+post: MemAvailable_kB=15874528 root_free=2145722368 throttled=0x80000
+P1_REF_DONE rc=0 2026-10-05T18:59:02+02:00

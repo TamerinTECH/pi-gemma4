@@ -1,0 +1,6 @@
+[{"id": "en_short_legacy_a", "lang": "en", "format": "legacy", "text": "In three short sentences: why is a mixture-of-experts model faster to run than a dense model of the same size?"},
+ {"id": "he_short_legacy_a", "lang": "he", "format": "legacy", "text": "ענה בעברית בשלושה משפטים קצרים: מה היתרון של מחשב קטן כמו Raspberry Pi?"},
+ {"id": "en_short_canonical", "lang": "en", "format": "canonical", "text": "In three short sentences: why is a mixture-of-experts model faster to run than a dense model of the same size?"},
+ {"id": "he_short_canonical", "lang": "he", "format": "canonical", "text": "ענה בעברית בשלושה משפטים קצרים: מה היתרון של מחשב קטן כמו Raspberry Pi?"},
+ {"id": "en_short_legacy_b", "lang": "en", "format": "legacy", "text": "In three short sentences: why is a mixture-of-experts model faster to run than a dense model of the same size?"},
+ {"id": "he_short_legacy_b", "lang": "he", "format": "legacy", "text": "ענה בעברית בשלושה משפטים קצרים: מה היתרון של מחשב קטן כמו Raspberry Pi?"}]

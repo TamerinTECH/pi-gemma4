@@ -1,0 +1,5 @@
+free=13466628096 need=11065366240 free_after=2401261856 min_free_after=2147483648
+downloaded_bytes=12728497888 seconds=1003 avg_MBps=11
+verifying sha256...
+OK /home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf free_now=2401214464
+FETCH_DONE

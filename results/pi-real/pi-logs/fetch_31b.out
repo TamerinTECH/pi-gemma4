@@ -1,0 +1,5 @@
+free=15228334080 need=11837782976 free_after=3390551104 min_free_after=2147483648
+downloaded_bytes=11837782976 seconds=1692 avg_MBps=6
+verifying sha256...
+OK /home/pi/pigemma/models/gemma-4-31B-it-UD-IQ3_XXS.gguf free_now=3292848128
+FETCH_DONE

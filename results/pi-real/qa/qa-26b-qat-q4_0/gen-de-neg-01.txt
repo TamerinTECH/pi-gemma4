@@ -1,0 +1,2 @@
+<start_of_turn><|channel>thought
+<channel|>Pinguin

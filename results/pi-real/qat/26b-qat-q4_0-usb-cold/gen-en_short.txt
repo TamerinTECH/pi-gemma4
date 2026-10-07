@@ -1,0 +1,2 @@
+<|channel>thought
+<channel|>A mixture-of-experts model only activates a small subset of its total parameters for each input. This sparse activation significantly reduces the number of computations required per token. Consequently, the model achieves the capacity of a large model while maintaining the inference speed of a much smaller one.

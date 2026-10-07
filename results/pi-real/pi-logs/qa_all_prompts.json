@@ -1,0 +1,182 @@
+[
+{
+"id": "en-01",
+"lang": "en",
+"text": "What is the capital of France? Answer with one word."
+},
+{
+"id": "en-02",
+"lang": "en",
+"text": "Which planet is the largest in our solar system? Answer with one word."
+},
+{
+"id": "en-03",
+"lang": "en",
+"text": "What is the chemical symbol for gold? Answer with the symbol only."
+},
+{
+"id": "en-04",
+"lang": "en",
+"text": "Who wrote the play Romeo and Juliet? Answer with the author's surname only."
+},
+{
+"id": "en-05",
+"lang": "en",
+"text": "How many legs does a spider have? Answer with one word."
+},
+{
+"id": "en-06",
+"lang": "en",
+"text": "If today is Monday, what day of the week will it be in three days? Answer with one word."
+},
+{
+"id": "en-07",
+"lang": "en",
+"text": "Which gas do plants take in from the air for photosynthesis? Answer with the name of the gas only."
+},
+{
+"id": "he-01",
+"lang": "he",
+"text": "מהי בירת צרפת? ענה במילה אחת."
+},
+{
+"id": "he-02",
+"lang": "he",
+"text": "מהו ההפך של המילה \"קר\"? ענה במילה אחת."
+},
+{
+"id": "he-03",
+"lang": "he",
+"text": "על איזה כוכב לכת אנחנו חיים? ענה בשתי מילים לכל היותר."
+},
+{
+"id": "he-04",
+"lang": "he",
+"text": "איזה צבע מתקבל כשמערבבים צבע כחול עם צבע צהוב? ענה במילה אחת."
+},
+{
+"id": "he-05",
+"lang": "he",
+"text": "באיזו יבשת נמצאת מצרים? ענה במילה אחת."
+},
+{
+"id": "he-06",
+"lang": "he",
+"text": "באיזו עיר נמצא הכותל המערבי? ענה במילה אחת."
+},
+{
+"id": "num-01",
+"lang": "num",
+"text": "What is 17*23? Answer with the number only."
+},
+{
+"id": "num-02",
+"lang": "num",
+"text": "A pen costs 2.40 shekels. How many shekels do 7 pens cost? Answer with the number only."
+},
+{
+"id": "num-03",
+"lang": "num",
+"text": "List the first five prime numbers in increasing order, separated by commas. Answer with the list only."
+},
+{
+"id": "neg-en-01",
+"lang": "en",
+"text": "Which of these is NOT a fruit: apple, carrot, banana, cherry? Answer with one word."
+},
+{
+"id": "neg-en-02",
+"lang": "en",
+"text": "Name a month of the year that does NOT contain the letter r. Answer with the month only."
+},
+{
+"id": "neg-he-01",
+"lang": "he",
+"text": "איזה מהבאים אינו יונק: כלב, לווייתן, נשר, סוס? ענה במילה אחת."
+},
+{
+"id": "num-hard-01",
+"lang": "en",
+"text": "A train leaves at 09:40 and the trip takes 2 hours and 35 minutes. At what time does it arrive? Answer in HH:MM format only."
+},
+{
+"id": "num-hard-02",
+"lang": "en",
+"text": "A class has 28 students. 3/7 of them are girls. How many boys are in the class? Answer with the number only."
+},
+{
+"id": "num-hard-03",
+"lang": "de",
+"text": "Ein Brot kostet 3,20 Euro. Wie viel kosten 5 Brote? Antworte nur mit der Zahl."
+},
+{
+"id": "num-hard-04",
+"lang": "he",
+"text": "לדני יש 45 שקלים. הוא קנה 3 מחברות ב-8 שקלים כל אחת. כמה שקלים נשארו לו? ענה במספר בלבד."
+},
+{
+"id": "ext-en-01",
+"lang": "en",
+"text": "Text: \"The meeting with the school principal, Dr. Noa Levi, was moved from Tuesday to Thursday at 14:30 in room 212.\" Question: In which room is the meeting? Answer with the number only."
+},
+{
+"id": "ext-en-02",
+"lang": "en",
+"text": "Text: \"Order #4471: 2 rye loaves, 1 baguette, 6 rolls. Pickup Saturday 07:15. Customer: M. Weber.\" Question: How many rolls were ordered? Answer with the number only."
+},
+{
+"id": "ext-he-01",
+"lang": "he",
+"text": "טקסט: \"הטיול השנתי של כיתה ז'2 יתקיים ביום רביעי, 14 במאי, ויוצא בשעה 07:30 מחניית בית הספר.\" שאלה: באיזו שעה יוצא הטיול? ענה בפורמט HH:MM בלבד."
+},
+{
+"id": "ext-de-01",
+"lang": "de",
+"text": "Text: \"Die Bäckerei Huber in Rosenheim öffnet montags bis freitags um 6:00 Uhr und samstags um 7:00 Uhr.\" Frage: Um wie viel Uhr öffnet die Bäckerei am Samstag? Antworte nur mit der Uhrzeit."
+},
+{
+"id": "ins-en-01",
+"lang": "en",
+"text": "Write exactly three words, all in lowercase, separated by single spaces, naming three colours. Output nothing else."
+},
+{
+"id": "ins-en-02",
+"lang": "en",
+"text": "Reply with the word YES in capital letters if 91 is a prime number, otherwise reply with the word NO in capital letters. Output only that word."
+},
+{
+"id": "ins-he-01",
+"lang": "he",
+"text": "כתוב רשימה ממוספרת של שלושה פירות בדיוק, פרי אחד בכל שורה, בלי שום טקסט נוסף."
+},
+{
+"id": "code-01",
+"lang": "code",
+"text": "What does this Python expression evaluate to: sum(i*i for i in range(4))? Answer with the number only."
+},
+{
+"id": "code-02",
+"lang": "code",
+"text": "What does this Python code print?\nx = [3, 1, 2]\nx.sort()\nprint(x[-1] - x[0])\nAnswer with the number only."
+},
+{
+"id": "code-03",
+"lang": "code",
+"text": "In Python, what is the value of len('שלום')? Answer with the number only."
+},
+{
+"id": "de-01",
+"lang": "de",
+"text": "Was ist die Hauptstadt von Bayern? Antworte mit einem Wort."
+},
+{
+"id": "de-neg-01",
+"lang": "de",
+"text": "Welches dieser Tiere kann NICHT fliegen: Adler, Pinguin, Taube, Spatz? Antworte mit einem Wort."
+},
+{
+"id": "mix-01",
+"lang": "en",
+"text": "Noa is older than Dan. Dan is older than Lior. Who is the youngest? Answer with the name only."
+}
+]

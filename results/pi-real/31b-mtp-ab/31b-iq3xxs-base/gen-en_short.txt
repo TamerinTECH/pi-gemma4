@@ -1,0 +1,2 @@
+<|channel>thought
+<channel|>A mixture-of-experts model only activates a small subset of its parameters for each token. This significantly reduces the number of floating-point operations required per forward pass. Consequently, it achieves the performance of a large model

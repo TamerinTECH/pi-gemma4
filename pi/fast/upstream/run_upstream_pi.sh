@@ -20,7 +20,12 @@ if [ ! -s "$work/master.tar.gz" ]; then
   curl -sSL --max-time 600 -o "$work/master.tar.gz" "https://github.com/ggml-org/llama.cpp/archive/$rev.tar.gz" || { echo "download FAILED"; exit 5; }
 fi
 sha256sum "$work/master.tar.gz" | cut -c1-64
-strip=0; tar -tzf "$work/master.tar.gz" | head -1 | grep -q "^llama.cpp-" && strip=1
+# GitHub archives have one top-level directory; a `git archive` file has none
+# (no pipe into head here: with pipefail the SIGPIPE of tar would hide the match)
+tar -tzf "$work/master.tar.gz" > "$work/master.list" 2> /dev/null
+strip=0; case "$(head -1 "$work/master.list")" in llama.cpp-*) strip=1;; esac
+echo "archive entries: $(wc -l < "$work/master.list"), strip-components=$strip"
+for t in ref ls pt; do [ -f "$work/$t/CMakeLists.txt" ] || rm -rf "$work/$t"; done
 for t in ref ls pt; do
   if [ ! -f "$work/$t/CMakeLists.txt" ]; then
     mkdir -p "$work/$t" && tar -xzf "$work/master.tar.gz" -C "$work/$t" --strip-components=$strip || { echo "extract $t FAILED"; exit 5; }

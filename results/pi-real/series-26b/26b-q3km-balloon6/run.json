@@ -1,0 +1,99 @@
+{
+ "label": "26b-q3km-balloon6",
+ "started": "2026-10-05T11:03:37+0200",
+ "host": "context-friend-1",
+ "kernel": "6.18.50+rpt-rpi-2712",
+ "page_size": 16384,
+ "model": {
+  "path": "/home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+  "bytes": 12728497888,
+  "sha256_first_MiB": "c13f3b670eb7b8ad"
+ },
+ "threads": 4,
+ "ctx": 4096,
+ "n_predict": 48,
+ "extra": "",
+ "balloon_gib": 6.0,
+ "meminfo_start_kB": {
+  "MemTotal": 16607552,
+  "MemAvailable": 15866400,
+  "Cached": 11156768,
+  "SwapFree": 1712464
+ },
+ "throttled_start": "throttled=0x0",
+ "temp_start_c": 61.7,
+ "requests": [
+  {
+   "id": "en_short",
+   "lang": "en",
+   "wall_s": 110.8,
+   "prompt_n": 52,
+   "prompt_tok_s": 0.808907603415687,
+   "gen_n": 48,
+   "gen_tok_s": 1.0109624683195013,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 5081653248,
+   "majflt": 52928,
+   "smaps_kB": {
+    "Rss": 9305840,
+    "Pss_Anon": 252736,
+    "Pss_File": 9051573,
+    "Swap": 304624
+   },
+   "mem_available_kB": 9371008,
+   "temp_c": 60.6,
+   "read_MB_per_request_token": 50.817,
+   "output_head": "<|channel>thought\n<channel|>A mixture-of-experts model only activates a small subset of its total parameters for each token processed. This sparse activation significantly reduces the number of floating-point operations required compared to"
+  },
+  {
+   "id": "he_short",
+   "lang": "he",
+   "wall_s": 79.7,
+   "prompt_n": 54,
+   "prompt_tok_s": 1.0940397685887082,
+   "gen_n": 48,
+   "gen_tok_s": 1.5497566008337755,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 3586990080,
+   "majflt": 36044,
+   "smaps_kB": {
+    "Rss": 9286784,
+    "Pss_Anon": 187056,
+    "Pss_File": 9098136,
+    "Swap": 412560
+   },
+   "mem_available_kB": 9400336,
+   "temp_c": 62.8,
+   "read_MB_per_request_token": 35.167,
+   "output_head": "<|channel>thought\n<channel|>היתרון המרכזי הוא מחיר נמוך וזול מאוד.\nהוא חסכוני מאוד בצריכת חשמל וגודלו קטן.\nהוא מושלם"
+  }
+ ],
+ "balloon": {
+  "ok": true,
+  "size_bytes": 6442450944,
+  "mlocked": true,
+  "errno": 0,
+  "mem_available_after": 9830236160,
+  "max_seconds": 3000
+ },
+ "meminfo_after_balloon_kB": {
+  "MemAvailable": 9600336,
+  "Cached": 9611584,
+  "Mlocked": 6289280
+ },
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+ "load_s": 132.1,
+ "load_read_bytes": 6965501952,
+ "load_majflt": 17065,
+ "after_load_smaps_kB": {
+  "Rss": 9375824,
+  "Pss_Anon": 507744,
+  "Pss_File": 8866549,
+  "Swap": 10832
+ },
+ "throttled_end": "throttled=0x0",
+ "temp_end_c": 58.4,
+ "finished": "2026-10-05T11:09:03+0200"
+}

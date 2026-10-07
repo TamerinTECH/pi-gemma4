@@ -1,0 +1,7 @@
+<start_of_turn>user
+ענה בעברית בשלושה משפטים קצרים: מה היתרון של מחשב קטן כמו Raspberry Pi?<end_of_turn>
+<start_of_turn>model<|channel>thought
+<channel|>הוא קטן וצורך מעט מאוד חשמל.
+הוא זול ונגיש למטרות למידה וניסויים.
+הוא מאפשר לבנות פרויקטים
+

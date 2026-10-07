@@ -1,0 +1,1158 @@
+{
+ "qa-26b-q3km": {
+  "items": [
+   {
+    "id": "en-01",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "What is the capital of France? Answer with one word.",
+    "expect": [
+     "Paris"
+    ],
+    "visible": "Paris",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-02",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Which planet is the largest in our solar system? Answer with one word.",
+    "expect": [
+     "Jupiter"
+    ],
+    "visible": "Jupiter<end_yt_of_turn>\nJupiter",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-03",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "What is the chemical symbol for gold? Answer with the symbol only.",
+    "expect": [
+     "(?i)\\bau\\b"
+    ],
+    "visible": "Au",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-04",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Who wrote the play Romeo and Juliet? Answer with the author's surname only.",
+    "expect": [
+     "Shakespeare"
+    ],
+    "visible": "Shakespeare",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-05",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "How many legs does a spider have? Answer with one word.",
+    "expect": [
+     "(?i)\\b(eight|8)\\b"
+    ],
+    "visible": "Eight",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-06",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "If today is Monday, what day of the week will it be in three days? Answer with one word.",
+    "expect": [
+     "Thursday"
+    ],
+    "visible": "Thursday",
+    "thinking_chars": 8,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-07",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Which gas do plants take in from the air for photosynthesis? Answer with the name of the gas only.",
+    "expect": [
+     "carbon dioxide",
+     "CO2"
+    ],
+    "visible": "Carbon dioxide",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-01",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "מהי בירת צרפת? ענה במילה אחת.",
+    "expect": [
+     "פריז",
+     "פאריס"
+    ],
+    "visible": "פריז",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-02",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "מהו ההפך של המילה \"קר\"? ענה במילה אחת.",
+    "expect": [
+     "חם"
+    ],
+    "visible": "חם",
+    "thinking_chars": 9,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-03",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "על איזה כוכב לכת אנחנו חיים? ענה בשתי מילים לכל היותר.",
+    "expect": [
+     "כדור הארץ",
+     "הארץ"
+    ],
+    "visible": "כדור הארץ",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-04",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "איזה צבע מתקבל כשמערבבים צבע כחול עם צבע צהוב? ענה במילה אחת.",
+    "expect": [
+     "ירוק"
+    ],
+    "visible": "ירוק",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-05",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "באיזו יבשת נמצאת מצרים? ענה במילה אחת.",
+    "expect": [
+     "אפריקה"
+    ],
+    "visible": "אפריקה",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-06",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "באיזו עיר נמצא הכותל המערבי? ענה במילה אחת.",
+    "expect": [
+     "ירושלים",
+     "ירושלם"
+    ],
+    "visible": "ירושלים",
+    "thinking_chars": 8,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-01",
+    "lang": "num",
+    "kind": "number",
+    "prompt": "What is 17*23? Answer with the number only.",
+    "expect": [
+     391
+    ],
+    "visible": "model\n391",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-02",
+    "lang": "num",
+    "kind": "number",
+    "prompt": "A pen costs 2.40 shekels. How many shekels do 7 pens cost? Answer with the number only.",
+    "expect": [
+     16.8
+    ],
+    "visible": "16.8",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-03",
+    "lang": "num",
+    "kind": "regex",
+    "prompt": "List the first five prime numbers in increasing order, separated by commas. Answer with the list only.",
+    "expect": [
+     "(?<!\\d)2\\D{0,12}3\\D{0,12}5\\D{0,12}7\\D{0,12}11(?!\\d)"
+    ],
+    "visible": "2, 3, 5, 7, 11",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "neg-en-01",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Which of these is NOT a fruit: apple, carrot, banana, cherry? Answer with one word.",
+    "expect": [
+     "carrot"
+    ],
+    "visible": "model\ncarrot",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "neg-en-02",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "Name a month of the year that does NOT contain the letter r. Answer with the month only.",
+    "expect": [
+     "(?i)\\b(may|june|july|august)\\b"
+    ],
+    "visible": "May",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "neg-he-01",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "איזה מהבאים אינו יונק: כלב, לווייתן, נשר, סוס? ענה במילה אחת.",
+    "expect": [
+     "נשר"
+    ],
+    "visible": "נשר",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-hard-01",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "A train leaves at 09:40 and the trip takes 2 hours and 35 minutes. At what time does it arrive? Answer in HH:MM format only.",
+    "expect": [
+     "12:15"
+    ],
+    "visible": "12:15",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-hard-02",
+    "lang": "en",
+    "kind": "number",
+    "prompt": "A class has 28 students. 3/7 of them are girls. How many boys are in the class? Answer with the number only.",
+    "expect": [
+     16
+    ],
+    "visible": "16",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-hard-03",
+    "lang": "de",
+    "kind": "regex",
+    "prompt": "Ein Brot kostet 3,20 Euro. Wie viel kosten 5 Brote? Antworte nur mit der Zahl.",
+    "expect": [
+     "16([,.]00?)?(?!\\d)"
+    ],
+    "visible": "16",
+    "thinking_chars": 8,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-hard-04",
+    "lang": "he",
+    "kind": "number",
+    "prompt": "לדני יש 45 שקלים. הוא קנה 3 מחברות ב-8 שקלים כל אחת. כמה שקלים נשארו לו? ענה במספר בלבד.",
+    "expect": [
+     21
+    ],
+    "visible": "21",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-en-01",
+    "lang": "en",
+    "kind": "number",
+    "prompt": "Text: \"The meeting with the school principal, Dr. Noa Levi, was moved from Tuesday to Thursday at 14:30 in room 212.\" Question: In which room is the meeting? Answer with the number only.",
+    "expect": [
+     212
+    ],
+    "visible": "212",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-en-02",
+    "lang": "en",
+    "kind": "number",
+    "prompt": "Text: \"Order #4471: 2 rye loaves, 1 baguette, 6 rolls. Pickup Saturday 07:15. Customer: M. Weber.\" Question: How many rolls were ordered? Answer with the number only.",
+    "expect": [
+     6
+    ],
+    "visible": "6",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-he-01",
+    "lang": "he",
+    "kind": "regex",
+    "prompt": "טקסט: \"הטיול השנתי של כיתה ז'2 יתקיים ביום רביעי, 14 במאי, ויוצא בשעה 07:30 מחניית בית הספר.\" שאלה: באיזו שעה יוצא הטיול? ענה בפורמט HH:MM בלבד.",
+    "expect": [
+     "07:30|7:30"
+    ],
+    "visible": "model\n07:30",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-de-01",
+    "lang": "de",
+    "kind": "regex",
+    "prompt": "Text: \"Die Bäckerei Huber in Rosenheim öffnet montags bis freitags um 6:00 Uhr und samstags um 7:00 Uhr.\" Frage: Um wie viel Uhr öffnet die Bäckerei am Samstag? Antworte nur mit der Uhrzeit.",
+    "expect": [
+     "\\b7(:00)?\\b|07:00"
+    ],
+    "visible": "7:00 Uhr",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ins-en-01",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "Write exactly three words, all in lowercase, separated by single spaces, naming three colours. Output nothing else.",
+    "expect": [
+     "^\\s*[a-z]+ [a-z]+ [a-z]+\\s*$"
+    ],
+    "visible": "red blue green",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ins-en-02",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "Reply with the word YES in capital letters if 91 is a prime number, otherwise reply with the word NO in capital letters. Output only that word.",
+    "expect": [
+     "^\\s*NO\\s*\\.?\\s*$"
+    ],
+    "visible": "model\nNO",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": false
+   },
+   {
+    "id": "ins-he-01",
+    "lang": "he",
+    "kind": "regex",
+    "prompt": "כתוב רשימה ממוספרת של שלושה פירות בדיוק, פרי אחד בכל שורה, בלי שום טקסט נוסף.",
+    "expect": [
+     "^\\s*1[.)].+\\n\\s*2[.)].+\\n\\s*3[.)].+\\s*$"
+    ],
+    "visible": "1. תפוח\n2. בננה\n3. תפוז",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "code-01",
+    "lang": "code",
+    "kind": "number",
+    "prompt": "What does this Python expression evaluate to: sum(i*i for i in range(4))? Answer with the number only.",
+    "expect": [
+     14
+    ],
+    "visible": "14",
+    "thinking_chars": 8,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "code-02",
+    "lang": "code",
+    "kind": "number",
+    "prompt": "What does this Python code print?\nx = [3, 1, 2]\nx.sort()\nprint(x[-1] - x[0])\nAnswer with the number only.",
+    "expect": [
+     2
+    ],
+    "visible": "2",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "code-03",
+    "lang": "code",
+    "kind": "number",
+    "prompt": "In Python, what is the value of len('שלום')? Answer with the number only.",
+    "expect": [
+     4
+    ],
+    "visible": "model\n4",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "de-01",
+    "lang": "de",
+    "kind": "contains",
+    "prompt": "Was ist die Hauptstadt von Bayern? Antworte mit einem Wort.",
+    "expect": [
+     "München",
+     "Muenchen",
+     "Munich"
+    ],
+    "visible": "München",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "de-neg-01",
+    "lang": "de",
+    "kind": "contains",
+    "prompt": "Welches dieser Tiere kann NICHT fliegen: Adler, Pinguin, Taube, Spatz? Antworte mit einem Wort.",
+    "expect": [
+     "Pinguin"
+    ],
+    "visible": "model\nPinguin",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "mix-01",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Noa is older than Dan. Dan is older than Lior. Who is the youngest? Answer with the name only.",
+    "expect": [
+     "Lior"
+    ],
+    "visible": "Lior",
+    "thinking_chars": 8,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   }
+  ],
+  "qa_score": 35,
+  "qa_total": 36,
+  "per_language": {
+   "en": {
+    "score": 15,
+    "total": 16
+   },
+   "he": {
+    "score": 10,
+    "total": 10
+   },
+   "num": {
+    "score": 3,
+    "total": 3
+   },
+   "de": {
+    "score": 4,
+    "total": 4
+   },
+   "code": {
+    "score": 3,
+    "total": 3
+   }
+  },
+  "coherent": true,
+  "visible_chars_total": 266,
+  "thinking_chars_total": 49,
+  "thinking_share": 0.15555555555555556
+ },
+ "qa-26b-qat-q4_0": {
+  "items": [
+   {
+    "id": "en-01",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "What is the capital of France? Answer with one word.",
+    "expect": [
+     "Paris"
+    ],
+    "visible": "Paris",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-02",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Which planet is the largest in our solar system? Answer with one word.",
+    "expect": [
+     "Jupiter"
+    ],
+    "visible": "Jupiter",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-03",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "What is the chemical symbol for gold? Answer with the symbol only.",
+    "expect": [
+     "(?i)\\bau\\b"
+    ],
+    "visible": "Au",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-04",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Who wrote the play Romeo and Juliet? Answer with the author's surname only.",
+    "expect": [
+     "Shakespeare"
+    ],
+    "visible": "Shakespeare",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-05",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "How many legs does a spider have? Answer with one word.",
+    "expect": [
+     "(?i)\\b(eight|8)\\b"
+    ],
+    "visible": "Eight",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-06",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "If today is Monday, what day of the week will it be in three days? Answer with one word.",
+    "expect": [
+     "Thursday"
+    ],
+    "visible": "Thursday",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "en-07",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Which gas do plants take in from the air for photosynthesis? Answer with the name of the gas only.",
+    "expect": [
+     "carbon dioxide",
+     "CO2"
+    ],
+    "visible": "Carbon dioxide",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-01",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "מהי בירת צרפת? ענה במילה אחת.",
+    "expect": [
+     "פריז",
+     "פאריס"
+    ],
+    "visible": "פריז",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-02",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "מהו ההפך של המילה \"קר\"? ענה במילה אחת.",
+    "expect": [
+     "חם"
+    ],
+    "visible": "of_thought\n<channel|>חם",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-03",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "על איזה כוכב לכת אנחנו חיים? ענה בשתי מילים לכל היותר.",
+    "expect": [
+     "כדור הארץ",
+     "הארץ"
+    ],
+    "visible": "כדור הארץ",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-04",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "איזה צבע מתקבל כשמערבבים צבע כחול עם צבע צהוב? ענה במילה אחת.",
+    "expect": [
+     "ירוק"
+    ],
+    "visible": "ירוק",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-05",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "באיזו יבשת נמצאת מצרים? ענה במילה אחת.",
+    "expect": [
+     "אפריקה"
+    ],
+    "visible": "תפוצה-אפריקה\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-",
+    "thinking_chars": 0,
+    "coherent": false,
+    "coherence_reason": "4-gram '- - - -' repeated 25 times",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "he-06",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "באיזו עיר נמצא הכותל המערבי? ענה במילה אחת.",
+    "expect": [
+     "ירושלים",
+     "ירושלם"
+    ],
+    "visible": "<start_of_turn>model\nירושלים",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-01",
+    "lang": "num",
+    "kind": "number",
+    "prompt": "What is 17*23? Answer with the number only.",
+    "expect": [
+     391
+    ],
+    "visible": "391",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-02",
+    "lang": "num",
+    "kind": "number",
+    "prompt": "A pen costs 2.40 shekels. How many shekels do 7 pens cost? Answer with the number only.",
+    "expect": [
+     16.8
+    ],
+    "visible": "16.8",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-03",
+    "lang": "num",
+    "kind": "regex",
+    "prompt": "List the first five prime numbers in increasing order, separated by commas. Answer with the list only.",
+    "expect": [
+     "(?<!\\d)2\\D{0,12}3\\D{0,12}5\\D{0,12}7\\D{0,12}11(?!\\d)"
+    ],
+    "visible": "2, 3, 5, 7, 11",
+    "thinking_chars": 8,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "neg-en-01",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Which of these is NOT a fruit: apple, carrot, banana, cherry? Answer with one word.",
+    "expect": [
+     "carrot"
+    ],
+    "visible": "model\ncarrot",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "neg-en-02",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "Name a month of the year that does NOT contain the letter r. Answer with the month only.",
+    "expect": [
+     "(?i)\\b(may|june|july|august)\\b"
+    ],
+    "visible": "May",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "neg-he-01",
+    "lang": "he",
+    "kind": "contains",
+    "prompt": "איזה מהבאים אינו יונק: כלב, לווייתן, נשר, סוס? ענה במילה אחת.",
+    "expect": [
+     "נשר"
+    ],
+    "visible": "נשר",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-hard-01",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "A train leaves at 09:40 and the trip takes 2 hours and 35 minutes. At what time does it arrive? Answer in HH:MM format only.",
+    "expect": [
+     "12:15"
+    ],
+    "visible": "12:15",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-hard-02",
+    "lang": "en",
+    "kind": "number",
+    "prompt": "A class has 28 students. 3/7 of them are girls. How many boys are in the class? Answer with the number only.",
+    "expect": [
+     16
+    ],
+    "visible": "<thought\n<channel|>16",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "num-hard-03",
+    "lang": "de",
+    "kind": "regex",
+    "prompt": "Ein Brot kostet 3,20 Euro. Wie viel kosten 5 Brote? Antworte nur mit der Zahl.",
+    "expect": [
+     "16([,.]00?)?(?!\\d)"
+    ],
+    "visible": "",
+    "thinking_chars": 33,
+    "coherent": false,
+    "coherence_reason": "empty output",
+    "error": null,
+    "pass": false
+   },
+   {
+    "id": "num-hard-04",
+    "lang": "he",
+    "kind": "number",
+    "prompt": "לדני יש 45 שקלים. הוא קנה 3 מחברות ב-8 שקלים כל אחת. כמה שקלים נשארו לו? ענה במספר בלבד.",
+    "expect": [
+     21
+    ],
+    "visible": "21",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-en-01",
+    "lang": "en",
+    "kind": "number",
+    "prompt": "Text: \"The meeting with the school principal, Dr. Noa Levi, was moved from Tuesday to Thursday at 14:30 in room 212.\" Question: In which room is the meeting? Answer with the number only.",
+    "expect": [
+     212
+    ],
+    "visible": "212",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-en-02",
+    "lang": "en",
+    "kind": "number",
+    "prompt": "Text: \"Order #4471: 2 rye loaves, 1 baguette, 6 rolls. Pickup Saturday 07:15. Customer: M. Weber.\" Question: How many rolls were ordered? Answer with the number only.",
+    "expect": [
+     6
+    ],
+    "visible": "<start_of_turn>model\n6",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-he-01",
+    "lang": "he",
+    "kind": "regex",
+    "prompt": "טקסט: \"הטיול השנתי של כיתה ז'2 יתקיים ביום רביעי, 14 במאי, ויוצא בשעה 07:30 מחניית בית הספר.\" שאלה: באיזו שעה יוצא הטיול? ענה בפורמט HH:MM בלבד.",
+    "expect": [
+     "07:30|7:30"
+    ],
+    "visible": "07:30",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ext-de-01",
+    "lang": "de",
+    "kind": "regex",
+    "prompt": "Text: \"Die Bäckerei Huber in Rosenheim öffnet montags bis freitags um 6:00 Uhr und samstags um 7:00 Uhr.\" Frage: Um wie viel Uhr öffnet die Bäckerei am Samstag? Antworte nur mit der Uhrzeit.",
+    "expect": [
+     "\\b7(:00)?\\b|07:00"
+    ],
+    "visible": "7:00 Uhr",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ins-en-01",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "Write exactly three words, all in lowercase, separated by single spaces, naming three colours. Output nothing else.",
+    "expect": [
+     "^\\s*[a-z]+ [a-z]+ [a-z]+\\s*$"
+    ],
+    "visible": "red blue green",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ins-en-02",
+    "lang": "en",
+    "kind": "regex",
+    "prompt": "Reply with the word YES in capital letters if 91 is a prime number, otherwise reply with the word NO in capital letters. Output only that word.",
+    "expect": [
+     "^\\s*NO\\s*\\.?\\s*$"
+    ],
+    "visible": "NO",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "ins-he-01",
+    "lang": "he",
+    "kind": "regex",
+    "prompt": "כתוב רשימה ממוספרת של שלושה פירות בדיוק, פרי אחד בכל שורה, בלי שום טקסט נוסף.",
+    "expect": [
+     "^\\s*1[.)].+\\n\\s*2[.)].+\\n\\s*3[.)].+\\s*$"
+    ],
+    "visible": "1. תפוח\n2. בננה\n3. אגס",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "code-01",
+    "lang": "code",
+    "kind": "number",
+    "prompt": "What does this Python expression evaluate to: sum(i*i for i in range(4))? Answer with the number only.",
+    "expect": [
+     14
+    ],
+    "visible": "14",
+    "thinking_chars": 8,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "code-02",
+    "lang": "code",
+    "kind": "number",
+    "prompt": "What does this Python code print?\nx = [3, 1, 2]\nx.sort()\nprint(x[-1] - x[0])\nAnswer with the number only.",
+    "expect": [
+     2
+    ],
+    "visible": "2",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "code-03",
+    "lang": "code",
+    "kind": "number",
+    "prompt": "In Python, what is the value of len('שלום')? Answer with the number only.",
+    "expect": [
+     4
+    ],
+    "visible": "",
+    "thinking_chars": 160,
+    "coherent": false,
+    "coherence_reason": "empty output",
+    "error": null,
+    "pass": false
+   },
+   {
+    "id": "de-01",
+    "lang": "de",
+    "kind": "contains",
+    "prompt": "Was ist die Hauptstadt von Bayern? Antworte mit einem Wort.",
+    "expect": [
+     "München",
+     "Muenchen",
+     "Munich"
+    ],
+    "visible": "München",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "de-neg-01",
+    "lang": "de",
+    "kind": "contains",
+    "prompt": "Welches dieser Tiere kann NICHT fliegen: Adler, Pinguin, Taube, Spatz? Antworte mit einem Wort.",
+    "expect": [
+     "Pinguin"
+    ],
+    "visible": "<start_of_turn>Pinguin",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   },
+   {
+    "id": "mix-01",
+    "lang": "en",
+    "kind": "contains",
+    "prompt": "Noa is older than Dan. Dan is older than Lior. Who is the youngest? Answer with the name only.",
+    "expect": [
+     "Lior"
+    ],
+    "visible": "Lior",
+    "thinking_chars": 0,
+    "coherent": true,
+    "coherence_reason": "ok",
+    "error": null,
+    "pass": true
+   }
+  ],
+  "qa_score": 34,
+  "qa_total": 36,
+  "per_language": {
+   "en": {
+    "score": 16,
+    "total": 16
+   },
+   "he": {
+    "score": 10,
+    "total": 10
+   },
+   "num": {
+    "score": 3,
+    "total": 3
+   },
+   "de": {
+    "score": 3,
+    "total": 4
+   },
+   "code": {
+    "score": 2,
+    "total": 3
+   }
+  },
+  "coherent": false,
+  "visible_chars_total": 367,
+  "thinking_chars_total": 209,
+  "thinking_share": 0.3628472222222222
+ }
+}

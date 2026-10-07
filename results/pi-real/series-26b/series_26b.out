@@ -1,0 +1,43 @@
+=== 1 cold 2026-10-05T10:46:15+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 9.345421516251509, "gen_n": 62, "gen_tok_s": 3.270343129226215, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 24.2}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 9.350608871823066, "gen_n": 64, "gen_tok_s": 3.2055974004742147, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 25.4}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 9.277491172769675, "gen_n": 69, "gen_tok_s": 3.2561682121175237, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 25.9}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 9.074504517874411, "gen_n": 96, "gen_tok_s": 3.243146216427846, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 34.6}
+{"id": "long_summary", "prompt_n": 821, "prompt_tok_s": 9.224461645362616, "gen_n": 96, "gen_tok_s": 2.5016272426890733, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 127.0}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-cold/run.json
+=== 2 A/B round 1 2026-10-05T10:52:41+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 9.214029139012766, "gen_n": 62, "gen_tok_s": 3.171046948181818, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 24.9}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 9.04342047617963, "gen_n": 64, "gen_tok_s": 3.149956373104233, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 26.0}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 9.02726154488629, "gen_n": 69, "gen_tok_s": 3.200861445958091, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 26.4}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 9.088320296642774, "gen_n": 96, "gen_tok_s": 3.1927124959372732, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 35.0}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-warm-base-r1/run.json
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 9.10968108583194, "gen_n": 63, "gen_tok_s": 3.1112932165527827, "draft_n": 69, "draft_n_accepted": 40, "read_bytes": 0, "majflt": 0, "wall_s": 25.6}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 9.21257714680344, "gen_n": 67, "gen_tok_s": 2.248534006930527, "draft_n": 102, "draft_n_accepted": 33, "read_bytes": 0, "majflt": 0, "wall_s": 35.2}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 9.087414207895542, "gen_n": 67, "gen_tok_s": 2.393439885892391, "draft_n": 96, "draft_n_accepted": 35, "read_bytes": 0, "majflt": 0, "wall_s": 32.7}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 9.069895448669776, "gen_n": 96, "gen_tok_s": 4.247148643228248, "draft_n": 77, "draft_n_accepted": 69, "read_bytes": 0, "majflt": 0, "wall_s": 27.7}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-warm-mtp-r1/run.json
+=== 2 A/B round 2 2026-10-05T10:56:47+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 9.210789447907052, "gen_n": 62, "gen_tok_s": 3.1913558412510783, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 24.8}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 9.057152139525764, "gen_n": 64, "gen_tok_s": 3.1726835771372794, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 25.8}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 9.06403405081731, "gen_n": 69, "gen_tok_s": 3.1753553572867825, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 26.5}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 8.997515561015716, "gen_n": 96, "gen_tok_s": 3.1588108094771905, "draft_n": null, "draft_n_accepted": null, "read_bytes": 0, "majflt": 0, "wall_s": 35.4}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-warm-base-r2/run.json
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 9.18927773867426, "gen_n": 63, "gen_tok_s": 3.0994571300836657, "draft_n": 69, "draft_n_accepted": 40, "read_bytes": 0, "majflt": 0, "wall_s": 25.7}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 9.06286760207768, "gen_n": 67, "gen_tok_s": 2.2530830112590996, "draft_n": 102, "draft_n_accepted": 33, "read_bytes": 0, "majflt": 0, "wall_s": 35.3}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 9.053314575915191, "gen_n": 67, "gen_tok_s": 2.39035591349244, "draft_n": 96, "draft_n_accepted": 35, "read_bytes": 0, "majflt": 0, "wall_s": 32.7}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 9.00330421264604, "gen_n": 96, "gen_tok_s": 4.2507036368707105, "draft_n": 77, "draft_n_accepted": 69, "read_bytes": 0, "majflt": 0, "wall_s": 27.7}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-warm-mtp-r2/run.json
+=== 3 balloon 4 GiB 2026-10-05T11:00:53+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 1.552918984485354, "gen_n": 48, "gen_tok_s": 2.0673492232727044, "draft_n": null, "draft_n_accepted": null, "read_bytes": 1705742336, "majflt": 39631, "wall_s": 56.3}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 2.9868574951482922, "gen_n": 48, "gen_tok_s": 2.6252980760642695, "draft_n": null, "draft_n_accepted": null, "read_bytes": 697450496, "majflt": 15203, "wall_s": 36.0}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-balloon4/run.json
+=== 3 balloon 6 GiB 2026-10-05T11:03:37+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 0.808907603415687, "gen_n": 48, "gen_tok_s": 1.0109624683195013, "draft_n": null, "draft_n_accepted": null, "read_bytes": 5081653248, "majflt": 52928, "wall_s": 110.8}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 1.0940397685887082, "gen_n": 48, "gen_tok_s": 1.5497566008337755, "draft_n": null, "draft_n_accepted": null, "read_bytes": 3586990080, "majflt": 36044, "wall_s": 79.7}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-balloon6/run.json
+=== 3 balloon 8 GiB 2026-10-05T11:09:03+02:00
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 0.5110438743352548, "gen_n": 48, "gen_tok_s": 0.5451429893822848, "draft_n": null, "draft_n_accepted": null, "read_bytes": 10796273664, "majflt": 83210, "wall_s": 188.0}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 0.7323565740001429, "gen_n": 48, "gen_tok_s": 0.7935223320061306, "draft_n": null, "draft_n_accepted": null, "read_bytes": 7539400704, "majflt": 62216, "wall_s": 133.0}
+RUN_DONE /home/pi/pigemma/results/26b-q3km-balloon8/run.json
+=== SERIES_DONE 2026-10-05T11:17:17+02:00
+2148753408

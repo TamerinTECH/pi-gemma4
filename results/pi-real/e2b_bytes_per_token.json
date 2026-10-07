@@ -1,0 +1,11 @@
+{
+ "model": "google/gemma-4-E2B-it-qat-q4_0-gguf",
+ "by_kind_bytes": {
+  "other (norms, scales, small)": 16626828,
+  "per-layer embedding table (row lookup only)": 1954284544,
+  "token_embd = tied output head (read fully every token)": 330301440,
+  "attention matrices": 156598272,
+  "FFN matrices": 875888640
+ },
+ "touched_per_token_bytes": 1379415180
+}

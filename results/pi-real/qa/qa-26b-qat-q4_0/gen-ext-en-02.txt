@@ -1,0 +1,3 @@
+<|channel><start_of_turn>model
+<|channel>thought
+<channel|>6

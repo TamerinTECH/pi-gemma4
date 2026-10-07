@@ -1,0 +1,2 @@
+<|channel>thought
+<start_of_turn>16,00<end_of_turn>

@@ -1,0 +1,2 @@
+<|channel>_thought
+<channel|>A Mixture-of-Experts (MoE) transformer uses a router to send each token to only a small subset of available "experts," significantly reducing the number of parameters activated per token compared to dense models. This architecture shifts the performance bottleneck from computational arithmetic to memory bandwidth, as the speed of token generation depends heavily on how efficiently the system can load expert weights from storage. To optimize performance on hardware with limited bandwidth, developers must leverage expert popularity, semantic

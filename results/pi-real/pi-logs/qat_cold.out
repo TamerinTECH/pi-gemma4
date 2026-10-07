@@ -1,0 +1,6 @@
+{"id": "en_short", "prompt_n": 52, "prompt_tok_s": 0.9511581044999362, "gen_n": 60, "gen_tok_s": 2.3555286413119165, "draft_n": null, "draft_n_accepted": null, "read_bytes": 2422849536, "majflt": 4732, "wall_s": 79.7}
+{"id": "he_short", "prompt_n": 54, "prompt_tok_s": 5.119029765641338, "gen_n": 66, "gen_tok_s": 3.6779877581855462, "draft_n": null, "draft_n_accepted": null, "read_bytes": 325632000, "majflt": 1284, "wall_s": 28.2}
+{"id": "de_short", "prompt_n": 46, "prompt_tok_s": 9.334243219128867, "gen_n": 65, "gen_tok_s": 4.143291596575984, "draft_n": null, "draft_n_accepted": null, "read_bytes": 50331648, "majflt": 354, "wall_s": 20.4}
+{"id": "code_short", "prompt_n": 48, "prompt_tok_s": 4.630710932790151, "gen_n": 96, "gen_tok_s": 3.379108876346348, "draft_n": null, "draft_n_accepted": null, "read_bytes": 409190400, "majflt": 2245, "wall_s": 38.5}
+{"id": "long_summary", "prompt_n": 821, "prompt_tok_s": 10.204988511619206, "gen_n": 96, "gen_tok_s": 2.8122348081077497, "draft_n": null, "draft_n_accepted": null, "read_bytes": 273563648, "majflt": 5099, "wall_s": 114.3}
+RUN_DONE /home/pi/pigemma/results/26b-qat-q4_0-usb-cold/run.json

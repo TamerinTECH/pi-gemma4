@@ -1,0 +1,27 @@
+commit a7b94df
+-- GGML_SYSTEM_ARCH: ARM
+-- ARM detected
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E - Failed
+-- ARM detected flags: -mcpu=cortex-a76+crc+crypto
+-- Performing Test GGML_MACHINE_SUPPORTS_dotprod
+-- Performing Test GGML_MACHINE_SUPPORTS_dotprod - Success
+-- Performing Test GGML_MACHINE_SUPPORTS_i8mm
+-- Performing Test GGML_MACHINE_SUPPORTS_i8mm - Failed
+-- Performing Test GGML_MACHINE_SUPPORTS_noi8mm
+-- Performing Test GGML_MACHINE_SUPPORTS_noi8mm - Success
+-- Checking for ARM features using flags:
+--   -U__ARM_FEATURE_MATMUL_INT8
+--   -U__ARM_FEATURE_SVE
+--   -U__ARM_FEATURE_SME
+build_seconds=410
+llama-bench
+llama-cli
+llama-completion
+llama-perplexity
+llama-server
+version: 0.5.0-dev (build 1, commit a7b94df)
+built with GNU 14.2.0 for Linux aarch64
+355M	llama.cpp
+free_bytes=14745223168
+BUILD_DONE

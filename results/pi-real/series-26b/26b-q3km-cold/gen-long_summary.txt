@@ -1,0 +1,2 @@
+<|channel>thought
+<channel|>Mixture-of-experts (MoE) transformers improve efficiency by using a router to send each token to only a small subset of available "expert" networks rather than activating the entire model. This architecture shifts the performance bottleneck from computational operations to memory bandwidth, as the speed of token generation depends heavily on how often expert weights can be retrieved from a cache. Because expert selection is often predictable and skewed toward a few popular networks, MoE models can run effectively

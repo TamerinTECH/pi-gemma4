@@ -1,0 +1,156 @@
+{
+ "label": "26b-q3km-cold",
+ "started": "2026-10-05T10:46:15+0200",
+ "host": "context-friend-1",
+ "kernel": "6.18.50+rpt-rpi-2712",
+ "page_size": 16384,
+ "model": {
+  "path": "/home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+  "bytes": 12728497888,
+  "sha256_first_MiB": "c13f3b670eb7b8ad"
+ },
+ "threads": 4,
+ "ctx": 4096,
+ "n_predict": 96,
+ "extra": "",
+ "balloon_gib": 0.0,
+ "meminfo_start_kB": {
+  "MemTotal": 16607552,
+  "MemAvailable": 15810016,
+  "Cached": 13777472,
+  "SwapFree": 2097136
+ },
+ "throttled_start": "throttled=0x0",
+ "temp_start_c": 46.3,
+ "requests": [
+  {
+   "id": "en_short",
+   "lang": "en",
+   "wall_s": 24.2,
+   "prompt_n": 52,
+   "prompt_tok_s": 9.345421516251509,
+   "gen_n": 62,
+   "gen_tok_s": 3.270343129226215,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 12983328,
+    "Pss_Anon": 557360,
+    "Pss_File": 12422805,
+    "Swap": 0
+   },
+   "mem_available_kB": 15219792,
+   "temp_c": 58.95,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>A mixture-of-experts model only activates a small subset of its total parameters for each token processed. This sparse activation significantly reduces the number of floating-point operations required compared to"
+  },
+  {
+   "id": "he_short",
+   "lang": "he",
+   "wall_s": 25.4,
+   "prompt_n": 54,
+   "prompt_tok_s": 9.350608871823066,
+   "gen_n": 64,
+   "gen_tok_s": 3.2055974004742147,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13028656,
+    "Pss_Anon": 602688,
+    "Pss_File": 12422802,
+    "Swap": 0
+   },
+   "mem_available_kB": 15212848,
+   "temp_c": 63.35,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>היתרון המרכזי הוא מחיר נמוך וזול מאוד.\nהוא חסכוני מאוד בצריכת חשמל וגודלו קטן.\nהוא מושלם לפרויקטים של למידה ואוטומציה ביתית."
+  },
+  {
+   "id": "de_short",
+   "lang": "de",
+   "wall_s": 25.9,
+   "prompt_n": 46,
+   "prompt_tok_s": 9.277491172769675,
+   "gen_n": 69,
+   "gen_tok_s": 3.2561682121175237,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13064448,
+    "Pss_Anon": 638480,
+    "Pss_File": 12422801,
+    "Swap": 0
+   },
+   "mem_available_kB": 15190560,
+   "temp_c": 65.0,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>Ein Raspberry Pi ist aufgrund seines geringen Preises sehr kostengünstig für Schulen einzusetzen. Er bietet eine ideale Plattform, um Schülern spielerisch Programmieren und Informatik näherzubringen. Zudem ist da"
+  },
+  {
+   "id": "code_short",
+   "lang": "code",
+   "wall_s": 34.6,
+   "prompt_n": 48,
+   "prompt_tok_s": 9.074504517874411,
+   "gen_n": 96,
+   "gen_tok_s": 3.243146216427846,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13089584,
+    "Pss_Anon": 663616,
+    "Pss_File": 12422802,
+    "Swap": 0
+   },
+   "mem_available_kB": 15154480,
+   "temp_c": 66.1,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>```python\ndef is_prime(n):\n    if n < 2:\n        return False\n    if n == 2 or n == 3:\n        return True\n    if n % 2 == 0 or n % 3 == 0:\n        return False\n    i = 5\n    while i * i <= n:\n        if n % i =="
+  },
+  {
+   "id": "long_summary",
+   "lang": "en",
+   "wall_s": 127.0,
+   "prompt_n": 821,
+   "prompt_tok_s": 9.224461645362616,
+   "gen_n": 96,
+   "gen_tok_s": 2.5016272426890733,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13419792,
+    "Pss_Anon": 993824,
+    "Pss_File": 12422802,
+    "Swap": 0
+   },
+   "mem_available_kB": 14810640,
+   "temp_c": 71.6,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>Mixture-of-experts (MoE) transformers improve efficiency by using a router to send each token to only a small subset of available \"expert\" networks rather than activating the entire model. This architecture shift"
+  }
+ ],
+ "cold": true,
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+ "load_s": 148.1,
+ "load_read_bytes": 12728500224,
+ "load_majflt": 0,
+ "after_load_smaps_kB": {
+  "Rss": 12944416,
+  "Pss_Anon": 518576,
+  "Pss_File": 12422674,
+  "Swap": 0
+ },
+ "throttled_end": "throttled=0x0",
+ "temp_end_c": 66.1,
+ "finished": "2026-10-05T10:52:41+0200"
+}

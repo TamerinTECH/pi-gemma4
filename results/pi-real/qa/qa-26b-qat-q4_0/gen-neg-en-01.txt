@@ -1,0 +1,3 @@
+model
+<|channel>thought
+<channel|>carrot

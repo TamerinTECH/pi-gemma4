@@ -1,0 +1,3 @@
+<|channel>thought
+<thought
+<channel|>16

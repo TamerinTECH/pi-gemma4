@@ -1,0 +1,132 @@
+{
+ "label": "26b-q3km-warm-mtp-r2",
+ "started": "2026-10-05T10:58:44+0200",
+ "host": "context-friend-1",
+ "kernel": "6.18.50+rpt-rpi-2712",
+ "page_size": 16384,
+ "model": {
+  "path": "/home/pi/pigemma/models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf",
+  "bytes": 12728497888,
+  "sha256_first_MiB": "c13f3b670eb7b8ad"
+ },
+ "threads": 4,
+ "ctx": 4096,
+ "n_predict": 96,
+ "extra": "-md models/mtp-gemma-4-26B-A4B-it-Q4_0.gguf --spec-type draft-mtp",
+ "balloon_gib": 0.0,
+ "meminfo_start_kB": {
+  "MemTotal": 16607552,
+  "MemAvailable": 15799376,
+  "Cached": 13778048,
+  "SwapFree": 2097136
+ },
+ "throttled_start": "throttled=0x0",
+ "temp_start_c": 69.95,
+ "requests": [
+  {
+   "id": "en_short",
+   "lang": "en",
+   "wall_s": 25.7,
+   "prompt_n": 52,
+   "prompt_tok_s": 9.18927773867426,
+   "gen_n": 63,
+   "gen_tok_s": 3.0994571300836657,
+   "draft_n": 69,
+   "draft_n_accepted": 40,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13353408,
+    "Pss_Anon": 696176,
+    "Pss_File": 12654047,
+    "Swap": 0
+   },
+   "mem_available_kB": 15117360,
+   "temp_c": 73.25,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>A mixture-of-experts model only activates a small fraction of its total parameters for any given input. This selective activation significantly reduces the number of floating-point operations required per token. "
+  },
+  {
+   "id": "he_short",
+   "lang": "he",
+   "wall_s": 35.3,
+   "prompt_n": 54,
+   "prompt_tok_s": 9.06286760207768,
+   "gen_n": 67,
+   "gen_tok_s": 2.2530830112590996,
+   "draft_n": 102,
+   "draft_n_accepted": 33,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13389184,
+    "Pss_Anon": 731952,
+    "Pss_File": 12654047,
+    "Swap": 0
+   },
+   "mem_available_kB": 15078608,
+   "temp_c": 75.45,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>היתרון המרכזי הוא מחיר נמוך וזול מאוד.\nהוא צורך מעט מאוד חשמל ומתאים לפרויקטים קטנים.\nבנוסף, הוא חסון ונוח מאוד לשימוש בחיבורים שונים."
+  },
+  {
+   "id": "de_short",
+   "lang": "de",
+   "wall_s": 32.7,
+   "prompt_n": 46,
+   "prompt_tok_s": 9.053314575915191,
+   "gen_n": 67,
+   "gen_tok_s": 2.39035591349244,
+   "draft_n": 96,
+   "draft_n_accepted": 35,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13422800,
+    "Pss_Anon": 765568,
+    "Pss_File": 12654047,
+    "Swap": 0
+   },
+   "mem_available_kB": 15047376,
+   "temp_c": 74.9,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>Ein Raspberry Pi ist aufgrund seines sehr günstigen Preises besonders erschwinglich für Schulen. Er eignet sich hervorragend, um Schülern spielerisch die Grundlagen der Informatik und Programmierung beizubringen."
+  },
+  {
+   "id": "code_short",
+   "lang": "code",
+   "wall_s": 27.7,
+   "prompt_n": 48,
+   "prompt_tok_s": 9.00330421264604,
+   "gen_n": 96,
+   "gen_tok_s": 4.2507036368707105,
+   "draft_n": 77,
+   "draft_n_accepted": 69,
+   "read_bytes": 0,
+   "majflt": 0,
+   "smaps_kB": {
+    "Rss": 13456112,
+    "Pss_Anon": 798880,
+    "Pss_File": 12654047,
+    "Swap": 0
+   },
+   "mem_available_kB": 15024736,
+   "temp_c": 74.9,
+   "read_MB_per_request_token": 0.0,
+   "output_head": "<|channel>thought\n<channel|>```python\ndef is_prime(n):\n    if n < 2:\n        return False\n    if n == 2 or n == 3:\n        return True\n    if n % 2 == 0 or n % 3 == 0:\n        return False\n    i = 5\n    while i * i <= n:\n        if n % i =="
+  }
+ ],
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m models/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080 -md models/mtp-gemma-4-26B-A4B-it-Q4_0.gguf --spec-type draft-mtp",
+ "load_s": 7.1,
+ "load_read_bytes": 0,
+ "load_majflt": 0,
+ "after_load_smaps_kB": {
+  "Rss": 13288288,
+  "Pss_Anon": 631184,
+  "Pss_File": 12653919,
+  "Swap": 0
+ },
+ "throttled_end": "throttled=0x0",
+ "temp_end_c": 71.05,
+ "finished": "2026-10-05T11:00:53+0200"
+}

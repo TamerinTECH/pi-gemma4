@@ -1,0 +1,132 @@
+{
+ "label": "31b-iq3xxs-base",
+ "started": "2026-10-05T15:31:27+0200",
+ "host": "context-friend-1",
+ "kernel": "6.18.50+rpt-rpi-2712",
+ "page_size": 16384,
+ "model": {
+  "path": "/mnt/usb/pigemma/models/31b-iq3xxs/gemma-4-31B-it-UD-IQ3_XXS-00001-of-00004.gguf",
+  "bytes": 3492946560,
+  "sha256_first_MiB": "5f277ef379abe947"
+ },
+ "threads": 4,
+ "ctx": 4096,
+ "n_predict": 48,
+ "extra": "",
+ "balloon_gib": 0.0,
+ "meminfo_start_kB": {
+  "MemTotal": 16607552,
+  "MemAvailable": 15915856,
+  "Cached": 15293392,
+  "SwapFree": 1728128
+ },
+ "throttled_start": "throttled=0x0",
+ "temp_start_c": 46.85,
+ "requests": [
+  {
+   "id": "en_short",
+   "lang": "en",
+   "wall_s": 176.8,
+   "prompt_n": 52,
+   "prompt_tok_s": 0.6168874920236151,
+   "gen_n": 48,
+   "gen_tok_s": 0.5082685671210494,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 1671168,
+   "majflt": 85,
+   "smaps_kB": {
+    "Rss": 13311728,
+    "Pss_Anon": 1757664,
+    "Pss_File": 11552542,
+    "Swap": 10528
+   },
+   "mem_available_kB": 14192752,
+   "temp_c": 74.9,
+   "read_MB_per_request_token": 0.017,
+   "output_head": "<|channel>thought\n<channel|>A mixture-of-experts model only activates a small subset of its parameters for each token. This significantly reduces the number of floating-point operations required per forward pass. Consequently, it achieves t"
+  },
+  {
+   "id": "he_short",
+   "lang": "he",
+   "wall_s": 180.1,
+   "prompt_n": 54,
+   "prompt_tok_s": 0.6156138903424534,
+   "gen_n": 48,
+   "gen_tok_s": 0.5088884679430852,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 655360,
+   "majflt": 40,
+   "smaps_kB": {
+    "Rss": 13441344,
+    "Pss_Anon": 1887312,
+    "Pss_File": 11552510,
+    "Swap": 9888
+   },
+   "mem_available_kB": 14064688,
+   "temp_c": 75.45,
+   "read_MB_per_request_token": 0.006,
+   "output_head": "<|channel>thought\n<channel|>הוא זול מאוד וצורך מעט אנרגיה.\nהוא קטן וקל להטמעה בפרויקטים של אלקטרוניקה.\nהוא מאפשר לל"
+  },
+  {
+   "id": "de_short",
+   "lang": "de",
+   "wall_s": 167.3,
+   "prompt_n": 46,
+   "prompt_tok_s": 0.6154266702265085,
+   "gen_n": 48,
+   "gen_tok_s": 0.5081579625244315,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 950272,
+   "majflt": 58,
+   "smaps_kB": {
+    "Rss": 13564832,
+    "Pss_Anon": 2010800,
+    "Pss_File": 11552510,
+    "Swap": 8960
+   },
+   "mem_available_kB": 13941024,
+   "temp_c": 77.1,
+   "read_MB_per_request_token": 0.01,
+   "output_head": "<|channel>thought\n<channel|>Ein Raspberry Pi ist kostengünstig und bietet einen einfachen Einstieg in die Welt der Informatik. Er ermöglicht Schülern das praktische Erlernen von Programmierung und Hardware-Steuerung. Durch seine Flexibilitä"
+  },
+  {
+   "id": "code_short",
+   "lang": "code",
+   "wall_s": 170.4,
+   "prompt_n": 48,
+   "prompt_tok_s": 0.6169311906953203,
+   "gen_n": 48,
+   "gen_tok_s": 0.5076495880239975,
+   "draft_n": null,
+   "draft_n_accepted": null,
+   "read_bytes": 442368,
+   "majflt": 27,
+   "smaps_kB": {
+    "Rss": 13682384,
+    "Pss_Anon": 2128352,
+    "Pss_File": 11552510,
+    "Swap": 8528
+   },
+   "mem_available_kB": 13823520,
+   "temp_c": 77.1,
+   "read_MB_per_request_token": 0.005,
+   "output_head": "<|channel>thought\n<channel|>```python\ndef is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n"
+  }
+ ],
+ "command": "nice -n 10 /home/pi/pigemma/llama.cpp/build/bin/llama-server -m /mnt/usb/pigemma/models/31b-iq3xxs/gemma-4-31B-it-UD-IQ3_XXS-00001-of-00004.gguf -nr -t 4 -c 4096 -np 1 --host 127.0.0.1 --port 18080",
+ "load_s": 135.1,
+ "load_read_bytes": 13576779264,
+ "load_majflt": 1444,
+ "after_load_smaps_kB": {
+  "Rss": 13227760,
+  "Pss_Anon": 1674160,
+  "Pss_File": 11552078,
+  "Swap": 11792
+ },
+ "throttled_end": "throttled=0x0",
+ "temp_end_c": 73.25,
+ "finished": "2026-10-05T15:45:17+0200"
+}

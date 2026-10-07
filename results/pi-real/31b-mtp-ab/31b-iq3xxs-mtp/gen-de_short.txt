@@ -1,0 +1,2 @@
+<|channel>thought
+<channel|>Ein Raspberry Pi ist kostengünstig und bietet einen einfachen Einstieg in die Welt der Informatik. Er ermöglicht Schülern das praktische Erlernen von Programmierung und Hardware-Steuerung. Durch seine Flexibilität lassen
