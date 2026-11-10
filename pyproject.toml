@@ -20,9 +20,8 @@
 #   only and we never pip-install gguf; Debian 13 ships python3-numpy 2.2.x, Windows has 2.3.3.
 # - Stdlib-only modules (pigemma.feasibility) must keep working on a stock Pi Python 3.13 with
 #   none of the dependencies installed; pigemma/__init__.py therefore imports nothing heavy.
-# - readme = README.md (added once README.md existed); no license field: the licence is the operator's
-#   decision.
-#   The "Private :: Do Not Upload" classifier makes PyPI reject an accidental upload.
+# - readme = README.md. licence = MIT (LICENSE). Upstream checkouts are not part of
+#   this package and keep their own licences.
 
 [build-system]
 requires = ["setuptools>=64"]
@@ -33,11 +32,12 @@ name = "pigemma"
 dynamic = ["version"]
 description = "Measure whether Gemma 4 26B-A4B / 31B can run on a Raspberry Pi 5 (CPU only): expert-routing traces, cache simulation, feasibility verdicts, H2 residual-streaming oracle."
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.12"
 authors = [{ name = "TamerinTECH" }]
 keywords = ["gemma", "llama.cpp", "raspberry-pi", "moe", "gguf", "benchmark"]
 classifiers = [
-    "Private :: Do Not Upload",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",

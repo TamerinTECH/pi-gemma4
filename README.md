@@ -1,6 +1,6 @@
 # pi-gemma4: can a full Gemma 4 run on a Raspberry Pi 5?
 
-Private repository of TamerinTECH. CPU only: no GPU, no NPU, no cloud.
+Public repository of TamerinTECH, under the MIT licence in [LICENSE](LICENSE). CPU only: no GPU, no NPU, no cloud.
 
 This page is the human guide: install, then one of the three run paths. The tables
 from [The answer so far](#the-answer-so-far) downward are the measurement record.
@@ -15,7 +15,7 @@ A fresh checkout can run the unit tests with no model and no compiler.
 **Desktop (Windows, PowerShell):**
 
 ```powershell
-git clone git@github.com:TamerinTECH/pi-gemma4.git
+git clone https://github.com/TamerinTECH/pi-gemma4.git
 cd pi-gemma4
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -27,7 +27,7 @@ python -m venv .venv
 Read [Safety](#safety) before any heavy command.
 
 ```bash
-git clone git@github.com:TamerinTECH/pi-gemma4.git ~/pigemma
+git clone https://github.com/TamerinTECH/pi-gemma4.git ~/pigemma
 cd ~/pigemma
 python3 -m pip install --user -r requirements.txt
 python3 -m pytest
@@ -36,8 +36,7 @@ python3 -m pytest
 On Debian 13 the same libraries are apt packages, named in
 [requirements.txt](requirements.txt): `python3-numpy`, `python3-psutil`,
 `python3-yaml`, `python3-pytest`. Use a virtual environment if you do not want
-`--user`. The machine that clones must already be allowed to read this private
-repository. Do not put a token in the clone URL.
+`--user`. Clone over HTTPS. Do not put a token in the clone URL.
 
 ### What to run
 
@@ -57,8 +56,8 @@ files and their checksums are listed in [pi/fast/README.md](pi/fast/README.md).
 Tokens, `.env` files, `models/`, `*.gguf`, `third_party/` checkouts, build trees,
 and `*.bin` / `*.dll` / `*.exe`. `tests/test_no_secrets.py` scans tracked files
 for token shapes. Remote:
-[github.com/TamerinTECH/pi-gemma4](https://github.com/TamerinTECH/pi-gemma4)
-(private), branch `fast-profile`.
+[github.com/TamerinTECH/pi-gemma4](https://github.com/TamerinTECH/pi-gemma4),
+branch `main`.
 
 **Status 2026-10-05.** llama.cpp is pinned at commit a7b94df (build b11398) on every host. Everything
 runs on CPUs: no GPU, no NPU, no cloud, no hidden big machine.
@@ -442,6 +441,7 @@ On the desktop: one model-loading job at a time (the bench lock), Docker caches 
 
 ## Documents
 
+- [LICENSE](LICENSE): MIT licence for this repository. Upstream checkouts keep their own licences.
 - [AGENTS.md](AGENTS.md): install, safety, and what an agent must not commit.
 - [CLAUDE.md](CLAUDE.md): the session handover. Its top is generated from
   [docs/cf-engine/STATUS.md](docs/cf-engine/STATUS.md).

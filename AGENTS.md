@@ -7,15 +7,16 @@ Its top is generated: edit `docs/cf-engine/STATUS.md`, then run
 "Historical decision brief" downward. Append a progress-log line there when you
 finish a step.
 
-The private remote is https://github.com/TamerinTECH/pi-gemma4 on branch
-`fast-profile`. Commits and pushes only when the operator asks.
+The public repository is https://github.com/TamerinTECH/pi-gemma4 on branch
+`main`. This repository is MIT ([LICENSE](LICENSE)). Upstream checkouts keep
+their own licences. Commits and pushes only when the operator asks.
 
 ## Install
 
 Desktop, from an empty directory. Python 3.12 or newer.
 
 ```powershell
-git clone git@github.com:TamerinTECH/pi-gemma4.git
+git clone https://github.com/TamerinTECH/pi-gemma4.git
 cd pi-gemma4
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt

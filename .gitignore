@@ -40,7 +40,7 @@ models/_split_tmp/
 results/cf-engine/*.tar.gz
 third_party/kleidiai-v1.24.0/
 
-# --- private GitHub remote (2026-11-10) ---
+# --- GitHub (public, 2026-11-10) ---
 # Tokens stay in the environment, or in HF_TOKEN_FILE outside this repo.
 .env
 .env.*
