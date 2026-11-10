@@ -39,3 +39,48 @@ results/cf-engine/own-baseline.tar.gz
 models/_split_tmp/
 results/cf-engine/*.tar.gz
 third_party/kleidiai-v1.24.0/
+
+# --- private GitHub remote (2026-11-10) ---
+# Tokens stay in the environment, or in HF_TOKEN_FILE outside this repo.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_ed25519
+credentials.json
+**/service-account*.json
+
+# Local locks and scratch logs
+llama.log
+results/.cpu.lock
+results/.cpu.lock.*
+
+# Third-party checkouts and their build trees. Clone them; do not commit them.
+# The pin, the URLs and the licences are in AGENTS.md.
+third_party/
+
+# Binaries and packed measurement dumps (GitHub rejects files over 100 MB).
+# tests/fixtures/golden_26b_72tok.moetrace.tokens.bin is already tracked; this
+# only stops new files of these types.
+*.exe
+*.dll
+*.so
+*.a
+*.o
+*.obj
+*.bin
+*.gguf
+*.tar
+*.tar.gz
+*.7z
+*.zip
+*.ext4
+results/**/*.csv
+
+# Editor and OS junk
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

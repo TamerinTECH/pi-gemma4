@@ -272,7 +272,9 @@ def grid(feas) -> dict:
 
 
 def _all_docs() -> list[Path]:
-    return [README] + sorted(p for p in DOCS_DIR.rglob("*.md") if p.is_file())
+    agents = REPO_ROOT / "AGENTS.md"
+    docs = sorted(p for p in DOCS_DIR.rglob("*.md") if p.is_file())
+    return [README, agents] + docs
 
 
 # ------------------------------------------------------------------------------------------ tests

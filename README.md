@@ -1,5 +1,65 @@
 # pi-gemma4: can a full Gemma 4 run on a Raspberry Pi 5?
 
+Private repository of TamerinTECH. CPU only: no GPU, no NPU, no cloud.
+
+This page is the human guide: install, then one of the three run paths. The tables
+from [The answer so far](#the-answer-so-far) downward are the measurement record.
+They are checked by `tests/test_docs.py`. Agents start at [AGENTS.md](AGENTS.md),
+then [CLAUDE.md](CLAUDE.md).
+
+## Install
+
+You need Git and Python 3.12 or newer. Model files and llama.cpp are not in git.
+A fresh checkout can run the unit tests with no model and no compiler.
+
+**Desktop (Windows, PowerShell):**
+
+```powershell
+git clone git@github.com:TamerinTECH/pi-gemma4.git
+cd pi-gemma4
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m pigemma.paths info
+```
+
+**Raspberry Pi** (Debian, `python3`). The board `context-friend-1` is protected.
+Read [Safety](#safety) before any heavy command.
+
+```bash
+git clone git@github.com:TamerinTECH/pi-gemma4.git ~/pigemma
+cd ~/pigemma
+python3 -m pip install --user -r requirements.txt
+python3 -m pytest
+```
+
+On Debian 13 the same libraries are apt packages, named in
+[requirements.txt](requirements.txt): `python3-numpy`, `python3-psutil`,
+`python3-yaml`, `python3-pytest`. Use a virtual environment if you do not want
+`--user`. The machine that clones must already be allowed to read this private
+repository. Do not put a token in the clone URL.
+
+### What to run
+
+| Goal | Where to go |
+|---|---|
+| Check the code | The `pytest` command above. No model, no llama.cpp |
+| Original measurement harness | [Quick start: desktop](#quick-start-desktop-today), then [Quick start: Raspberry Pi](#quick-start-raspberry-pi-5-pi00-to-pi06) |
+| Fast profile, the current speed work | [pi/fast/README.md](pi/fast/README.md). Apply the patch to a separate llama.cpp checkout. Do not commit that checkout |
+| The decision in one page | [docs/fast/DECISION_2026-10-06.md](docs/fast/DECISION_2026-10-06.md), section 8 |
+
+When a run needs weights, `python -m pigemma.paths model 26b-q4 --require` prints
+the download command. Files go in `models/`, which git ignores. The fast-profile
+files and their checksums are listed in [pi/fast/README.md](pi/fast/README.md).
+
+### Keep out of git
+
+Tokens, `.env` files, `models/`, `*.gguf`, `third_party/` checkouts, build trees,
+and `*.bin` / `*.dll` / `*.exe`. `tests/test_no_secrets.py` scans tracked files
+for token shapes. Remote:
+[github.com/TamerinTECH/pi-gemma4](https://github.com/TamerinTECH/pi-gemma4)
+(private), branch `fast-profile`.
+
 **Status 2026-10-05.** llama.cpp is pinned at commit a7b94df (build b11398) on every host. Everything
 runs on CPUs: no GPU, no NPU, no cloud, no hidden big machine.
 
@@ -38,8 +98,11 @@ Most desktop experiments (E0 to E6 and the full E7) have not run yet. Their thre
 - No GPU, NPU or cloud inference. AI HATs were evaluated and rejected (see [Hardware options](#hardware-options)).
 - No training, fine-tuning, distillation or new quantisation method. Only published GGUF files are used:
   Google's QAT Q4_0 files and unsloth's lower-bit quants.
-- No patched llama.cpp. Everything runs on stock a7b94df. The custom native code is three small tools
-  (a routing/activation probe, an mlock pinner and a memory-bandwidth benchmark).
+- No patched llama.cpp in the original harness. `pc/` and `pi/00` to `pi/06` run on stock a7b94df.
+  The custom native code there is three small tools (a routing/activation probe, an mlock pinner and a
+  memory-bandwidth benchmark). The fast profile in [pi/fast/](pi/fast/) (2026-10-06) is a separate patched
+  copy of the same commit. It stays off unless its environment variables are set. See
+  [pi/fast/README.md](pi/fast/README.md).
 - No speed claim without a measurement. Projections are labelled as projections.
 - Not a chat product. The Pi scripts can run a chat or a server, but the deliverable is the measurement.
 
@@ -265,8 +328,9 @@ Requirements: Windows with Python ≥ 3.12, numpy, psutil and pyyaml (`requireme
 Bash, Docker Desktop with the `pi-gemma4-build:latest` image ([docker/Dockerfile.build](docker/Dockerfile.build)),
 the llama.cpp a7b94df Windows binaries in `third_party/llama.cpp-win/`, and the models in `models/`
 (gitignored; `python -m pigemma.paths model 26b-q4 --require` prints the download command if one is
-missing). There is no install step: everything runs as `python -m pigemma.<module>` from the repository
-root, and pytest finds the package through `pythonpath` in [pyproject.toml](pyproject.toml).
+missing). Install the Python libraries first ([Install](#install)). After that, everything runs as
+`python -m pigemma.<module>` from the repository root, and pytest finds the package through
+`pythonpath` in [pyproject.toml](pyproject.toml).
 
 ```powershell
 python -m pytest                                    # unit tests: synthetic GGUFs and traces, no models needed
@@ -373,11 +437,14 @@ On the desktop: one model-loading job at a time (the bench lock), Docker caches 
 | [traces/](traces/) | Routing traces and H2 activations; the large binaries are gitignored, `map31.json` and `*.stats.json` are tracked |
 | [tests/](tests/) | pytest. `pytest` needs no models; `pytest -m integration` needs the models, Docker or native binaries ([fixtures](tests/fixtures/README.md)) |
 | [docker/](docker/) | `Dockerfile.build` (Ubuntu 24.04 toolchain) and `Dockerfile.pi-emu` (Debian 13 arm64 under qemu) |
-| `third_party/` | llama.cpp at a7b94df: sources, the Linux x86 build, and the official Windows CPU binaries |
+| `third_party/` | Not in git. Local checkouts of llama.cpp and the comparison engines. Pins and licences: [AGENTS.md](AGENTS.md) |
 | `models/` | The GGUF files (gitignored) |
 
 ## Documents
 
+- [AGENTS.md](AGENTS.md): install, safety, and what an agent must not commit.
+- [CLAUDE.md](CLAUDE.md): the session handover. Its top is generated from
+  [docs/cf-engine/STATUS.md](docs/cf-engine/STATUS.md).
 - [docs/HYPOTHESES.md](docs/HYPOTHESES.md): H1 and H2 as falsifiable statements, the byte arithmetic,
   the Pi 5 budgets and every pre-registered threshold.
 - [docs/EXPERIMENT_PLAN.md](docs/EXPERIMENT_PLAN.md): E0 to E8, with procedures, commands, controls,
