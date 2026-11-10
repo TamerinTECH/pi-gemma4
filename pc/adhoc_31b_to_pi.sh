@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 # Desktop -> Pi: unsloth 31B UD-IQ3_XXS (download, sha256) + split copy to the USB stick + 31B MTP drafter.
 set -euo pipefail
-cd REPO_ROOT
-export HF_TOKEN="$(sed -n 's/^HUGGING_FACE_TOKEN=//p' HF_TOKEN_FILE | tr -d '\r\n')"
+cd "$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+if [ -z "${HF_TOKEN:-}" ] && [ -n "${HUGGING_FACE_TOKEN:-}" ]; then
+  export HF_TOKEN="$HUGGING_FACE_TOKEN"
+fi
+if [ -z "${HF_TOKEN:-}" ]; then
+  echo "Set HF_TOKEN or HUGGING_FACE_TOKEN. The value is never printed." >&2
+  exit 1
+fi
 python - <<'PY'
 import os, hashlib
 from huggingface_hub import hf_hub_download
@@ -23,6 +29,6 @@ rm -f "$src"   # D: is tight; re-download in ~3 min if the desktop needs it (sha
 df -h /d | tail -1
 bash pc/adhoc_copy_split_to_pi.sh "$src" /mnt/usb/pigemma/models/31b-iq3xxs 3500M
 PI="-o BatchMode=yes -o ConnectTimeout=30 -o HostKeyAlias=context-friend-1"
-scp -q $PI models/unsloth__gemma-4-31B-it-qat-GGUF/MTP/mtp-gemma-4-31B-it-Q4_0.gguf pi@PI_HOST:/mnt/usb/pigemma/models/31b-iq3xxs/mtp-gemma-4-31B-it-Q4_0.gguf
-ssh $PI pi@PI_HOST "stat -c %s /mnt/usb/pigemma/models/31b-iq3xxs/mtp-gemma-4-31B-it-Q4_0.gguf"
+scp -q $PI models/unsloth__gemma-4-31B-it-qat-GGUF/MTP/mtp-gemma-4-31B-it-Q4_0.gguf ${PI_HOST:?Set PI_HOST=user@host}:/mnt/usb/pigemma/models/31b-iq3xxs/mtp-gemma-4-31B-it-Q4_0.gguf
+ssh $PI ${PI_HOST:?Set PI_HOST=user@host} "stat -c %s /mnt/usb/pigemma/models/31b-iq3xxs/mtp-gemma-4-31B-it-Q4_0.gguf"
 echo ALL_31B_DONE

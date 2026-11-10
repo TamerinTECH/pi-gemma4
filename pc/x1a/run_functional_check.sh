@@ -4,8 +4,8 @@
 # The model is read from the Docker volume pigemma-models (mounted READ-ONLY; byte-identical copy of
 # models/unsloth__gemma-4-26B-A4B-it-GGUF/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf, sha256 checked in the run).
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1a-upstream-llama-recent (wf_02d183f6-341)"
 OUT_REL="results/comparisons/x1a/functional"
 RUN_ID="${1:-run1}"

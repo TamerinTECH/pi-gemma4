@@ -5,7 +5,7 @@
 #
 # Usage (from anywhere; run long downloads detached on the Wi-Fi Pi: --bg, or nohup ... &):
 #     pi/04_fetch_model.sh [--model 26b|31b|ID] [--quant auto|Q4_0|UD-Q3_K_M|...|ID] [--draft]
-#                          [--dest $MODEL_DIR] [--from-desktop user@host:REPO_ROOT/models]
+#                          [--dest $MODEL_DIR] [--from-desktop user@host:/path/to/pi-gemma4/models]
 #                          [--dry-run] [more options: --help] [-- extra pigemma.feasibility args]
 #
 # SELECTION
@@ -352,7 +352,7 @@ Usage: pi/04_fetch_model.sh [options] [-- extra pigemma.feasibility args]
   --draft                   also fetch the family's speculative-decoding sidecar (-md for llama.cpp)
   --draft-type mtp|dflash   which sidecar (default mtp; dflash exists for the 26B only)
   --dest DIR                target directory (default MODEL_DIR='$MODEL_DIR'; with --facts: its model_dir)
-  --from-desktop SRC        rsync from SRC (user@host:REPO_ROOT/models or a mounted dir)
+  --from-desktop SRC        rsync from SRC (user@host:/path/to/pi-gemma4/models or a mounted dir)
                             instead of Hugging Face; tries SRC/<repo with / -> __>/<file>, then SRC/<file>
   --ssh-opts "OPTS"         ssh options for --from-desktop (default: $FM_SSH_OPTS_DEFAULT)
   --facts FILE              use this facts.json instead of collecting fresh facts (planning, tests)
@@ -383,7 +383,7 @@ Examples:
   pi/04_fetch_model.sh --dry-run                     # what would be fetched, how big, how long
   PIGEMMA_I_KNOW=1 pi/04_fetch_model.sh --model 26b --bg
   pi/04_fetch_model.sh --quant UD-Q3_K_M --draft     # explicit 3-bit 26B + its MTP sidecar
-  pi/04_fetch_model.sh --model 26b --from-desktop user@desktop:REPO_ROOT/models
+  pi/04_fetch_model.sh --model 26b --from-desktop user@desktop:/path/to/pi-gemma4/models
 EOF
 }
 

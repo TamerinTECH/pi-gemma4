@@ -41,7 +41,7 @@ results/cf-engine/*.tar.gz
 third_party/kleidiai-v1.24.0/
 
 # --- GitHub (public, 2026-11-10) ---
-# Tokens stay in the environment, or in HF_TOKEN_FILE outside this repo.
+# Tokens stay in the environment (HF_TOKEN or HUGGING_FACE_TOKEN), or in a file you pass and do not commit.
 .env
 .env.*
 !.env.example

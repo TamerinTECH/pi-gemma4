@@ -6,7 +6,7 @@ verbatim in `results/cf-engine/CLAUDE.before.md`.
 
 ## Repository (2026-11-10)
 
-Public GitHub repository: https://github.com/TamerinTECH/pi-gemma4 branch `main`. MIT licence (`LICENSE`).
+Developed by TamerinTECH GmbH. Public GitHub repository: https://github.com/TamerinTECH/pi-gemma4 branch `main`. MIT licence (`LICENSE`).
 Humans install from `README.md`. Agents read `AGENTS.md`, then this handover.
 Never commit secrets, `models/`, `third_party/` checkouts, or build binaries.
 `tests/test_no_secrets.py` scans tracked files for token shapes.
@@ -251,7 +251,7 @@ first token), several users at once and copy-heavy output.
   Never overwrite a script on the Pi while it is running (bash reads it incrementally; a build died that way).
 - Ports 18190/18191 on the Pi belong to another local service. The 26B at this board's memory limit pushes
   memory into swap; do not run it more often than needed.
-- Models for desktop tests: `a local models directory outside this repository\` (E2B, E4B, drafters, drafters with cluster tensors);
+- Models for desktop tests: `a local models directory outside this repository` (E2B, E4B, drafters, drafters with cluster tensors);
   Docker volumes `pigemma-fastcheck-build6` (x86 build of patch v7 + E2B) and `pigemma-upstream-51ce9c1`
   (master, three builds). The scratch clone of llama.cpp master with the three worktrees was in the session
   scratchpad of 2026-10-06 and can be recreated with `pi/fast/upstream/port_to_master.py`.
@@ -449,7 +449,7 @@ conflict; a summary is appended to `INSTRUCTIONS_2026-10-05_decision.md`). Three
 `context-friend-1` (PI_HOST) dropped off the network between 23:36 and 23:46 while X2's quality
 diagnostic was running (our own a7b94df build, resident, 71.6 °C, MemAvailable 15.4 GB, all four ContextFriend
 services active at 23:35). Since then no ARP/ping/SSH answer (retried until 00:51 and again at 03:25); the name
-still resolves to a stale address and the current one; OTHER_LAN_HOST is a DIFFERENT Raspberry Pi (other host key) — never touch it.
+still resolves to a stale address as well as the current one; the other address is a DIFFERENT Raspberry Pi (other host key) — never touch it.
 Cause unknown (Wi-Fi driver drop under sustained load is documented on this board; a hang or power issue is
 also possible). **State of the ContextFriend services is unknown.** Nothing can be done remotely.
 - the operator: please check the board (power LED / network; a power-cycle is your call). Tell the agent when it is back.
@@ -499,14 +499,14 @@ Stages that were interrupted mid-way left work on disk — **continue from it, d
   downloads `ionice -c3`, keep **>= 2 GB free on `/`**, never edit `/boot/firmware/config.txt`, never reboot,
   no `/etc/fstab` edits. mlock only for bounded experiments (balloon/pinner, self-expiring).
 - Never prune Docker caches/images/volumes you did not create (they belong to other projects).
-- Never print the HF token (`HF_TOKEN_FILE`, key `HUGGING_FACE_TOKEN`; repos are ungated anyway).
+- Never print the HF token (environment variables `HF_TOKEN` or `HUGGING_FACE_TOKEN`; it is not stored in this repository; the Gemma files used here are ungated).
 - Report MEASURED vs PROJECTED vs ASSUMED separately; never claim speed-ups from runs on a loaded desktop.
 
 ## Access & environment cheat-sheet
 
 | What | How |
 |---|---|
-| Real Pi | `ssh -o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1 pi@PI_HOST` (the name also resolves to a a stale address; Wi-Fi only, drops packets under load — use `nohup` for anything > 1 min) |
+| Real Pi | `ssh -o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1 "$PI_HOST"` (set `PI_HOST=user@host` outside this repository; the name also resolves to a stale address; Wi-Fi only, drops packets under load — use `nohup` for anything > 1 min) |
 | Pi work dir | `~/pigemma` (llama.cpp build in `~/pigemma/llama.cpp/build/bin`, models in `~/pigemma/models`, results in `~/pigemma/results`, ad-hoc tools `*.sh *.py`) |
 | Pi USB stick | `/dev/sda1` FAT32 (4 GB file limit → split GGUFs), mounted by hand at `/mnt/usb` (NOT persistent): `sudo mount -o rw,uid=1000,gid=1000,umask=022,noatime /dev/sda1 /mnt/usb` |
 | Desktop llama.cpp | Windows prebuilt b11398 in `third_party/llama.cpp-win/` (use for timing); Linux build in `third_party/llama.cpp/build-linux-x86/bin` (Docker) |
@@ -648,3 +648,4 @@ read / 57 MB/s write, Active Cooler, kernel `cgroup_disable=memory` (no memory c
 - 2026-10-07 07:00-09:15 — Claude, brief 3 closed: UPSTREAM-STYLE PATCHES MEASURED ON THE PI on llama.cpp master 51ce9c1 (pi/fast/upstream/): layer skip 62.7 -> 171.4 tok/s prompt processing, KV state identical, logits 137/140 bit-identical; padded tail rewritten twice after measurement (every thread preparing its own padded block loses half of the gain; final version: one thread prepares it in the operation's work buffer, no shared state): 2/3/6/7 rows per pass 10.9/13.2/24.8/24.6 -> 13.6/20.0/27.5/31.3 tok/s, bit-identical on x86 at 1/3/6 threads, largest logit difference 5.7e-6 on the Pi. Report, upstream notes, checksums and handover final; branch fast-profile, nothing pushed. Nothing running; Pi healthy, 0.7 GB in swap since the 26B screen.
 - 2026-11-10 — private GitHub repo TamerinTECH/pi-gemma4, branch fast-profile. Human install and run steps: README.md. Agent guide: AGENTS.md. Secrets, models, third_party checkouts and binaries stay untracked. Local result dumps that were never committed stay local.
 - 2026-11-10 — MIT licence in LICENSE. Branch fast-profile renamed to main. Repository TamerinTECH/pi-gemma4 is public. Upstream checkouts keep their own licences.
+- 2026-11-10 — public tree: home addresses, personal paths, and the token-file path removed. Developed by TamerinTECH GmbH. Earlier commits still contain the old text. One calibration prompt lost a personal name, so that file is no longer byte-identical to the October traces.

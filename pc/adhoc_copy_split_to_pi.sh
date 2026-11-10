@@ -4,9 +4,9 @@
 # llama.cpp loads split GGUFs natively: pass the first part (-00001-of-0000N.gguf) to -m.
 set -euo pipefail
 src=$1; rdir=$2; max=${3:-3500M}
-cd REPO_ROOT
+cd "$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
 PI="-o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=30 -o HostKeyAlias=context-friend-1"
-HOST=pi@PI_HOST
+HOST=${PI_HOST:?Set PI_HOST=user@host}
 stem=$(basename "$src" .gguf)
 tmp=models/_split_tmp/$stem; mkdir -p "$tmp"
 if ls "$tmp"/*-00001-of-*.gguf >/dev/null 2>&1; then echo "[$(date +%T)] reusing existing split parts in $tmp"; else

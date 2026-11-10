@@ -1,5 +1,5 @@
 # pigemma runtime + test requirements. Mirrors [project].dependencies in pyproject.toml plus pytest.
-# Install into a venv if you need to (never into the global interpreter on the operator's desktop):
+# Install into a venv if you need to (never into a global interpreter):
 #   python -m pip install -r requirements.txt
 # On the Pi (Debian 13, Python 3.13) the apt equivalents are:
 #   python3-numpy python3-psutil python3-yaml python3-pytest

@@ -3,8 +3,8 @@
 # a7b94df in the pi-gemma4-build container, at -j 4, under results/.cpu.lock. Source trees are mounted
 # read-only; build trees live on the Docker volumes pigemma-x1a-build-<rev> (created by this script).
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1a-upstream-llama-recent (wf_02d183f6-341)"
 LOG="$REPO/results/comparisons/x1a/build_both.log"
 export MSYS_NO_PATHCONV=1

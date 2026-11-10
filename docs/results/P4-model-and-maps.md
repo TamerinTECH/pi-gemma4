@@ -107,7 +107,7 @@ Memory left for expert pages (page cache or pinned) after the 2.40 GB non-expert
 ## Reproduce
 
 ```bash
-bash pc/adhoc_fetch_26b_ud_q3km.sh                 # download + full sha256 (token from HF_TOKEN_FILE, never printed)
+bash pc/adhoc_fetch_26b_ud_q3km.sh                 # download + full sha256 (token from the HF_TOKEN environment variable, never printed)
 bash pc/adhoc_copy_26b_q3km_to_volume.sh           # docker volume pigemma-models + sha256 inside the VM
 python -m pigemma.expert_map build models/unsloth__gemma-4-26B-A4B-it-GGUF/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf --embed-base-map --page-sizes 4096,16384 --provenance results/maps/provenance_ud_q3_k_m.json --out results/maps/map26_ud_q3_k_m.json
 python -m pigemma.expert_map pages --map results/maps/map26_ud_q3_k_m.json --experts 0:0,0:1,0:2 --page-size 16384

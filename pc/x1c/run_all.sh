@@ -11,7 +11,7 @@
 #
 # Steps 2-4 are skipped when E1 shows that the ik build cannot run the exact GGUF.
 set -u
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
 OWNER="X1c-ik-llama-x86-engine (wf_02d183f6-341)"
 X="$REPO/results/comparisons/x1c"
 LOG="$X/run_all.log"

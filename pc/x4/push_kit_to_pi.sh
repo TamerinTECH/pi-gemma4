@@ -4,7 +4,7 @@
 # Usage (Git Bash on the desktop): pc/x4/push_kit_to_pi.sh
 set -euo pipefail
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
-PI="pi@PI_HOST"
+PI="${PI_HOST:?Set PI_HOST=user@host}"
 SSHO="-o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1"
 # shellcheck disable=SC2086
 ssh $SSHO "$PI" 'set -e; mkdir -p ~/pigemma/x4 /dev/shm/pigemma-x4-bin; uptime;
@@ -27,7 +27,7 @@ fi
 ssh $SSHO "$PI" 'chmod +x ~/pigemma/x4/x4_run_pi.sh; ls -la ~/pigemma/x4; python3 -m py_compile ~/pigemma/x4/x4_compare.py && echo DRIVER_OK; bash -n ~/pigemma/x4/x4_run_pi.sh && echo RUNNER_OK'
 cat <<'MSG'
 Kit is on the Pi. Start everything (about 1.5-2 h, resident runs only, Pi bench lock held for the whole time):
-  ssh -o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1 pi@PI_HOST \
+  ssh -o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1 ${PI_HOST:?Set PI_HOST=user@host} \
     'nohup bash ~/pigemma/x4/x4_run_pi.sh all > /dev/shm/x4_all.out 2>&1 < /dev/null & echo started'
 Poll:   ssh ... 'tail -5 /dev/shm/x4_all.out'      (ends with "X4_ALL_DONE rc=0 results=<dir>")
 Fetch:  pc/x4/fetch_results_from_pi.sh

@@ -16,7 +16,7 @@
 # becomes (repo path derived from this script's location, `pwd -W` on Git Bash):
 #
 #   MSYS_NO_PATHCONV=1 docker run --rm -i [-t] --init \
-#       -v "REPO_ROOT:/work" -w /work \
+#       -v "/path/to/pi-gemma4:/work" -w /work \
 #       --memory=6g --memory-swap=6g --cpus=6 -v pigemma-models:/models:ro \
 #       -e PIGEMMA_IN_CONTAINER=1 -e PYTHONUTF8=1 ... \
 #       pi-gemma4-build:latest /bin/sh -c '<python shim>; exec "$@"' pigemma-run CMD...

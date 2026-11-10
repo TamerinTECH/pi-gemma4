@@ -1,5 +1,7 @@
 # pi-gemma4: can a full Gemma 4 run on a Raspberry Pi 5?
 
+Developed by TamerinTECH GmbH.
+
 Public repository of TamerinTECH, under the MIT licence in [LICENSE](LICENSE). CPU only: no GPU, no NPU, no cloud.
 
 This page is the human guide: install, then one of the three run paths. The tables
@@ -62,7 +64,7 @@ branch `main`.
 **Status 2026-10-05.** llama.cpp is pinned at commit a7b94df (build b11398) on every host. Everything
 runs on CPUs: no GPU, no NPU, no cloud, no hidden big machine.
 
-the operator (TamerinTECH) asked whether a *full* Gemma 4 large model can be downloaded and run on a Raspberry
+TamerinTECH asked whether a *full* Gemma 4 large model can be downloaded and run on a Raspberry
 Pi 5 "with good speed and quality". This repository is the measurement harness built to answer that.
 **The question is the project; a "yes" is not assumed anywhere.** Every number in this repository
 carries one of three labels:
@@ -229,7 +231,7 @@ and the Pi-only status table is [docs/PI_RUNBOOK.md, section 13](docs/PI_RUNBOOK
 
 ## Hardware options
 
-the operator's note: "for the pi, we can consider other setups: more RAM, NVMe drives, AI HAT, etc." The table
+Note from the brief: "for the pi, we can consider other setups: more RAM, NVMe drives, AI HAT, etc." The table
 gives the **PROJECTED** tok/s and verdict of `pigemma.feasibility` for each Pi 5 configuration, using the
 **ASSUMED** catalog constants (10.0 GB/s × 0.65; storage speeds as listed; the prior LRU hit curve for
 expert streaming). 26B means the 26B-A4B QAT Q4_0 file (14.44 GB), 31B the dense QAT Q4_0 file

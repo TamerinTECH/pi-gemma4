@@ -6,8 +6,8 @@
 #           warm-up - emulation speed is not representative and a warm-up would touch every expert)
 # Nothing runs on the real Pi. Holds results/.cpu.lock; step 2 also holds results/.bench.lock.
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1b-hotpin (wf_02d183f6-341)"
 HPOUT="hotpin-llm-build-a6647b1"
 LOG="$REPO/results/comparisons/x1b/aarch64_check.log"

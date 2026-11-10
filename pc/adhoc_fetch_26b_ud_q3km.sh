@@ -2,10 +2,16 @@
 # P4: download the primary MoE comparison file (the exact file used on the Pi) to the desktop and verify it.
 # unsloth/gemma-4-26B-A4B-it-GGUF @ c099eb48e663fd284577b04978a94ffccb261841, gemma-4-26B-A4B-it-UD-Q3_K_M.gguf
 # expected 12,728,497,888 bytes, sha256 811882f6df81c8ea204a5d382f196d6bd601245091786912d4c70df41cdfa052.
-# The HF token is read from HF_TOKEN_FILE and never printed. Re-running is safe (skips a verified file).
+# The HF token is read from the HF_TOKEN environment variable and never printed. Re-running is safe (skips a verified file).
 set -euo pipefail
-cd REPO_ROOT
-export HF_TOKEN="$(sed -n 's/^HUGGING_FACE_TOKEN=//p' HF_TOKEN_FILE | tr -d '\r\n')"
+cd "$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+if [ -z "${HF_TOKEN:-}" ] && [ -n "${HUGGING_FACE_TOKEN:-}" ]; then
+  export HF_TOKEN="$HUGGING_FACE_TOKEN"
+fi
+if [ -z "${HF_TOKEN:-}" ]; then
+  echo "Set HF_TOKEN or HUGGING_FACE_TOKEN. The value is never printed." >&2
+  exit 1
+fi
 export HF_XET_CHUNK_CACHE_SIZE_BYTES=0   # no xet chunk cache on C:
 echo "[$(date +%T)] free space before download:"; df -h /c /d | tail -2
 python - <<'PY'

@@ -86,9 +86,9 @@ Design decisions (the manifest left these open; listed again in the agent report
 * catalog-refresh queries the ``main`` revision and records ``info.sha`` as ``revision``; it
   rewrites catalog.json with a formatter that reproduces the hand-written layout byte for byte
   (2-space indent, short scalar lists inline), so a refresh produces a minimal diff. HF token:
-  env HF_TOKEN / HUGGING_FACE_TOKEN, else ``--token-file`` / env PIGEMMA_HF_TOKEN_FILE, else
-  ``HF_TOKEN_FILE`` if it exists (key HUGGING_FACE_TOKEN or
-  HF_TOKEN); the token is never printed. The listed repos are ungated, so anonymous works too.
+  env HF_TOKEN / HUGGING_FACE_TOKEN, else ``--token-file`` / env PIGEMMA_HF_TOKEN_FILE.
+  There is no default token path. The token is never printed. The listed repos are
+  ungated, so anonymous access works too.
 
 Public API: build_map, read_gguf_header, GgufHeader, TensorRecord, ArraySummary, GgufMap,
 load_map, classify_tensor, aligned, merge_ranges, kv_bytes_for, plan_hotset, write_hotset,
@@ -134,7 +134,7 @@ RANGES_FIRST_LINE_PREFIX = "# pigemma-ranges v1 "
 KV_REFERENCE_CTX = 4096
 CATALOG_INLINE_MAX = 100
 GENERATOR = f"pigemma.gguf_map/{__version__}"
-DEFAULT_HF_TOKEN_FILES: tuple[str, ...] = ("HF_TOKEN_FILE",)
+DEFAULT_HF_TOKEN_FILES: tuple[str, ...] = ()
 
 KINDS: tuple[str, ...] = (
     "token_embd", "output", "attn", "ffn_dense", "norm", "router", "expert_scale", "expert", "other",

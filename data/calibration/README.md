@@ -6,7 +6,7 @@ scripts (Hebrew vs English), and code.
 
 | File | Content | Origin |
 |---|---|---|
-| `he_discussion_llm_efficiency.txt` | Long Hebrew technical discussion about efficient LLM inference (the discussion this experiment started from) | TamerinTECH / conversation notes, 2026-10 |
+| `he_discussion_llm_efficiency.txt` | Long Hebrew technical discussion about efficient LLM inference (the discussion this experiment started from) | conversation notes, 2026-10 |
 | `en_tech_moe_streaming.txt` | English technical explainer: MoE routing, expert caching, Raspberry Pi byte budgets | written for this repo |
 | `en_narrative_bakery.txt` | English narrative prose (a small-town bakery morning) | written for this repo |
 | `code_cpp_llamacpp_eval_callback.cpp` | C++ source | llama.cpp `examples/eval-callback/eval-callback.cpp` (MIT) |

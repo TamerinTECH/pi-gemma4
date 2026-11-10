@@ -2,8 +2,8 @@
 # X1b host wrapper (Git Bash): LOCALLY ADAPTED HotPin routing dump (stride fix) - build the extra binary,
 # then profile data/workloads/calibration.jsonl with it (tag "stridefix"). Not HotPin's original procedure.
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1b-hotpin (wf_02d183f6-341)"
 HPOUT="hotpin-llm-build-a6647b1"
 LOG="$REPO/results/comparisons/x1b/stridefix_build.log"

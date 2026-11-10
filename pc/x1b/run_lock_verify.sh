@@ -3,8 +3,8 @@
 #   run_lock_verify.sh <run id> <cases json (repo-relative)> [memlock ulimit, default -1:-1] [ipc_lock yes|no]
 # Holds results/.cpu.lock and results/.bench.lock. Functional check, not a benchmark.
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1b-hotpin (wf_02d183f6-341)"
 RUN_ID="${1:?run id}"; CASES="${2:?cases json}"; MEMLOCK="${3:--1:-1}"; IPC="${4:-yes}"
 OUT_REL="results/comparisons/x1b/lock_verify/$RUN_ID"

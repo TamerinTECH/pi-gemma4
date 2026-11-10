@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # X1c host wrapper (Git Bash): evidence build of the instrumented ik_llama.cpp server (-j 4, CPU lock).
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1c-ik-llama-x86-engine (wf_02d183f6-341)"
 SHA="3d27f5bb6348c4d79edded63b03e9a93efb2f80e"
 VOL="pigemma-x1c-ik-3d27f5b"

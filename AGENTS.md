@@ -7,9 +7,10 @@ Its top is generated: edit `docs/cf-engine/STATUS.md`, then run
 "Historical decision brief" downward. Append a progress-log line there when you
 finish a step.
 
-The public repository is https://github.com/TamerinTECH/pi-gemma4 on branch
-`main`. This repository is MIT ([LICENSE](LICENSE)). Upstream checkouts keep
-their own licences. Commits and pushes only when the operator asks.
+Developed by TamerinTECH GmbH. The public repository is
+https://github.com/TamerinTECH/pi-gemma4 on branch `main`. This repository is
+MIT ([LICENSE](LICENSE)). Upstream checkouts keep their own licences. Commits
+and pushes only when asked.
 
 ## Install
 
@@ -60,16 +61,18 @@ version is section 8 of the decision doc.
 
 ## Safety
 
-`context-friend-1` (`pi@PI_HOST`) runs production services. Never stop,
-restart, or kill `contextfriend-box`, `contextfriend-gpu-tunnel`, `hailort`, or
-`whisper-bench@base`. Never kill a process you did not start.
+The measured board is `context-friend-1`. It runs production services. Never
+stop, restart, or kill `contextfriend-box`, `contextfriend-gpu-tunnel`,
+`hailort`, or `whisper-bench@base`. Never kill a process you did not start.
+
+Do not commit that board's address, a home directory, or a token. Scripts that
+need SSH read `PI_HOST`. Set `PI_HOST=user@host` outside this repository. The
+hostname can also resolve to a different machine. Do not use that one. The
+host-key alias below is what selects the measured board.
 
 ```text
-ssh -o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1 pi@PI_HOST
+ssh -o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1 "$PI_HOST"
 ```
-
-`OTHER_LAN_HOST` is a different Pi. Do not use it. The hostname also resolves
-to a stale address; the host-key alias above is the right board.
 
 On that Pi:
 
@@ -91,9 +94,10 @@ images, volumes, or caches you did not create. Background builds use at most
 `-j 4`. A CPU-heavy job writes `results/.cpu.lock` and removes it when finished.
 
 The Hugging Face token is not in this repository. The Gemma files used here are
-ungated. If a script needs `HF_TOKEN` or `HUGGING_FACE_TOKEN`, take it from the
-environment. `pc/adhoc_fetch_26b_ud_q3km.sh` and `pc/adhoc_31b_to_pi.sh` read it
-from a file outside this repo. Never print the value, and never commit it.
+ungated. Scripts that need a token read `HF_TOKEN` or `HUGGING_FACE_TOKEN` from
+the environment, or a file passed with `--token-file`. `pc/adhoc_fetch_26b_ud_q3km.sh`
+and `pc/adhoc_31b_to_pi.sh` exit if that variable is unset. Never print the
+value, and never commit it.
 
 ## What must not be committed
 

@@ -15,8 +15,8 @@
 # The model is read from the Docker volume pigemma-models (read-only; same sha256 as
 # models/unsloth__gemma-4-26B-A4B-it-GGUF/gemma-4-26B-A4B-it-UD-Q3_K_M.gguf on D:).
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1c-ik-llama-x86-engine (wf_02d183f6-341)"
 RUN_ID="${1:?run id}"; ENGINES_REL="${2:?engines json}"
 OUT_REL="results/comparisons/x1c/$RUN_ID"

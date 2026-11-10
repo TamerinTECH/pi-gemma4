@@ -6,8 +6,8 @@
 #   hotpin source : copy of the parent + `git apply` of third_party/hotpin-llm/patches/{hotpin_l1_pin,dump_routing_prefetch}.diff
 #                   on volume pigemma-x1b-hotpin-a6647b1 (/hp/src, /hp/build) - AGPL-3.0 combined work
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1b-hotpin (wf_02d183f6-341)"
 LOG="$REPO/results/comparisons/x1b/build.log"
 PARENT="llama.cpp-a6647b1"

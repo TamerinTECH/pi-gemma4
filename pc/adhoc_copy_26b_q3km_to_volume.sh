@@ -2,10 +2,12 @@
 # P4: copy the verified 26B UD-Q3_K_M GGUF into Docker volume pigemma-models (ext4 on the Docker VM's /dev/sdc 8:32)
 # and verify sha256 inside the VM. Heavy I/O window is logged so concurrent timing runs can be cross-checked.
 set -euo pipefail
-cd REPO_ROOT
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
+cd "$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
 echo "[$(date '+%F %T')] HEAVY_IO_START copy to volume; free space:"; df -h /c /d /f | tail -3
 docker volume inspect pigemma-models --format '{{.Name}} {{.Mountpoint}} {{.Labels}}'
-MSYS_NO_PATHCONV=1 docker run --rm -v pigemma-models:/models -v "REPO_ROOT/models:/src:ro" \
+MSYS_NO_PATHCONV=1 docker run --rm -v pigemma-models:/models -v "$REPO_W/models:/src:ro" \
   pi-gemma4-build:latest bash -c '
 set -euo pipefail
 d=/models/unsloth__gemma-4-26B-A4B-it-GGUF; f=gemma-4-26B-A4B-it-UD-Q3_K_M.gguf

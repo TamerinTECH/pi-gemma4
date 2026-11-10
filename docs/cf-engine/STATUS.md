@@ -6,7 +6,7 @@ verbatim in `results/cf-engine/CLAUDE.before.md`.
 
 ## Repository (2026-11-10)
 
-Public GitHub repository: https://github.com/TamerinTECH/pi-gemma4 branch `main`. MIT licence (`LICENSE`).
+Developed by TamerinTECH GmbH. Public GitHub repository: https://github.com/TamerinTECH/pi-gemma4 branch `main`. MIT licence (`LICENSE`).
 Humans install from `README.md`. Agents read `AGENTS.md`, then this handover.
 Never commit secrets, `models/`, `third_party/` checkouts, or build binaries.
 `tests/test_no_secrets.py` scans tracked files for token shapes.
@@ -251,7 +251,7 @@ first token), several users at once and copy-heavy output.
   Never overwrite a script on the Pi while it is running (bash reads it incrementally; a build died that way).
 - Ports 18190/18191 on the Pi belong to another local service. The 26B at this board's memory limit pushes
   memory into swap; do not run it more often than needed.
-- Models for desktop tests: `a local models directory outside this repository\` (E2B, E4B, drafters, drafters with cluster tensors);
+- Models for desktop tests: `a local models directory outside this repository` (E2B, E4B, drafters, drafters with cluster tensors);
   Docker volumes `pigemma-fastcheck-build6` (x86 build of patch v7 + E2B) and `pigemma-upstream-51ce9c1`
   (master, three builds). The scratch clone of llama.cpp master with the three worktrees was in the session
   scratchpad of 2026-10-06 and can be recreated with `pi/fast/upstream/port_to_master.py`.

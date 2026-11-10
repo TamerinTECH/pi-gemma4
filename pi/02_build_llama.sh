@@ -6,7 +6,7 @@
 #
 # ------------------------------------------------------------------------------------------------ usage
 #   pi/02_build_llama.sh [--commit a7b94df] [--jobs N] [--with-tools]
-#                        [--from-desktop user@host:REPO_ROOT/third_party/llama.cpp]
+#                        [--from-desktop user@host:/path/to/pi-gemma4/third_party/llama.cpp]
 #                        [--arch auto|native|pi5|generic] [--targets a,b,...] [--repo-url URL]
 #                        [--tools-build-dir DIR] [--rebuild] [--clean-objects] [--min-free-gb 3]
 #                        [--min-mem-gb 1.5] [--ignore-lock] [--configure-only] [--dry-run] [--verbose]

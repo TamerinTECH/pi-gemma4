@@ -3,8 +3,8 @@
 #   run_routing_dump.sh <tag> <llama-simple-chat path inside the container> [extra driver args]
 # Holds results/.cpu.lock (CPU-heavy) and results/.bench.lock (model-loading job). 4 threads, cpuset 2,4,6,8.
 set -u
-REPO_W="REPO_ROOT"
-REPO="REPO_ROOT"
+REPO="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+REPO_W="$(cd "$REPO" && (pwd -W 2>/dev/null || pwd))"
 OWNER="X1b-hotpin (wf_02d183f6-341)"
 TAG="${1:?tag}"; EXE="${2:?exe}"; shift 2
 OUT_REL="results/comparisons/x1b/routing"

@@ -7,7 +7,7 @@
 # REFUSES (exit 4) until the operator enables the memory controller (append `cgroup_enable=memory
 # cgroup_memory=1 psi=1` to /boot/firmware/cmdline.txt and reboot once - his decision, never done by
 # this script). The refusal path is the only path verified on the Pi (read-only check):
-#   ssh ... pi@PI_HOST 'bash -s -- --check' < pi/cgroup_cell.sh
+#   ssh ... ${PI_HOST:?Set PI_HOST=user@host} 'bash -s -- --check' < pi/cgroup_cell.sh
 #
 # Usage (once enabled):
 #   pi/cgroup_cell.sh --check                      readiness report (JSON), exit 0 ready / 4 refused

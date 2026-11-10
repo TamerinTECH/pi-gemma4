@@ -2,7 +2,7 @@
 # X4: copy the Pi-side results back and run the analysis. Usage: pc/x4/fetch_results_from_pi.sh
 set -euo pipefail
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
-PI="pi@PI_HOST"
+PI="${PI_HOST:?Set PI_HOST=user@host}"
 SSHO="-o BatchMode=yes -o ConnectTimeout=20 -o HostKeyAlias=context-friend-1"
 DST="$REPO/results/pi-real/x4-resident-bottleneck/pi"
 mkdir -p "$DST"
